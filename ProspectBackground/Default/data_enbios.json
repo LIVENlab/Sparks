@@ -1,0 +1,236 @@
+{
+    "bw_project": "Seeds_exp4",
+    "activities": {
+        "wind_onshore__electricity___DEU": {
+            "id": {
+                "code": "81174ec2c20931c1a36f65c654bbd11e"
+            }
+        },
+        "heat_storage_big__heat___ESP": {
+            "id": {
+                "code": "07db2c419abe9cffeb033aa0bed7f0ba"
+            }
+        },
+        "chp_wte_back_pressure__electricity___ESP": {
+            "id": {
+                "code": "fd6356e68720aec505c69cdadb3046fc"
+            }
+        },
+        "pumped_hydro__electricity___ESP": {
+            "id": {
+                "code": "309ff1f1194f2b5ea34d8c077103b1e3"
+            }
+        },
+        "open_field_pv__electricity___ESP": {
+            "id": {
+                "code": "206c2e2c30f45d47ea2e9a3701f8ecc5"
+            }
+        },
+        "methane_storage__methane___ESP": {
+            "id": {
+                "code": "da586847dea594ccd75188627f456d03"
+            }
+        },
+        "biofuel_boiler__heat___ESP": {
+            "id": {
+                "code": "413bc4617794c6e8b07038dbeca64adb"
+            }
+        },
+        "biofuel_supply__biofuel___ESP": {
+            "id": {
+                "code": "f1cc5e0b69dcd3bdb2c6a4d393521a65"
+            }
+        },
+        "biofuel_to_methanol__methanol___ESP": {
+            "id": {
+                "code": "df54a237474430370bb580c2451d405d"
+            }
+        },
+        "hydro_run_of_river__electricity___ESP": {
+            "id": {
+                "code": "b870e3d3ddd5b634d016940064b27532"
+            }
+        },
+        "battery__electricity___ESP": {
+            "id": {
+                "code": "a2634d3b6d27046ccb1d0af9c0384c64"
+            }
+        },
+        "hydro_reservoir__electricity___ESP": {
+            "id": {
+                "code": "c868c4688fbf78f5ca3787ac3d83312b"
+            }
+        },
+        "waste_supply__waste___ESP": {
+            "id": {
+                "code": "fd6356e68720aec505c69cdadb3046fc"
+            }
+        },
+        "heat_storage_small__heat___ESP": {
+            "id": {
+                "code": "14e0227e764a4a098e5fd34525ccaf3f"
+            }
+        },
+        "methane_boiler__heat___ESP": {
+            "id": {
+                "code": "a3039e0a35ed472774d6ed66262c67f3"
+            }
+        },
+        "roof_mounted_pv__electricity___ESP": {
+            "id": {
+                "code": "1d7a3591e7a3d033a25e0eaf699bb50b"
+            }
+        },
+        "wind_onshore__electricity___ESP": {
+            "id": {
+                "code": "81174ec2c20931c1a36f65c654bbd11e"
+            }
+        },
+        "wind_offshore__electricity___ESP": {
+            "id": {
+                "code": "46839adbc3cf15621ddbbe687eaa6df1"
+            }
+        },
+        "chp_biofuel_extraction__electricity___ESP": {
+            "id": {
+                "code": "1952fb157a18463b0028629917057bcf"
+            }
+        }
+    },
+    "hierarchy": {
+        "Energysystem": {
+            "Generation": {
+                "Electricity_generation": [
+                    "wind_onshore__electricity___DEU",
+                    "wind_onshore__electricity___ESP",
+                    "wind_offshore__electricity___ESP",
+                    "hydro_run_of_river__electricity___ESP",
+                    "hydro_reservoir__electricity___ESP",
+                    "chp_biofuel_extraction__electricity___ESP",
+                    "open_field_pv__electricity___ESP",
+                    "roof_mounted_pv__electricity___ESP",
+                    "chp_wte_back_pressure__electricity___ESP",
+                    "waste_supply__waste___ESP"
+                ],
+                "Thermal_generation": [
+                    "biofuel_supply__biofuel___ESP",
+                    "biofuel_boiler__heat___ESP",
+                    "methane_boiler__heat___ESP"
+                ]
+            },
+            "Storage": {
+                "Electricity_storage": [
+                    "battery__electricity___ESP",
+                    "pumped_hydro__electricity___ESP"
+                ],
+                "Thermal_storage": [
+                    "heat_storage_big__heat___ESP",
+                    "heat_storage_small__heat___ESP",
+                    "methane_storage__methane___ESP"
+                ]
+            },
+            "Conversions": {
+                "Conversions": [
+                    "biofuel_to_methanol__methanol___ESP"
+                ]
+            },
+            "Imports": {
+                "Imports": []
+            }
+        }
+    },
+    "methods": {
+        "agricultural land occupation (LOP)": [
+            "ReCiPe 2016 v1.03, midpoint (H)",
+            "land use",
+            "agricultural land occupation (LOP)"
+        ],
+        "surplus ore potential (SOP)": [
+            "ReCiPe 2016 v1.03, midpoint (H)",
+            "material resources: metals/minerals",
+            "surplus ore potential (SOP)"
+        ]
+    },
+    "scenarios": {
+        "1": {
+            "activities": {
+                "battery__electricity___ESP": [
+                    "kilogram",
+                    177116763.27286738
+                ],
+                "biofuel_boiler__heat___ESP": [
+                    "megajoule",
+                    60993170.586876236
+                ],
+                "biofuel_supply__biofuel___ESP": [
+                    "kilogram",
+                    11116318862.344933
+                ],
+                "biofuel_to_methanol__methanol___ESP": [
+                    "kilogram",
+                    3406779443.3349853
+                ],
+                "chp_biofuel_extraction__electricity___ESP": [
+                    "kilowatt hour",
+                    19141044.2579453
+                ],
+                "chp_wte_back_pressure__electricity___ESP": [
+                    "kilowatt hour",
+                    1446099614.233801
+                ],
+                "heat_storage_big__heat___ESP": [
+                    "unit",
+                    25900054.83567452
+                ],
+                "heat_storage_small__heat___ESP": [
+                    "unit",
+                    779282437.8375512
+                ],
+                "hydro_reservoir__electricity___ESP": [
+                    "kilowatt hour",
+                    32642094027.013477
+                ],
+                "hydro_run_of_river__electricity___ESP": [
+                    "kilowatt hour",
+                    462875457.37951
+                ],
+                "methane_boiler__heat___ESP": [
+                    "megajoule",
+                    19226703.97107468
+                ],
+                "methane_storage__methane___ESP": [
+                    "unit",
+                    15592.031124376686
+                ],
+                "open_field_pv__electricity___ESP": [
+                    "kilowatt hour",
+                    702627886974.9557
+                ],
+                "pumped_hydro__electricity___ESP": [
+                    "kilowatt hour",
+                    15328072022.828697
+                ],
+                "roof_mounted_pv__electricity___ESP": [
+                    "kilowatt hour",
+                    673614.4662161
+                ],
+                "waste_supply__waste___ESP": [
+                    "kilowatt hour",
+                    6643100589.042727
+                ],
+                "wind_offshore__electricity___ESP": [
+                    "kilowatt hour",
+                    5305450.6299441
+                ],
+                "wind_onshore__electricity___DEU": [
+                    "kilowatt hour",
+                    527085174157.3209
+                ],
+                "wind_onshore__electricity___ESP": [
+                    "kilowatt hour",
+                    1007224736896.1727
+                ]
+            }
+        }
+    }
+}

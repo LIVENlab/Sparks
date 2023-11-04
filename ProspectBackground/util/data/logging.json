@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "disable_existing_loggers": false,
+  "formatters": {
+    "raw": {
+      "format": "%(message)s"
+    },
+    "simple": {
+      "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    }
+  },
+  "handlers": {
+    "console": {
+      "class": "logging.StreamHandler",
+      "level": "DEBUG",
+      "formatter": "simple",
+      "stream": "ext://sys.stdout"
+    }
+  },
+  "loggers": {
+    "enbios2.generic": {
+      "level": "DEBUG",
+      "handlers": [
+        "console"
+      ],
+      "propagate": false
+    },
+    "enbios2.generic.tree": {
+      "level": "DEBUG",
+      "handlers": [
+        "console"
+      ],
+      "propagate": false
+    },
+    "enbios2.base": {
+      "level": "DEBUG",
+      "handlers": [
+        "console"
+      ],
+      "propagate": false
+    },
+    "enbios2.ecoinvent": {
+      "level": "DEBUG",
+      "handlers": [
+        "console"
+      ],
+      "propagate": false
+    }
+  },
+  "root": {
+    "level": "INFO",
+    "handlers": [
+      "console"
+    ]
+  }
+}
