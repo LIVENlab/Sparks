@@ -15,13 +15,17 @@ from dataclasses import dataclass
 from ProspectBackground.util.preprocess.template_market_4_electricity import Market_for_electricity
 from ProspectBackground.util.updater.background_updater import Updater
 import time
+import pprint
 
 @dataclass
 class Prospect():
 
-    def __init__(self, caliope : Union[str, pd.DataFrame], mother_file: [str], project : [str], database):
-        """
+    __scenarios=[]
+    __Softlink=None
+    __exec_time={}
 
+    def __init__(self, caliope : Union[str, pd.DataFrame], mother_file: [str], project : [str], database : [str]):
+        """
         @param caliope: path to the caliope data (flow_out_sum.csv)
         @type caliope: either str path or pd.Dataframe
         @param mother_file: path to the mother file
@@ -36,14 +40,13 @@ class Prospect():
         self.calliope=caliope
         self.mother=mother_file
         self.techs=[]
+
         self.scenarios=[]
-        self.preprocessed=None
+
         self.preprocessed_starter=None
         self.template_electricity_market = None
-        self.SoftLink=None
-        self.input=None
+
         self.database=database
-        self.template_code=None
         self.exp=None
 
         #Check project and db
@@ -55,8 +58,8 @@ class Prospect():
             start = time.time()
             func(*args,**kwargs)
             end = time.time()
-            print(f'function {func.__name__} executed in {end - start} seconds')
-
+            total=end-start
+            Prospect.__exec_time[func.__name__]=total
         return wrapper
 
 
@@ -115,52 +118,47 @@ class Prospect():
         cleaner=Cleaner(self.calliope,self.mother,subregions)
         self.preprocessed_starter=cleaner.preprocess_data()
         self.preprocessed_units=cleaner.adapt_units()
+        self.locations=cleaner.locations
         self.exluded_techs_and_regions=cleaner.techs_region_not_included
 
 
-       # preprocessed_units=unit_adapter(self.preprocessed_starter, self.mother)
-        #self.preprocessed = preprocessed_units
-        #self.techs = preprocessed_units['techs'].unique().tolist() #give some info
-        #self.scenarios = preprocessed_units['scenarios'].unique().tolist()
 
-
-
-    def data_for_ENBIOS(self, path_save=None,smaller_vers=None):
+    @timer
+    def data_for_ENBIOS(self,path_save=None,smaller_vers=None):
         """
         Transform the data into enbios like dictionary
         """
         # Create an instance of the SoftLInkCalEnb
-        self.SoftLink=SoftLinkCalEnb(self.preprocessed_units,self.mother,smaller_vers)
-        self.SoftLink.run(path_save)
-        self.enbios2_data = self.SoftLink.enbios2_data
+        self.__Softlink=SoftLinkCalEnb(self.preprocessed_units,self.mother,smaller_vers)
+        self.__Softlink.run(path_save)
+        self.enbios2_data = self.__Softlink.enbios2_data
         self.save_json_data(self.enbios2_data, path_save)
 
 
-
-    def template_electricity(self, final_key,Location='Undefined',Reference_product=None,
-        Activity_name='Future_market_for_electricity', Activity_code='FM4E'
-        ,Units=None):
+    @timer
+    def template_electricity(self, final_key, Units):
         """
         This function creates the template activity for the market for electricity using the data of enbios.
         It gets all the activities with _electicity_ in the alias
-
-        @param final_key: Key of the enbios dictionary opening the electricity activities
-        @type final_key:  str
-        @param Location:
-        @param Activity_name: Save the market under this name in SQL database
-        @param Activity_code: "
-        @param Reference_product:
-        @type Reference_product:
-        @param Units: units of the activity
         """
-        market_class=Market_for_electricity(self.enbios2_data)
-        self.electricity_activities = market_class.get_list(final_key)
-        self.default_market = market_class.template_market_4_electricity(Location,
-                                                   Activity_name,
-                                                   Activity_code,
-                                                   Reference_product,
-                                                   Units)
-        self.template_code=Activity_code
+        # Create an instance of the class
+
+
+        market_class=Market_for_electricity(self.enbios2_data,final_key,regions=self.locations, units=Units)
+        temp=market_class.build_templates()
+        self.default_market=temp
+        # DO SOME TEST HERE
+        updater = Updater(self.enbios2_data, self.default_market)
+        updater.update_results('1')
+        self.default_market=updater.template # Update the dictionary with the new info from Updater
+        pass
+        #for reg in self.locations:
+
+
+        #self.electricity_activities = market_class.get_elec_acts()  # run get list to
+
+        #self.default_market = market_class.template_market_4_electricity(Location,Activity_name,Activity_code,Reference_product,Units)
+        #self.template_code=Activity_code
 
 
     def classic_run(self):
@@ -207,7 +205,6 @@ class Prospect():
             template=updater.inventoryModify(scenario)
             self.template_electricity_market=template # update the table
             updater.exchange_updater(self.template_code)
-
             exp.run_scenario(scenario)
 
 
@@ -237,7 +234,9 @@ class Prospect():
             print(f'Data for enbios saved in {file_path}')
             self.path_saved=file_path
 
-
+    @classmethod
+    def get_execution_times(cls):
+        return cls.__exec_time
 
 
 
