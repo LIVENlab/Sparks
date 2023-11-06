@@ -4,8 +4,9 @@ import bw2data as bd
 import pandas as pd
 from bw2data.errors import UnknownObject
 from ProspectBackground.const.const import bw_project,bw_db
+from ProspectBackground.const.caliope_ecoinvent_regions import ecoinvent_caliope_regions
 from .activity_creator import InventoryFromExcel
-from collections import defaultdict
+import warnings
 from typing import Dict,Union
 getLogger("peewee").setLevel("ERROR")
 bd.projects.set_current(bw_project)            # Select your project
@@ -151,27 +152,40 @@ class Market_for_electricity():
         return df
 
     def get_market_ecoinvent(self,region):
-        search='market for electricity, high voltage'
+        ecoinvent_region=self.get_location_key(region)
         code=None
         for act in ei:
-            if 'market for electricity, high voltage' in act['name'] and 'aluminium industry' not in str(act['name']) and act['location'] == region:
+            if 'market for electricity, high voltage' in act['name'] and 'aluminium industry' not in str(act['name']) and act['location'] == ecoinvent_region:
                 code=act['code']
-        if code is None:
-            raise Warning(f'Region {region} has no market')
+                if code is None:
+                    message=f'''The defined calliope region {region} has no market for electricity in the database
+                        \n This market for electricity won't be used'''
+                    warnings.warn(message,Warning)
         return code
 
+    @staticmethod
+    def get_location_key(key):
+        """
+        pass the calliope location and return the econvent location
+        """
+        ecoinvent_location=ecoinvent_caliope_regions[key]
+        return ecoinvent_location
 
     def build_templates(self)-> Dict[str,Union[pd.DataFrame,str]]:
         templates={}
         for region in self.regions:
             activities=self.get_elec_acts(region)
-            # Modify the activity code
-            Location=region
-            Activity_name='Future_market_for_electricity'+'_'+region
-            Activity_code = 'FM4E' +'_'+ region
-            Reference_product = f'Future electricity production in {region}, {self.units}'
-            template=self.template_market_4_electricity(Location,Activity_name,Activity_code,Reference_product,self.units)
-            old_code=self.get_market_ecoinvent(region)
-            templates[region]=[template,Activity_code]
+            old_code = self.get_market_ecoinvent(region)
+            if old_code is None:
+                continue
+            else:
+                # Modify the activity code
+                Location=region
+                Activity_name='Future_market_for_electricity'+'_'+region
+                Activity_code = 'FM4E' +'_'+ region
+                Reference_product = f'Future electricity production in {region}, {self.units}'
+                template=self.template_market_4_electricity(Location,Activity_name,Activity_code,Reference_product,self.units)
+
+                templates[region]=[template,Activity_code,old_code]
         return templates
 
