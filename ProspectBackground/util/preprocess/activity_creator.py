@@ -56,13 +56,10 @@ def InventoryFromExcel(data)->str:
     for index,row in df.iterrows():
         origin=str(row['Act_to'])
         if origin == "marker":            # If Act origin=NA == This is the new activity to create
-            #assert isinstance(row['COLUMNA_PROBLEMA'], str), f"El elemento '{row['Activity_origin']}' no es de tipo str"
-            print('origin equal to marker',origin)
+
             activity_name = str(row['Activity name'])
             activity_code=str(row['Activity_code'])
             activ.append(activity_code)
-            #TODO: IF ACTIVITIY IN THE DB, WE ONLY WANT TO UPDATE THE AMOUNTS
-            #TODO
 
             #Check if activity in the DB
             try:
@@ -83,7 +80,7 @@ def InventoryFromExcel(data)->str:
             act_df = df.loc[df['Act_to'] == activity_name]
 
             # Subset all the activities that have origin in the new activity created
-            for _, row2 in tqdm(act_df.iterrows()):
+            for _, row2 in act_df.iterrows():
                 if row2['Technosphere'] == 'Yes':
                     try:
                         act = bd.Database(row2['Database']).get_node(row2['Activity_code'])
@@ -106,15 +103,10 @@ def InventoryFromExcel(data)->str:
                         exchange.save()
                     else:
                         pass
-
-                print('####################')
-                print('activity {} to {}'.format(act,row2['Act_to']))
-
         else:
             pass
-    final_time=time.time()
-    final_lap=final_time-starter_time
-    print('Create activity executed in {} seconds'.format(final_lap))
+
+
     return(activ)
 
 
