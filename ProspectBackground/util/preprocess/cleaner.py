@@ -40,6 +40,7 @@ class Cleaner():
         self.activity_conversion_dictionary : Dict[str,Dict[str,Union[str,int]]]=dict() #Dictionary containing the activity-conversion factor information
         self.clean_modified=None # Final output of the Unit functions
         self.techs_region_not_included=[] #List of the Processors and regions (together) not included in the basefile
+        self.locations=[] # List of the regions included in the study
     @staticmethod
     def create_df() -> pd.DataFrame:
         """
@@ -125,7 +126,14 @@ class Cleaner():
         *Update: the function also filters if the technology with region included is not defined
         """
         df_names=df.copy()
+        if self.subregions is True:
+
+            df_names['Subregions']=df_names['locs']
+            df_names['locs'] = df_names['locs'].apply(lambda x: x.split('_')[0])
+        else:
+            pass
         df_names['tecregion']=df_names['techs'] + df_names['locs']
+
         df_techs = pd.read_excel(self.mother_file, sheet_name='Processors')
         df_techs['tecregion']= df_techs['Processor']+df_techs['Region']
 
@@ -137,6 +145,9 @@ class Cleaner():
         mark=df_names['tecregion'].isin(techs_regions)
 
         df_filtered = df_names[mark]
+        if self.subregions is True:
+            df_filtered=df_filtered.drop('locs',axis=1)
+            df_filtered=df_filtered.rename(columns={'Subregions': 'locs'})
         # Catch some information
         techs_not_in_list = df_names['techs'][~mark_tec].unique().tolist()
 
@@ -177,7 +188,23 @@ class Cleaner():
         dat = self.changer()
         final_df = self.filter_techs(dat)
         self.clean=final_df
+        regions=self.get_regions(final_df)
+        self.locations=regions
         return final_df
+
+
+    def get_regions(self,df)->list:
+        """
+        This function returns a list of the existing regions in the study
+        """
+        regions = df['locs'].unique().tolist()
+        if self.subregions is not True:
+            return regions
+
+        else:
+            regions=list(set([e.split('_')[0] for e in regions]))
+            return regions
+
 
 
     ##############################################################################
@@ -237,6 +264,7 @@ class Cleaner():
     def adapt_units(self):
         self.data_merge()
         modified_units_df=self.modify_data()
+
         return modified_units_df
 
 
