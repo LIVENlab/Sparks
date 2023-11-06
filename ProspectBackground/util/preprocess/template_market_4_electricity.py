@@ -5,17 +5,27 @@ import pandas as pd
 from bw2data.errors import UnknownObject
 from ProspectBackground.const.const import bw_project,bw_db
 from .activity_creator import InventoryFromExcel
-
-
-
+from collections import defaultdict
+from typing import Dict,Union
 getLogger("peewee").setLevel("ERROR")
 bd.projects.set_current(bw_project)            # Select your project
 ei = bd.Database(bw_db)
 
 class Market_for_electricity():
 
-    def __init__(self,enbios_data):
+    """
+    This class creates a template for the future market for electricity.
+
+    """
+
+    def __init__(self,enbios_data,dendrogram_key,regions,units):
+
         self.enbios_data= enbios_data
+        self.regions=regions
+        self.dendrogram_key=dendrogram_key
+        self.electricity_list =[]
+        self.units=units
+
 
 
     @staticmethod
@@ -38,27 +48,28 @@ class Market_for_electricity():
         return df
 
 
-    def get_list(self,final_key, present_dict=None):
+
+
+    def get_elec_acts(self,region,present_dict=None):
         """
-        :param
-            -args: We're looking for the activities under that define a "future market for electricity". Hence, we specify
-                    the keys that point something like "Electricity generation" in the hierarchy
-        :return:  list of the activities failing into the electricity_market
-        """
-        present_dict=self.enbios_data
-
-
-        keys_to_check = [present_dict]  # Lista de diccionarios que se están explorando
-
+                :param
+                    -args: We're looking for the activities under that define a "future market for electricity". Hence, we specify
+                            the keys that point something like "Electricity generation" in the hierarchy
+                :return:  list of the activities failing into the electricity_market
+                """
+        present_dict = self.enbios_data
+        keys_to_check = [present_dict]
         while keys_to_check:
-            current_dict = keys_to_check.pop()  # Tomar el siguiente diccionario
+            current_dict = keys_to_check.pop()
             for key, value in current_dict.items():
-                if key == final_key and isinstance(value, list):
+                if key == self.dendrogram_key and isinstance(value, list):
+                    value=[element for element in value if element.split('___')[-1] == region]
                     self.electricity_list=value
                     return value
                 if isinstance(value, dict):
                     keys_to_check.append(value)
         return None
+
 
 
 
@@ -89,9 +100,6 @@ class Market_for_electricity():
         df = self.create_template_df()
         map_activities=self.enbios_data['activities']
 
-
-        print('Creating the new market for electricity...')
-
         # Add first row to the df
         first_row = {"Amount": 1,
                      "Location": Location,
@@ -120,8 +128,6 @@ class Market_for_electricity():
                     location = act['location']
                     ref_prod = act['reference product']
                     unit_check = act['unit']
-
-
                     row = {"Amount": 1,
                            "Location": str(location),
                            "Activity name": str(key),
@@ -135,19 +141,37 @@ class Market_for_electricity():
                            }
 
                     df.loc[len(df.index)] = row
-
-
         #TODO: Check if needed
         # df_gruoped = df.groupby('Activity_code')['Amount'].transform('sum')
         # df['Amount'] = df_gruoped
         # df = df.drop_duplicates(subset='Activity_code')
-
-        print(f'Template for {Activity_name} created')
-        # TODO: Add the activity in the DB
+        print(f'Template for future market for electicity in {Location} has been created')
         InventoryFromExcel(df)
 
         return df
 
+    def get_market_ecoinvent(self,region):
+        search='market for electricity, high voltage'
+        code=None
+        for act in ei:
+            if 'market for electricity, high voltage' in act['name'] and 'aluminium industry' not in str(act['name']) and act['location'] == region:
+                code=act['code']
+        if code is None:
+            raise Warning(f'Region {region} has no market')
+        return code
 
-if __name__ =='__main__':
-    pass
+
+    def build_templates(self)-> Dict[str,Union[pd.DataFrame,str]]:
+        templates={}
+        for region in self.regions:
+            activities=self.get_elec_acts(region)
+            # Modify the activity code
+            Location=region
+            Activity_name='Future_market_for_electricity'+'_'+region
+            Activity_code = 'FM4E' +'_'+ region
+            Reference_product = f'Future electricity production in {region}, {self.units}'
+            template=self.template_market_4_electricity(Location,Activity_name,Activity_code,Reference_product,self.units)
+            old_code=self.get_market_ecoinvent(region)
+            templates[region]=[template,Activity_code]
+        return templates
+

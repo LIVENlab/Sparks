@@ -51,7 +51,7 @@ This function creates a template of the new market for electricity with amounts=
 enbios_mod.template_electricity('Electricity_generation', Location='PT',
                         Reference_product='electricity production, 2050 in Portugal test', Units='kWh')
 
-
+pass
 # 5. Run
 
 """
