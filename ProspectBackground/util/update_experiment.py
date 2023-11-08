@@ -36,17 +36,15 @@ class Prospect():
         @param database: db name in bw
         @type database: str
         """
-        self.default_market = None #
+        self._default_market = None #
         self.project=project
         self.calliope=caliope
         self.mother=mother_file
         self.techs=[]
         self.locations=[]
         self.scenarios=[]
-
+        self.excluded_techs_and_regions=[]
         self.preprocessed_starter=None
-        self.template_electricity_market = None
-
         self.database=database
         self.exp=None
 
@@ -122,13 +120,15 @@ class Prospect():
                 -Filtered activities contained in the mother file
         ___________________________
         """
+        if subregions is True:
+            raise NotImplementedError(f'Subregions are not yet implemented')
 
         # Create an instance of the Cleaner class
         cleaner=Cleaner(self.calliope,self.mother,subregions)
         self.preprocessed_starter=cleaner.preprocess_data()
         self.preprocessed_units=cleaner.adapt_units()
         self.locations=cleaner.locations
-        self.exluded_techs_and_regions=cleaner.techs_region_not_included
+        self.excluded_techs_and_regions=cleaner.techs_region_not_included
 
 
 
@@ -155,7 +155,7 @@ class Prospect():
 
         market_class=Market_for_electricity(self.enbios2_data,final_key,regions=self.locations, units=Units)
         temp=market_class.build_templates()
-        self.default_market=temp
+        self._default_market=temp
 
         pass
         #for reg in self.locations:
@@ -182,7 +182,7 @@ class Prospect():
 
 
         general = self.enbios2_data
-        general_path = Path(self.path_saved)
+        general_path = str(self.path_saved)
         scenarios = list(general['scenarios'].keys())
         try:
             exp = Experiment(general_path)
@@ -193,26 +193,31 @@ class Prospect():
             with open(ecoinvent_units_file_path, 'w') as file:
                 file.write(text_to_write)
             print(f'error {e} covered and solved')
-            pass
             exp=Experiment(general_path)
             pass
 
-        updater = Updater(self.enbios2_data, self.default_market)
+        updater = Updater(self.enbios2_data, self._default_market)
         updater.update_results('1')  # WORKS
-        self.default_market = updater.template  # Update the dictionary with the new info from Updater
+        self._default_market = updater.template  # Update the dictionary with the new info from Updater
         # check if template created
-        updater=Updater(general,self.default_market)
+        updater=Updater(general, self._default_market)
 
         for scenario in scenarios:
             print(f'Analyzing {scenario}')
             updater.update_results(scenario)
-            self.default_market=updater.template # Actualize the templates
+            self._default_market=updater.template # Actualize the templates
             exp.run_scenario(scenario)
             result=exp.result_to_dict()
             self.save_json_data(result,results_path)
 
         pass
 
+    @property
+    def _get_markets(self):
+        return self._template_electricity_market
+    @property
+    def _print_market(self, country : str):
+        self._template_electricity_market[country]
 
     def save_json_data(self,data, path=None):
         if path is not None:

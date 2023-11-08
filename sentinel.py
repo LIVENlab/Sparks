@@ -9,5 +9,6 @@ enbios_mod = Prospect('/home/lex/PycharmProjects/SparkBox/data_sentinel/flow_out
 enbios_mod.preprocess(subregions=False)
 enbios_mod.data_for_ENBIOS(smaller_vers=1)
 enbios_mod.template_electricity('Electricity_generation', Units='kWh')
+
 enbios_mod.updater_run('/home/lex/PycharmProjects/SparkBox/result_test')
 

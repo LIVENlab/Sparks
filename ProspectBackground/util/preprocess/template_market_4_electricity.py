@@ -114,7 +114,7 @@ class Market_for_electricity():
         for activity in self.electricity_list[region]:
             pass
             for key in map_activities.keys():
-                if act == key:
+                if activity == key:
                     code = map_activities[key]['id']['code']  # This might change
                     try:
                         act = ei.get_node(code)
