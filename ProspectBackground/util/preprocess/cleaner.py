@@ -158,7 +158,6 @@ class Cleaner():
             \n Please,check the following items in order to avoid missing information'''
             warnings.warn(message,Warning)
 
-
         return df_filtered
 
 
