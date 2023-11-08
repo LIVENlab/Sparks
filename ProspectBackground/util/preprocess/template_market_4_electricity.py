@@ -7,7 +7,7 @@ from ProspectBackground.const.const import bw_project,bw_db
 from ProspectBackground.const.caliope_ecoinvent_regions import ecoinvent_caliope_regions
 from .activity_creator import InventoryFromExcel
 import warnings
-from typing import Dict,Union
+from typing import Dict,Union,List
 getLogger("peewee").setLevel("ERROR")
 bd.projects.set_current(bw_project)            # Select your project
 ei = bd.Database(bw_db)
@@ -24,13 +24,13 @@ class Market_for_electricity():
         self.enbios_data= enbios_data
         self.regions=regions
         self.dendrogram_key=dendrogram_key
-        self.electricity_list =[]
+        self.electricity_list ={}
         self.units=units
 
 
 
     @staticmethod
-    def create_template_df():
+    def create_template_df()-> pd.DataFrame:
         """
         :return: a template df of the excel like inventory
         """
@@ -51,13 +51,11 @@ class Market_for_electricity():
 
 
 
-    def get_elec_acts(self,region,present_dict=None):
+    def get_elec_acts(self,region,present_dict=None)->Dict[str,List[str]]:
+
         """
-                :param
-                    -args: We're looking for the activities under that define a "future market for electricity". Hence, we specify
-                            the keys that point something like "Electricity generation" in the hierarchy
-                :return:  list of the activities failing into the electricity_market
-                """
+        Update self.electricity_list with the activities that form the market for electricity
+        """
         present_dict = self.enbios_data
         keys_to_check = [present_dict]
         while keys_to_check:
@@ -65,7 +63,7 @@ class Market_for_electricity():
             for key, value in current_dict.items():
                 if key == self.dendrogram_key and isinstance(value, list):
                     value=[element for element in value if element.split('___')[-1] == region]
-                    self.electricity_list=value
+                    self.electricity_list[region]=value
                     return value
                 if isinstance(value, dict):
                     keys_to_check.append(value)
@@ -74,27 +72,22 @@ class Market_for_electricity():
 
 
 
-    def template_market_4_electricity(self,*args):
+    def template_market_4_electricity(self,region,*args: str) -> pd.DataFrame:
         """
         This function returns a template of the "default_market_for electricity" in order to create an inventory.
-
-        Check the template_market.csv to do some changes
-
-        :param market_el_list:
-        :param Location:
-        :param Activity_name:
-        :param Activity_code:
-        :param Reference_product:
-        :param Unit:
-        :param Database:
-        :return:
+        It fills all the information required to create a new activity in ecoinvent + the activities from that market
+        args:
+        -Location
+        -Activity_name
+        -Activity_code
+        -Units
         """
-        Location=args[0]
-        Activity_name=args[1]
-        Activity_code=args[2]
-        Reference_product=args[3]
-        Units=args[4]
-
+        Location=region
+        Activity_name=args[0]
+        Activity_code=args[1]
+        Reference_product=args[2]
+        Units=args[3]
+        pass
 
 
         # Call create_template to create the df of the inventory
@@ -114,12 +107,15 @@ class Market_for_electricity():
                      "Unit_check": None
                      }
         df.loc[len(df.index)] = first_row
+        self.get_elec_acts(region)
+        pass
 
-        for element in self.electricity_list:
+
+        for activity in self.electricity_list[region]:
+            pass
             for key in map_activities.keys():
-                if element == key:
+                if act == key:
                     code = map_activities[key]['id']['code']  # This might change
-
                     try:
                         act = ei.get_node(code)
                     except UnknownObject:
@@ -164,7 +160,7 @@ class Market_for_electricity():
         return code
 
     @staticmethod
-    def get_location_key(key):
+    def get_location_key(key)->str:
         """
         pass the calliope location and return the econvent location
         """
@@ -172,9 +168,13 @@ class Market_for_electricity():
         return ecoinvent_location
 
     def build_templates(self)-> Dict[str,Union[pd.DataFrame,str]]:
+        """
+        Call functions defined in this file in order to create the template of the market for electricity for one regions
+        This function adds the market in the template dictionary
+        {region : template(pd.DataFrame)}
+        """
         templates={}
         for region in self.regions:
-            activities=self.get_elec_acts(region)
             old_code = self.get_market_ecoinvent(region)
             if old_code is None:
                 continue
@@ -184,8 +184,8 @@ class Market_for_electricity():
                 Activity_name='Future_market_for_electricity'+'_'+region
                 Activity_code = 'FM4E' +'_'+ region
                 Reference_product = f'Future electricity production in {region}, {self.units}'
-                template=self.template_market_4_electricity(Location,Activity_name,Activity_code,Reference_product,self.units)
-
+                template=self.template_market_4_electricity(Location,Activity_code,Activity_name,Reference_product,self.units)
                 templates[region]=[template,Activity_code,old_code]
+        pass
         return templates
 
