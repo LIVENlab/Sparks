@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from ProspectBackground.util.preprocess.template_market_4_electricity import Market_for_electricity
 from ProspectBackground.util.updater.background_updater import Updater
 import time
-import pprint
+from pathlib import Path
 
 @dataclass
 class Prospect():
@@ -23,6 +23,7 @@ class Prospect():
     __scenarios=[]
     __Softlink=None
     __exec_time={}
+    __results_path=None
 
     def __init__(self, caliope : Union[str, pd.DataFrame], mother_file: [str], project : [str], database : [str]):
         """
@@ -40,7 +41,7 @@ class Prospect():
         self.calliope=caliope
         self.mother=mother_file
         self.techs=[]
-
+        self.locations=[]
         self.scenarios=[]
 
         self.preprocessed_starter=None
@@ -59,6 +60,7 @@ class Prospect():
             func(*args,**kwargs)
             end = time.time()
             total=end-start
+            print(f'Function {func.__name__} executed in {total} seconds')
             Prospect.__exec_time[func.__name__]=total
         return wrapper
 
@@ -83,8 +85,15 @@ class Prospect():
 
         bd.projects.set_current(self.project)
         if self.database not in list(bd.databases):
-            print(list(bd.databases))
-            raise Warning(f"database {self.database} not in bw databases")
+            ans = input(f'Database {self.database} not in projects. Want to create a new project? (y/n)')
+            #TODO: check the path
+            if ans == 'y':
+                spolds = Path(input('Enter path to the spold files:'))
+                self.create_BW_project(self.project, self.database, spolds)
+                const.bw_project = self.project
+                const.bw_db = self.database
+            else:
+                raise Warning('Please, select or create a database before continuing')
         print('Project and Database existing...')
 
     @staticmethod
@@ -147,10 +156,7 @@ class Prospect():
         market_class=Market_for_electricity(self.enbios2_data,final_key,regions=self.locations, units=Units)
         temp=market_class.build_templates()
         self.default_market=temp
-        # DO SOME TEST HERE
-        updater = Updater(self.enbios2_data, self.default_market)
-        updater.update_results('1')
-        self.default_market=updater.template # Update the dictionary with the new info from Updater
+
         pass
         #for reg in self.locations:
 
@@ -162,6 +168,7 @@ class Prospect():
 
 
     def classic_run(self):
+        #TODO: implement
 
         general_path=self.path_saved
         self.exp = Experiment(general_path)
@@ -170,17 +177,12 @@ class Prospect():
 
 
 
-    def updater_run(self):
+    def updater_run(self,results_path: Union[str,Path]):
 
 
-        # check if template created
-
-        if self.template_code is None:
-            raise TypeError(
-                f'An error occurred. The template for electricity is {self.template_code}. Please, consider running {self.template_electricity.__name__} before')
 
         general = self.enbios2_data
-        general_path = self.path_saved
+        general_path = Path(self.path_saved)
         scenarios = list(general['scenarios'].keys())
         try:
             exp = Experiment(general_path)
@@ -188,30 +190,31 @@ class Prospect():
             # Generally the exception is the unspecificEcoinvent error from ENBIOS
             from enbios2.base.unit_registry import ecoinvent_units_file_path
             text_to_write = 'unspecificEcoinventUnit = []'
-            # Abre el archivo en modo escritura ('w')
             with open(ecoinvent_units_file_path, 'w') as file:
                 file.write(text_to_write)
             print(f'error {e} covered and solved')
+            pass
             exp=Experiment(general_path)
             pass
 
-
-
+        updater = Updater(self.enbios2_data, self.default_market)
+        updater.update_results('1')  # WORKS
+        self.default_market = updater.template  # Update the dictionary with the new info from Updater
+        # check if template created
         updater=Updater(general,self.default_market)
 
         for scenario in scenarios:
-            print(f'parsing scenario {scenario}')
-
-            template=updater.inventoryModify(scenario)
-            self.template_electricity_market=template # update the table
-            updater.exchange_updater(self.template_code)
+            print(f'Analyzing {scenario}')
+            updater.update_results(scenario)
+            self.default_market=updater.template # Actualize the templates
             exp.run_scenario(scenario)
-
+            result=exp.result_to_dict()
+            self.save_json_data(result,results_path)
 
         pass
 
 
-    def save_json_data(self,data, path):
+    def save_json_data(self,data, path=None):
         if path is not None:
             try:
                 with open(path, 'w') as file:
@@ -228,6 +231,7 @@ class Prospect():
             os.makedirs(folder_path,exist_ok=True)
             file_path=os.path.join(folder_path,'data_enbios.json')
             print(file_path)
+            self.path_saved=file_path
 
             with open(file_path, 'w') as file:
                 json.dump(data, file,indent=4)
