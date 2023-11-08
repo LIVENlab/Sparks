@@ -5,7 +5,8 @@
 Explore EuroCalliope Data with [ENBIOS](https://github.com/LIVENlab/enbios) through Prospective Analysis.
 Check out the [demo](https://github.com/LexPascal/SparkBox/blob/dev/Demo.ipynb) 
 
-![figure_1.png](..%2F..%2FDownloads%2Ffigure_1.png)
+![figure_1](https://github.com/LexPascal/SparkBox/assets/79085248/2dd9103f-dc60-4a3f-ae67-85debd30ddf2)
+
 
 
 ## TODO
