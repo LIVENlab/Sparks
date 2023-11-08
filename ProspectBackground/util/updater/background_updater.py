@@ -2,8 +2,7 @@ import bw2data as bd
 import pandas as pd
 import typing
 from ProspectBackground.const.const import bw_project,bw_db
-from ProspectBackground.util.updater.recrusive_dict_changer import inventoryModify
-from pathlib import Path
+from typing import Dict,List
 from decimal import Decimal, getcontext
 bd.projects.set_current(bw_project)            # Select your project
 ei = bd.Database(bw_db)
@@ -12,14 +11,14 @@ ei = bd.Database(bw_db)
 
 class Updater():
     """
-    This class updates the amounts of each technology for the future market for electricity
+    This class updates the "amounts" of each technology for the future market for electricity
     """
     def __init__(self,enbios_data,templates):
         self.template=templates
         self.enbios_data=enbios_data
         pass
 
-    def inventoryModify(self,data,scenario: str) -> pd.DataFrame:
+    def inventoryModify(self,data: pd.DataFrame ,scenario: str,region : str) -> pd.DataFrame:
 
         """
         This function updates the values of the template inventory.
@@ -30,8 +29,9 @@ class Updater():
         df=data
 
         dict=self.enbios_data
-        subdict = dict['scenarios'][scenario]['activities']
-
+        subdict=self.get_region_activities(dict,scenario,region)
+        #subdict = dict['scenarios'][scenario]['activities']
+        pass
         for key in subdict.keys():
             name = key
             amount = subdict[key][1]
@@ -50,6 +50,15 @@ class Updater():
 
         return df
 
+    @staticmethod
+    def get_region_activities(dict,scenario,region) -> Dict[str,List[str]]:
+        """
+              This function returns the enbios data filtered by the scenario and region
+        """
+        subdict = dict['scenarios'][scenario]['activities']
+        # FIlter for the region
+        sub={key: val for key,val in subdict.items() if key.endswith(str(region))}
+        return sub
 
 
     def exchange_updater(self,df,code):
@@ -76,12 +85,14 @@ class Updater():
                     pass
 
     def update_results(self,scenario):
+
         template_dic=self.template
-        for key in self.template.keys():
+        for key,value in self.template.items():
+            pass
             # Access the dataframe with the data
             data=template_dic[key][0]
             #Update the dictionary
-            updated_data=self.inventoryModify(data,scenario)
+            updated_data=self.inventoryModify(data,scenario,key)
             # save it
             template_dic[key][0]=updated_data
             # Modify the new echanges in the db
