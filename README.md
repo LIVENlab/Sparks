@@ -17,3 +17,4 @@ Check out the [demo](https://github.com/LexPascal/SparkBox/blob/dev/Demo.ipynb)
   - Detect missing rows
 - Work on assistant functions or classes:
   - Since the filling of the base-file is a time expansive task, create some classes that allow to fill faster that file
+-Delete keys with empty lists in the general dictionary
