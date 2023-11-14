@@ -1,7 +1,7 @@
 import pandas as pd
 from ProspectBackground.util.update_experiment import Prospect
 
-enbios_mod = Prospect('/home/lex/PycharmProjects/SparkBox/data_sentinel/flow_out_sum.csv',
+enbios_mod = Prospect('/home/lex/Documents/data_sentinel/flow_out_sum.csv',
                        '/home/lex/PycharmProjects/SparkBox/ProspectBackground/data/base_file_simplified_v2.xlsx',
                        'Seeds_exp4', 'db_experiments')
 

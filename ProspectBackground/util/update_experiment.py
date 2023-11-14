@@ -180,7 +180,6 @@ class Prospect():
     def updater_run(self,results_path: Union[str,Path]):
 
 
-
         general = self.enbios2_data
         general_path = str(self.path_saved)
         scenarios = list(general['scenarios'].keys())

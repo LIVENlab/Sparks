@@ -1,12 +1,14 @@
+import warnings
 import bw2data as bd
+import bw2data.errors
 import pandas as pd
 import typing
 from ProspectBackground.const.const import bw_project,bw_db
 from typing import Dict,List
 from decimal import Decimal, getcontext
+
 bd.projects.set_current(bw_project)            # Select your project
 ei = bd.Database(bw_db)
-
 
 
 class Updater():
@@ -66,7 +68,12 @@ class Updater():
         """"
         Opens the bw activity and update the results with the modified dataframe
         """
-        market = ei.get_node(code)
+        try:
+            market = ei.get_node(code)
+        except bw2data.errors.UnknownObject:
+            warnings.warn(f'Market code {code} not included', Warning)
+
+
         # Eval exchanges from market
 
         for index, row in df.iterrows():

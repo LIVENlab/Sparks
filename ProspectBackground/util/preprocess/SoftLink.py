@@ -21,6 +21,7 @@ class SoftLinkCalEnb():
 
     """
 
+    __delete_keys=[]
     def __init__(self,calliope,motherfile,smaller_vers=None):
 
         self.calliope=calliope
@@ -222,7 +223,6 @@ class SoftLinkCalEnb():
                 last = self.tree_last_level(df_level, *args)
                 global last_list
                 last_list = last
-
             else:
                 df_level = df[df['Level'] == level]
                 list_2 = self.generate_dict(df_level, last_list)
@@ -231,6 +231,7 @@ class SoftLinkCalEnb():
 
         dict_tree = list_total[-1]
         self.hierarchy_tree=dict_tree[-1]
+
 
     @staticmethod
     def tree_last_level(df, *args):
@@ -262,6 +263,8 @@ class SoftLinkCalEnb():
             childs = df3['Processor'].unique().tolist()
             last_level[parent] = childs
             last_level_list.append(last_level)
+
+        pass
 
         return last_level_list
 
@@ -310,27 +313,50 @@ class SoftLinkCalEnb():
 
         map_names=self.dict_gen
 
-        for value in hierarchy_dict.values():
+
+        for key,value in hierarchy_dict.items():
 
             if isinstance(value, list):
-
+                if len(value) <1:
+                    print(f'value {value}', key)
                 # Copy the list
+
                 values_copy = value[:]
+
                 value.clear()
+
                 for element in values_copy:
                     for key, val in map_names.items():
                         if element == key:
                             list_names = map_names[key]
                             # 3. Include the new names
                             for name in list_names:
-
                                 value.append(name)
+
+
             elif isinstance(value, dict):
 
                 self.hierarchy_refinement(value)
 
+            for key,value in hierarchy_dict.items():
+                if isinstance(value,list) and len(value)<1:
+                    self.__delete_keys.append(key)
+                    #del hierarchy_dict[key]
+                    print('I GOT U',key,value)
+        pass
+        # Check if you have an empty list
+
         self.hierarchy_tree = hierarchy_dict
 
+    def clean_key(self, key_delete):
+        def delete_recursive(d):
+            if key_delete in d:
+                del d[key_delete]
+            for value in d.values():
+                if isinstance(value, dict):
+                    delete_recursive(value)
+
+        delete_recursive(self.hierarchy_tree)
     def get_methods(self):
         methods = {}
         processors = pd.read_excel(
@@ -345,14 +371,14 @@ class SoftLinkCalEnb():
 
 
 
-
     def run(self, path= None):
 
         self.generate_scenarios(self.smaller_vers)
         self.generate_activities(*self.acts)
         self.hierarchy(*self.final_acts)
         self.hierarchy_refinement(hierarchy_dict=self.hierarchy_tree)
-
+        self.clean_key(self.__delete_keys[0])
+        pass
         enbios2_methods= self.get_methods()
 
         self.enbios2_data = {
