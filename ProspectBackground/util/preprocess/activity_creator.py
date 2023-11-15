@@ -61,11 +61,8 @@ def InventoryFromExcel(data)->str:
             activity_code=str(row['Activity_code'])
             activ.append(activity_code)
 
-            #Check if activity in the DB
-            try:
-                act=ei.get_node(activity_code)
-            except bd.errors.UnknownObject:
-                pass
+
+
 
             try:
                 new_activity = ei.new_activity(name=activity_name, code=activity_code, unit=str(row['Unit']))
@@ -78,7 +75,7 @@ def InventoryFromExcel(data)->str:
                 new_activity.save()
 
             act_df = df.loc[df['Act_to'] == activity_name]
-
+            pass
             # Subset all the activities that have origin in the new activity created
             for _, row2 in act_df.iterrows():
                 if row2['Technosphere'] == 'Yes':
@@ -91,6 +88,7 @@ def InventoryFromExcel(data)->str:
                         print(f"Error: Code '{code}', in   db {name} is not in the db")
 
                         raise e
+
                     if row2['Reference_product'] != 'NA':
                         exchange = new_activity.new_exchange(input=act, type='technosphere',unit=row2['Unit'], amount=row2['Amount'],location=row2['Location'])
                         exchange.save()
@@ -103,8 +101,10 @@ def InventoryFromExcel(data)->str:
                         exchange.save()
                     else:
                         pass
-        else:
-            pass
+            new_activity.save()
+
+
+
 
 
     return(activ)

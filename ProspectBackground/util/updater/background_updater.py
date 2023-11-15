@@ -68,10 +68,10 @@ class Updater():
         """"
         Opens the bw activity and update the results with the modified dataframe
         """
-        try:
-            market = ei.get_node(code)
-        except bw2data.errors.UnknownObject:
-            warnings.warn(f'Market code {code} not included', Warning)
+        pass
+        market = ei.get_node(code)
+
+
 
 
         # Eval exchanges from market
@@ -94,6 +94,7 @@ class Updater():
     def update_results(self,scenario):
 
         template_dic=self.template
+        pass
         for key,value in self.template.items():
             pass
             # Access the dataframe with the data

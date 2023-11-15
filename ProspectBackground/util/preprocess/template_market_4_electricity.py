@@ -143,6 +143,7 @@ class Market_for_electricity():
         # df['Amount'] = df_gruoped
         # df = df.drop_duplicates(subset='Activity_code')
         print(f'Template for future market for electicity in {Location} has been created')
+
         InventoryFromExcel(df)
 
         return df
