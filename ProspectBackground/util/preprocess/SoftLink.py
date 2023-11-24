@@ -20,23 +20,24 @@ class SoftLinkCalEnb():
     Class that allows to move from Calliope-mother file data to input data for enbios
 
     """
-
+    __scenarios=[]
     __delete_keys=[]
     def __init__(self,calliope,motherfile,smaller_vers=None):
-
         self.calliope=calliope
         self.motherfile=motherfile
         self.dict_gen=None
         self.scens=None
+        self.filtered_mother=[pd.DataFrame]
         self.aliases=[]
         self.final_acts={}
         self.hierarchy_tree=None
         self.smaller_vers=smaller_vers
 
 
+    pass
 
     def generate_scenarios(self, smaller_vers=None):
-        """
+        """SoftLink
         Iterate through the data from calliope (data.csv, output results...)
             -Create new columns, such as alias
         The function includes an intermediate step to create the hierarchy
@@ -57,7 +58,7 @@ class SoftLinkCalEnb():
         else:
             raise Exception(f'Input data error in {self.generate_scenarios.__name__}')
 
-        cal_dat['aliases'] = cal_dat['techs'] + '__' + cal_dat['carriers'] + '___' + cal_dat['locs']  # Use ___ to split the loc for the recognision of the activities
+        #cal_dat['aliases'] = cal_dat['techs'] + '__' + cal_dat['carriers'] + '___' + cal_dat['locs']  # Use ___ to split the loc for the recognision of the activities
         cal_dat['scenarios']=cal_dat['scenarios'].astype(str)
 
         try:
@@ -68,15 +69,17 @@ class SoftLinkCalEnb():
 
         if smaller_vers is not None:  # get a small version of the data ( only 3 scenarios )
             try:
-                scenarios = scenarios[:smaller_vers]
+                self.__scenarios = scenarios[:smaller_vers]
             except:
                 raise ValueError('Scenarios out of bonds')
 
 
         scenarios=[str(x) for x in scenarios ] # Convert to string, just in case the scenario is a number
+
         scen_dict = {}
         for scenario in scenarios:
             df = cal_dat[cal_dat['scenarios'] == scenario]
+
             info = SoftLinkCalEnb.get_scenario(df)
             scen_dict[scenario] = {}
             scen_dict[scenario]['activities'] = info
@@ -141,9 +144,12 @@ class SoftLinkCalEnb():
         :param args:
         :return:
         """
+        #TODO: THIS ACTIVITY IS CAUSING PROBLEMS
+
 
         processors = pd.read_excel(self.motherfile, sheet_name='Processors')
 
+        delete={}
         activities_cool = {}
         for index, row in processors.iterrows():
             code = str(row['BW_DB_FILENAME'])
@@ -153,8 +159,8 @@ class SoftLinkCalEnb():
             except UnknownObject:
                 mess=f'''\n{row['Processor']},has an unknown object in the db \n
                 It will not be included in the input data'''
-
                 warnings.warn(mess,Warning)
+
                 continue
 
 
@@ -181,10 +187,39 @@ class SoftLinkCalEnb():
                         }
                     }
 
+        pass
         self.final_acts = activities
+
         print('Activities stored as a dict')
 
 
+
+    def generate_aternative_activities(self):
+        calliope=self.calliope
+        # Get all the aliases
+        aliases_unique=calliope['aliases'].unique().tolist()
+
+
+        processors_mother=pd.read_excel(self.motherfile, sheet_name='Processors')
+
+        # 1. Generate the same aliases
+        processors_mother['aliases']=processors_mother['Processor']+'__'+processors_mother['@SimulationCarrier']+'___'+ processors_mother['Region']
+        codes={}
+        for _,row in processors_mother.iterrows():
+            alias=row['aliases']
+            if str(alias) not in aliases_unique:
+                # if alias not in the calliope filter; delete the row
+                processors_mother.drop(index=row.name, inplace=True)
+                continue
+            else:
+                codes[alias]={
+                    'id': {
+                        'code': row['BW_DB_FILENAME']
+                    }
+                }
+        self.filtered_mother=processors_mother
+        self.final_acts = codes
+        return codes
 
 
     def hierarchy(self, *args) -> dict:
@@ -232,6 +267,51 @@ class SoftLinkCalEnb():
         dict_tree = list_total[-1]
         self.hierarchy_tree=dict_tree[-1]
 
+    def alternative_hierarchy(self,*args):
+        """
+                This function creates the hierarchy tree.
+                It uses two complementary functions (generate_dict and tree_last_level).
+
+                It reads the information contained in the mother file starting by the bottom (n-lowest) level
+                :param data:
+                :param args:
+                :return:
+                """
+        print('Creating tree following the structure defined in the basefile')
+        df = pd.read_excel(self.motherfile, sheet_name='Dendrogram_top')
+        #df2 = pd.read_excel(self.motherfile, sheet_name='Processors')
+        df2=self.filtered_mother
+        # Do some changes to match the regions and aliases
+
+        df2['Processor'] = df2['Processor'] + '__' + df2['@SimulationCarrier']  # Mark, '__' for carrier split
+        # Start by the last level of parents
+        levels = df['Level'].unique().tolist()
+        last_level_parent = int(levels[-1].split('-')[-1])
+        last_level_processors = 'n-' + str(last_level_parent + 1)
+        df2['Level'] = last_level_processors
+        df = pd.concat([df, df2[['Processor', 'ParentProcessor', 'Level']]], ignore_index=True, axis=0)
+
+        levels = df['Level'].unique().tolist()
+
+        list_total = []
+        for level in reversed(levels):
+            df_level = df[df['Level'] == level]
+            if level == levels[0]:
+                break
+
+            elif level == levels[-1]:
+                last = self.tree_last_level(df_level, *args)
+                global last_list
+                last_list = last
+            else:
+                df_level = df[df['Level'] == level]
+                list_2 = self.generate_dict(df_level, last_list)
+                last_list = list_2
+                list_total.append(list_2)
+
+        dict_tree = list_total[-1]
+        self.hierarchy_tree = dict_tree[-1]
+        pass
 
     @staticmethod
     def tree_last_level(df, *args):
@@ -337,7 +417,7 @@ class SoftLinkCalEnb():
             elif isinstance(value, dict):
 
                 self.hierarchy_refinement(value)
-
+            pass
             for key,value in hierarchy_dict.items():
                 if isinstance(value,list) and len(value)<1:
                     self.__delete_keys.append(key)
@@ -374,11 +454,15 @@ class SoftLinkCalEnb():
     def run(self, path= None):
 
         self.generate_scenarios(self.smaller_vers)
-        self.generate_activities(*self.acts)
-        self.hierarchy(*self.final_acts)
+        self.generate_aternative_activities()
+
+        #self.generate_activities(*self.acts)
+        self.alternative_hierarchy(*self.final_acts)
+        #self.hierarchy(*self.final_acts)
         self.hierarchy_refinement(hierarchy_dict=self.hierarchy_tree)
-        self.clean_key(self.__delete_keys[0])
-        pass
+        for element in self.__delete_keys:
+            self.clean_key(element)
+
         enbios2_methods= self.get_methods()
 
         self.enbios2_data = {
@@ -396,13 +480,9 @@ class SoftLinkCalEnb():
 
         print('Input data for ENBIOS created')
 
+    @property
+    def _scenarios_list_(self):
+        return self.__scenarios
 
 
 
-
-
-if __name__=='__main__':
-    # TODO: Calliope path will be the atribute of a preprocess class.
-    # Keep the path link for testing
-    a=SoftLinkCalEnb(r'C:\Users\Alex\PycharmProjects\pythonProject\enbios_2\projects\seed\Data\flow_out_sum_modified_unit_checked_full_subregions.csv',r'C:\Users\Alex\PycharmProjects\pythonProject\enbios_2\projects\seed\Data\base_file_simplified.xlsx')
-    a.run()

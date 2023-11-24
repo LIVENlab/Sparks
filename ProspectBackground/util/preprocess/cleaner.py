@@ -12,7 +12,8 @@ from ProspectBackground.const.const import bw_project,bw_db
 from typing import Dict,Union,Optional
 bd.projects.set_current(bw_project)            # Select your project
 database = bd.Database(bw_db)        # Select your db
-
+import time
+import os
 
 
 class Cleaner():
@@ -21,6 +22,7 @@ class Cleaner():
         *Clean the input data
         *Modify the units of the input data
     """
+
     def __init__(self, caliope, motherfile, subregions : [Optional,bool]= False):
         """
         @param caliope: Calliope data, str path
@@ -35,12 +37,25 @@ class Cleaner():
         self.data=caliope # flow_out_sum
         self.mother_file=motherfile # basefile
         self.clean=None # Final output of the Cleaning functions
-
+        self.mother_ghost=None
         # Unit changer
         self.activity_conversion_dictionary : Dict[str,Dict[str,Union[str,int]]]=dict() #Dictionary containing the activity-conversion factor information
         self.clean_modified=None # Final output of the Unit functions
         self.techs_region_not_included=[] #List of the Processors and regions (together) not included in the basefile
         self.locations=[] # List of the regions included in the study
+
+    @staticmethod
+    def timer(func):
+        def wrapper(*args, **kwargs):
+            start = time.time()
+            func(*args, **kwargs)
+            end = time.time()
+            total = end - start
+            print(f'Function {func.__name__} executed in {total} seconds')
+
+
+        return wrapper
+
     @staticmethod
     def create_df() -> pd.DataFrame:
         """
@@ -76,6 +91,11 @@ class Cleaner():
             print('Input checked. Columns look ok')
         else:
             raise KeyError(f"Columns {cols} do not match the expected columns: {expected_cols}")
+
+
+
+
+
 
     def changer(self):
         """
@@ -119,47 +139,6 @@ class Cleaner():
         return gen_df
 
 
-    def filter_techs(self, df):
-        """
-        This function filters the Calliope data with the technologies defined in the basefile
-        If the name is not defined in the "Processor column, it will be removed
-        *Update: the function also filters if the technology with region included is not defined
-        """
-        df_names=df.copy()
-        if self.subregions is True:
-
-            df_names['Subregions']=df_names['locs']
-            df_names['locs'] = df_names['locs'].apply(lambda x: x.split('_')[0])
-        else:
-            pass
-        df_names['tecregion']=df_names['techs'] + df_names['locs']
-
-        df_techs = pd.read_excel(self.mother_file, sheet_name='Processors')
-        df_techs['tecregion']= df_techs['Processor']+df_techs['Region']
-
-        techs = df_techs['Processor'].tolist()
-
-        techs_regions=(df_techs['tecregion'].unique().tolist())
-
-        mark_tec = df_names['techs'].isin(techs)
-        mark=df_names['tecregion'].isin(techs_regions)
-
-        df_filtered = df_names[mark]
-        if self.subregions is True:
-            df_filtered=df_filtered.drop('locs',axis=1)
-            df_filtered=df_filtered.rename(columns={'Subregions': 'locs'})
-        # Catch some information
-        techs_not_in_list = df_names['techs'][~mark_tec].unique().tolist()
-
-        self.techs_region_not_included=df_names['tecregion'][~mark].unique().tolist()
-        if len(techs_not_in_list)>0:
-            message=f'''\nThe following technologies, are present in the energy data but not in the Basefile: 
-            \n{techs_not_in_list}
-            \n Please,check the following items in order to avoid missing information'''
-            warnings.warn(message,Warning)
-
-        return df_filtered
-
 
     def manage_regions(self,arg):
 
@@ -179,17 +158,6 @@ class Cleaner():
         return region
 
 
-    def preprocess_data(self):
-        """
-        Run different functions of the class under one call
-        @return: final_df: calliope data cleaned. Check definitions of the class for more information
-        """
-        dat = self.changer()
-        final_df = self.filter_techs(dat)
-        self.clean=final_df
-        regions=self.get_regions(final_df)
-        self.locations=regions
-        return final_df
 
 
     def get_regions(self,df)->list:
@@ -206,8 +174,13 @@ class Cleaner():
 
 
 
+
+
+
+
     ##############################################################################
     # This second part focuses on the modification of the units
+
 
     def data_merge(self):
         """
@@ -229,6 +202,7 @@ class Cleaner():
             }
         self.activity_conversion_dictionary=general_dict
         return general_dict
+
 
 
 
@@ -257,17 +231,20 @@ class Cleaner():
         df.dropna(axis=0, inplace=True)
         print('Units adapted and ready to go')
         self.clean_modified=df
+
         return df
 
 
-    def adapt_units(self):
+    def adapt_units(self)-> pd.DataFrame:
+        "combines some functions under one call"
         self.data_merge()
         modified_units_df=self.modify_data()
-
         return modified_units_df
 
 
-    @staticmethod
+
+
+
     def join_techs_and_carriers(df) -> list:
         """
         This function checks joins the tech names and carriers and returns a list
@@ -281,6 +258,7 @@ class Cleaner():
                 print(f'An error occured in row {row}. Check the type. More info {e}')
                 continue
         return names_joined
+
 
     def ecoinvent_units_factors(self,df):
         """
@@ -317,6 +295,91 @@ class Cleaner():
                 else:
                     pass
         return df
+
+
+
+    def fitler_techs_update(self)-> pd.DataFrame:
+        """
+        This function filters the technologies based on what's defined on the basefile
+        """
+        ex_data = pd.read_excel(self.mother_file, sheet_name=None)
+        # Create the alias
+        sheet_name='Processors'
+        mother_file=ex_data[sheet_name].copy()
+
+
+        # 1. Generate the same aliases on the mother file
+        mother_file['aliases'] = mother_file['Processor'] + '__' + mother_file['@SimulationCarrier'] + '___' + \
+                                 mother_file['Region']
+
+
+        # Load the calliope data
+        calliop=self.clean_modified
+
+        # create aliases for the calliope data
+        calliop['aliases'] = calliop['techs'] + '__' + calliop['carriers'] + '___' + calliop['locs']
+        # Rule: if an alias is not in the mother file, delete it
+
+        ali_list=mother_file['aliases'].unique().tolist()
+        calio_filtered=calliop[calliop['aliases'].isin(ali_list)]
+        self.clean_modified=calio_filtered
+        regions = self.get_regions(calio_filtered)
+        self.locations = regions
+
+
+
+        # Save the modified mother file as a copy in the default folder
+        ex_data[sheet_name]=mother_file
+        current = os.path.dirname(os.path.abspath(__file__))
+        folder_path = os.path.join(os.path.dirname(current), 'Default')
+        print(current)
+        os.makedirs(folder_path, exist_ok=True)
+        file_path = os.path.join(folder_path, 'base_ghost.xlsx')
+        with pd.ExcelWriter(file_path) as writer:
+            for sheet,df in ex_data.items():
+                df.to_excel(writer,sheet_name,index=False)
+
+        self.mother_ghost=file_path
+
+
+        return calio_filtered
+
+
+    def clean_included_activities(self):
+        """
+        This code filters the technologies only if they are avaliable on the db
+        """
+        df_mother = pd.read_excel(self.mother_ghost, sheet_name='Processors')
+        df_cal = self.clean_modified
+
+        delete = []
+        for index, row in df_mother.iterrows():
+            processor = row['Processor']
+            code = row['BW_DB_FILENAME']
+
+            try:
+                database.get_node(code)
+            except:
+                delete.append(processor)
+
+                pass
+
+        df_cal = df_cal.loc[~df_cal['techs'].isin(delete)]
+        self.clean_modified = df_cal
+        return df_cal
+        pass
+
+
+    def preprocess_data(self):
+        """
+        Run different functions of the class under one call
+        @return: final_df: calliope data cleaned. Check definitions of the class for more information
+        """
+        dat = self.changer()
+        self.clean = dat
+
+
+
 
 
 
