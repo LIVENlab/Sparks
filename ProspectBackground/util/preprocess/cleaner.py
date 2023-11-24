@@ -94,8 +94,8 @@ class Cleaner():
 
         # 1. Generate the same aliases on the mother file
         mother_file['aliases'] = mother_file['Processor'] + '__' + mother_file['@SimulationCarrier'] + '___' +mother_file['Region']
-        pass
-        ex_data[sheet_name] = mother_file
+        ex_data[sheet_name] = mother_file.copy()
+
         current = os.path.dirname(os.path.abspath(__file__))
         folder_path = os.path.join(os.path.dirname(current), 'Default')
         print(current)
@@ -215,8 +215,8 @@ class Cleaner():
         self.modify_mother_file()
         self.get_mother_data()
 
-
         dat = self.changer()
+        pass
         self.clean = dat
         return dat
 
@@ -270,8 +270,9 @@ class Cleaner():
 
 
         df=self.ecoinvent_units_factors(df)
+
         # Prepare an enbios-like file    cols = ['spores', 'locs', 'techs', 'carriers', 'units', 'new_vals']
-        cols = ['spores', 'locs', 'techs', 'carriers', 'units', 'new_vals']
+        cols = ['spores', 'locs', 'techs', 'carriers', 'units', 'new_vals','aliases']
         df = df[cols]
         df.rename(columns={'spores': 'scenarios', 'new_vals': 'flow_out_sum'}, inplace=True)
         df.dropna(axis=0, inplace=True)
@@ -342,7 +343,6 @@ class Cleaner():
         df_mother = ex_data[sheet_name].copy()
         #df_mother = pd.read_excel(self.mother_ghost, sheet_name='Processors')
         df_cal = self.clean_modified
-        pass
 
         delete = []
         for index, row in df_mother.iterrows():
@@ -358,20 +358,35 @@ class Cleaner():
 
         # Save the modified mother file
         df_mother = df_mother.loc[~df_mother['Processor'].isin(delete)]
-        ex_data[sheet_name] = df_mother
-        with pd.ExcelWriter(self.mother_ghost) as writer:
-            for sheet, df in ex_data.items():
-                cols=df.columns
-                df.to_excel(writer, sheet, index=False, columns=cols)
+
+
 
         # Save the calliope data
         self.clean_modified = df_cal
+        caliope_techs=df_cal['aliases'].unique().tolist()
+        df_mother=df_mother.loc[df_mother['Processor'].isin(caliope_techs)]
+
+
+        ex_data[sheet_name] = df_mother
+        with pd.ExcelWriter(self.mother_ghost) as writer:
+            for sheet, df in ex_data.items():
+                cols = df.columns
+                df.to_excel(writer, sheet, index=False, columns=cols)
+
+
         return df_cal
         pass
+
+    def clean_base_ghost(self):
+        """
+        This function filters the other way arround;
+        If the base file has activities which do not exist on the calliope data, delete them
+        """
 
     def adapt_units(self)-> pd.DataFrame:
         "combines some functions under one call"
         self.data_merge()
+        pass
         modified_units_df=self.modify_data()
         return modified_units_df
 

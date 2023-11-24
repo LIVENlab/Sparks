@@ -93,7 +93,9 @@ class SoftLinkCalEnb():
 
         activities=set(acts)
         # Create intermediate information for the hierarchy
+        pass
         dict_gen=SoftLinkCalEnb.get_regionalized_processors(*activities)
+
         self.dict_gen=dict(dict_gen) # avoid missing key errors
         self.acts=activities
         self.scens=scen_dict
@@ -221,7 +223,13 @@ class SoftLinkCalEnb():
         self.final_acts = codes
         return codes
 
+    def fix_hierarchy_mother(self):
+        """
+        Check if some dendrogrm category it's not being used
+        """
 
+
+        pass
     def hierarchy(self, *args) -> dict:
         """
         This function creates the hierarchy tree.
@@ -454,15 +462,16 @@ class SoftLinkCalEnb():
     def run(self, path= None):
 
         self.generate_scenarios(self.smaller_vers)
+        pass
         self.generate_aternative_activities()
-
+        pass
         #self.generate_activities(*self.acts)
         self.alternative_hierarchy(*self.final_acts)
         #self.hierarchy(*self.final_acts)
         self.hierarchy_refinement(hierarchy_dict=self.hierarchy_tree)
         for element in self.__delete_keys:
             self.clean_key(element)
-
+        pass
         enbios2_methods= self.get_methods()
 
         self.enbios2_data = {
