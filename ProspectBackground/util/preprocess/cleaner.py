@@ -22,6 +22,7 @@ class Cleaner():
         *Clean the input data
         *Modify the units of the input data
     """
+    __aliases=[]
 
     def __init__(self, caliope, motherfile, subregions : [Optional,bool]= False):
         """
@@ -44,17 +45,7 @@ class Cleaner():
         self.techs_region_not_included=[] #List of the Processors and regions (together) not included in the basefile
         self.locations=[] # List of the regions included in the study
 
-    @staticmethod
-    def timer(func):
-        def wrapper(*args, **kwargs):
-            start = time.time()
-            func(*args, **kwargs)
-            end = time.time()
-            total = end - start
-            print(f'Function {func.__name__} executed in {total} seconds')
 
-
-        return wrapper
 
     @staticmethod
     def create_df() -> pd.DataFrame:
@@ -92,9 +83,54 @@ class Cleaner():
         else:
             raise KeyError(f"Columns {cols} do not match the expected columns: {expected_cols}")
 
+    def modify_mother_file(self):
+        """
+        Crete a new column "aliases" and store the file as a ghost file
+        """
+        ex_data = pd.read_excel(self.mother_file, sheet_name=None)
+        # Create the alias
+        sheet_name = 'Processors'
+        mother_file = ex_data[sheet_name].copy()
 
+        # 1. Generate the same aliases on the mother file
+        mother_file['aliases'] = mother_file['Processor'] + '__' + mother_file['@SimulationCarrier'] + '___' +mother_file['Region']
+        pass
+        ex_data[sheet_name] = mother_file
+        current = os.path.dirname(os.path.abspath(__file__))
+        folder_path = os.path.join(os.path.dirname(current), 'Default')
+        print(current)
+        os.makedirs(folder_path, exist_ok=True)
+        file_path = os.path.join(folder_path, 'base_ghost.xlsx')
+        with pd.ExcelWriter(file_path) as writer:
+            for sheet, df in ex_data.items():
+                cols=df.columns
+                df.to_excel(writer, sheet, index=False, columns=cols)
 
+        self.mother_ghost = file_path
 
+    def get_mother_data(self):
+        """
+        Get and store some data from the mother file: - regions - aliases
+        """
+        ex_data = pd.read_excel(self.mother_ghost, sheet_name='Processors')
+        pass
+        regions = ex_data['Region'].unique().tolist()
+        aliases = ex_data['aliases'].unique().tolist()
+        self.regions = regions
+        self.__aliases = aliases
+
+    pass
+
+    def apply_filters(self,df):
+        """
+        Filter the calliope data based on the filters from get_mother_data
+        -regions
+        -aliases
+        """
+        caliope=df
+        calliope = caliope[caliope['locs'].isin(self.regions)]
+        calliope = calliope[calliope['aliases'].isin(self.__aliases)]
+        return calliope
 
 
     def changer(self):
@@ -119,11 +155,9 @@ class Cleaner():
             df = df.dropna()
             # Create an empty df with the expected data
             gen_df = self.create_df()
-
             scenarios = list(df.spores.unique())
             for scenario in scenarios:
                 df_sub = df.loc[df['spores'] == scenario]   # Create a new df with the data from 1 scenario
-
                 df_sub['locs'] = df['locs'].apply(self.manage_regions)
                 df_sub = df_sub.groupby(['techs', 'locs']).agg({
                     "spores": "first",
@@ -132,11 +166,12 @@ class Cleaner():
                     "flow_out_sum": "sum"
                 }).reset_index()
                 gen_df = pd.concat([gen_df, df_sub])
-
-
-
-
+        gen_df['aliases']=gen_df['techs']+'__'+gen_df['carriers']+'___'+gen_df['locs']
+        pass
+        gen_df=self.apply_filters(gen_df)
+        self.clean=gen_df
         return gen_df
+
 
 
 
@@ -172,16 +207,25 @@ class Cleaner():
             regions=list(set([e.split('_')[0] for e in regions]))
             return regions
 
+    def preprocess_data(self):
+        """
+        Run different functions of the class under one call
+        @return: final_df: calliope data cleaned. Check definitions of the class for more information
+        """
+        self.modify_mother_file()
+        self.get_mother_data()
 
 
+        dat = self.changer()
+        self.clean = dat
+        return dat
 
 
 
 
     ##############################################################################
+
     # This second part focuses on the modification of the units
-
-
     def data_merge(self):
         """
         This function reads the Excel "mother file" and generates a dictionary following the structure:
@@ -190,13 +234,14 @@ class Cleaner():
             { bw_code : [str],
             conversion factor: [int]}}
         """
-        df = pd.read_excel(self.mother_file)
+        df = pd.read_excel(self.mother_ghost)
         general_dict = {}
         for index, row in df.iterrows():
-            name = row['Processor'] + '_' + row['@SimulationCarrier']
+
+            alias=row['aliases']
             code = row['BW_DB_FILENAME']
             factor = row['@SimulationToEcoinventFactor']
-            general_dict[name] = {
+            general_dict[alias] = {
                 'factor': factor,
                 'code': code
             }
@@ -219,10 +264,11 @@ class Cleaner():
             Returns a list of techs to apply the following function "check elements"
         """
         df=self.clean
+
         # Create a modified column name to match  the names
         print('Preparing to change and adapt the units...')
 
-        df['names2'] = self.join_techs_and_carriers(df)
+
         df=self.ecoinvent_units_factors(df)
         # Prepare an enbios-like file    cols = ['spores', 'locs', 'techs', 'carriers', 'units', 'new_vals']
         cols = ['spores', 'locs', 'techs', 'carriers', 'units', 'new_vals']
@@ -235,35 +281,17 @@ class Cleaner():
         return df
 
 
-    def adapt_units(self)-> pd.DataFrame:
-        "combines some functions under one call"
-        self.data_merge()
-        modified_units_df=self.modify_data()
-        return modified_units_df
 
 
 
-
-
-    def join_techs_and_carriers(df) -> list:
-        """
-        This function checks joins the tech names and carriers and returns a list
-        """
-        names_joined = []
-        for index, row in df.iterrows():
-            try:
-                new_name = str(row['techs']) + '_' + str(row['carriers'])
-                names_joined.append(new_name)
-            except TypeError as e:
-                print(f'An error occured in row {row}. Check the type. More info {e}')
-                continue
-        return names_joined
 
 
     def ecoinvent_units_factors(self,df):
         """
         Read the calliope data and extend the information based on self.actvity_conversion dictionary
         *add new columns and apply the conversion factor to the value
+
+        *delete the activities with non existing codes in the db
         """
         # Create new columns
         #df=df.copy() # avoid modifications during the loop
@@ -271,6 +299,8 @@ class Cleaner():
         df['Units_new'] = None
         df['codes'] = None
         df['names_db'] = None
+
+        delete=[]
         # df['flow_out_sum']=[x.replace(',','.') for x in df['flow_out_sum']]
         for key in self.activity_conversion_dictionary.keys():
             code = self.activity_conversion_dictionary[key]['code']
@@ -279,12 +309,14 @@ class Cleaner():
                 unit = activity['unit']
                 act_name = activity['name']
             except bw2data.errors.UnknownObject:
-                message=f" \n{code} from activity, {key} not found in the database. Please check your database"
+                message=f" \n{code} from activity, {key} not found in the database. Please check your database. This activitiy will be deleted"
                 warnings.warn(message,Warning)
+                delete.append(key)
 
                 continue  # If activity doesn't exists, do nothing
+            pass
             for index, row in df.iterrows():
-                if str(key) == str(row['names2']):
+                if str(key) == str(row['aliases']):
                     factor = (self.activity_conversion_dictionary[key]['factor'])
                     value = float(row['flow_out_sum'])
                     new_val = value * factor
@@ -294,63 +326,23 @@ class Cleaner():
                     df.at[index, 'names_db'] = act_name
                 else:
                     pass
+        df=df.loc[~df['aliases'].isin(delete)]
+
         return df
-
-
-
-    def fitler_techs_update(self)-> pd.DataFrame:
-        """
-        This function filters the technologies based on what's defined on the basefile
-        """
-        ex_data = pd.read_excel(self.mother_file, sheet_name=None)
-        # Create the alias
-        sheet_name='Processors'
-        mother_file=ex_data[sheet_name].copy()
-
-
-        # 1. Generate the same aliases on the mother file
-        mother_file['aliases'] = mother_file['Processor'] + '__' + mother_file['@SimulationCarrier'] + '___' + \
-                                 mother_file['Region']
-
-
-        # Load the calliope data
-        calliop=self.clean_modified
-
-        # create aliases for the calliope data
-        calliop['aliases'] = calliop['techs'] + '__' + calliop['carriers'] + '___' + calliop['locs']
-        # Rule: if an alias is not in the mother file, delete it
-
-        ali_list=mother_file['aliases'].unique().tolist()
-        calio_filtered=calliop[calliop['aliases'].isin(ali_list)]
-        self.clean_modified=calio_filtered
-        regions = self.get_regions(calio_filtered)
-        self.locations = regions
-
-
-
-        # Save the modified mother file as a copy in the default folder
-        ex_data[sheet_name]=mother_file
-        current = os.path.dirname(os.path.abspath(__file__))
-        folder_path = os.path.join(os.path.dirname(current), 'Default')
-        print(current)
-        os.makedirs(folder_path, exist_ok=True)
-        file_path = os.path.join(folder_path, 'base_ghost.xlsx')
-        with pd.ExcelWriter(file_path) as writer:
-            for sheet,df in ex_data.items():
-                df.to_excel(writer,sheet_name,index=False)
-
-        self.mother_ghost=file_path
-
-
-        return calio_filtered
 
 
     def clean_included_activities(self):
         """
         This code filters the technologies only if they are avaliable on the db
+        Delete the activities from the ghost mother file
         """
-        df_mother = pd.read_excel(self.mother_ghost, sheet_name='Processors')
+        ex_data = pd.read_excel(self.mother_file, sheet_name=None)
+        # Create the alias
+        sheet_name = 'Processors'
+        df_mother = ex_data[sheet_name].copy()
+        #df_mother = pd.read_excel(self.mother_ghost, sheet_name='Processors')
         df_cal = self.clean_modified
+        pass
 
         delete = []
         for index, row in df_mother.iterrows():
@@ -364,19 +356,26 @@ class Cleaner():
 
                 pass
 
-        df_cal = df_cal.loc[~df_cal['techs'].isin(delete)]
+        # Save the modified mother file
+        df_mother = df_mother.loc[~df_mother['Processor'].isin(delete)]
+        ex_data[sheet_name] = df_mother
+        with pd.ExcelWriter(self.mother_ghost) as writer:
+            for sheet, df in ex_data.items():
+                cols=df.columns
+                df.to_excel(writer, sheet, index=False, columns=cols)
+
+        # Save the calliope data
         self.clean_modified = df_cal
         return df_cal
         pass
 
+    def adapt_units(self)-> pd.DataFrame:
+        "combines some functions under one call"
+        self.data_merge()
+        modified_units_df=self.modify_data()
+        return modified_units_df
 
-    def preprocess_data(self):
-        """
-        Run different functions of the class under one call
-        @return: final_df: calliope data cleaned. Check definitions of the class for more information
-        """
-        dat = self.changer()
-        self.clean = dat
+
 
 
 
