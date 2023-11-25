@@ -68,8 +68,11 @@ class Updater():
         """"
         Opens the bw activity and update the results with the modified dataframe
         """
-        pass
-        market = ei.get_node(code)
+        try:
+            market = ei.get_node(code)
+            print(f'Activity {code} registered')
+        except bw2data.errors.UnknownObject:
+            raise Warning(f'Acivity with code {code} not in the db')
 
 
 
@@ -94,7 +97,7 @@ class Updater():
     def update_results(self,scenario):
 
         template_dic=self.template
-        pass
+
         for key,value in self.template.items():
             pass
             # Access the dataframe with the data

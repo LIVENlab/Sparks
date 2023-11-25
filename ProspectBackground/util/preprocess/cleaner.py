@@ -168,6 +168,13 @@ class Cleaner():
                 except:
                     raise ValueError('Scenarios out of bonds')
             # Create an empty df with the expected data
+            else:
+                df['spores'] = df['spores'].astype(str)
+                scenarios = df['spores'].unique().tolist()
+                cal_dat = df[df['spores'].isin(scenarios)]
+                self.data = cal_dat
+
+                pass
 
             gen_df = self.create_df()
             scenarios = list(cal_dat.spores.unique())
@@ -312,11 +319,6 @@ class Cleaner():
 
         *delete the activities with non-existing codes in the db
         """
-
-        a=EcoInventUnitFactor(df,self.activity_conversion_dictionary)
-        b=a.ecoinvent_units_data()
-        pass
-
         # Create new columns
         df=df.copy() # avoid modifications during the loop
         df['new_vals'] = None

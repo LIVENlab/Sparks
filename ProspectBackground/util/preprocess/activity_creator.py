@@ -55,15 +55,14 @@ def InventoryFromExcel(data)->str:
     activ=[]
     for index,row in df.iterrows():
         origin=str(row['Act_to'])
+
         if origin == "marker":            # If Act origin=NA == This is the new activity to create
 
             activity_name = str(row['Activity name'])
             activity_code=str(row['Activity_code'])
             activ.append(activity_code)
 
-
-
-
+            pass
             try:
                 new_activity = ei.new_activity(name=activity_name, code=activity_code, unit=str(row['Unit']))
                 new_activity.save()

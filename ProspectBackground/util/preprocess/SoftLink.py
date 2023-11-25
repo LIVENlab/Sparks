@@ -10,7 +10,7 @@ from typing import Optional,Dict,Union,List
 from ProspectBackground.const.const import bw_project,bw_db
 import warnings
 from ProspectBackground.errors.errors import HierarchyError
-from ProspectBackground.util.DataTypes.DataTypes import ActivityData,Scenarios_Dict,ActitiesDict,Hierarchy
+from ProspectBackground.util.DataTypes.DataTypes import ActivityData,Scenarios_Dict,ActitiesDict
 
 
 
