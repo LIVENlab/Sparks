@@ -24,7 +24,7 @@ class Cleaner():
     """
     __aliases=[]
 
-    def __init__(self, caliope, motherfile, subregions : [Optional,bool]= False):
+    def __init__(self, caliope, motherfile, smaller_vers : int =None, subregions=False):
         """
         @param caliope: Calliope data, str path
         @param motherfile: Basefile, str path
@@ -44,6 +44,7 @@ class Cleaner():
         self.clean_modified=None # Final output of the Unit functions
         self.techs_region_not_included=[] #List of the Processors and regions (together) not included in the basefile
         self.locations=[] # List of the regions included in the study
+        self.smaller_vers = smaller_vers
 
 
 
@@ -83,6 +84,7 @@ class Cleaner():
         else:
             raise KeyError(f"Columns {cols} do not match the expected columns: {expected_cols}")
 
+        return data
     def modify_mother_file(self):
         """
         Crete a new column "aliases" and store the file as a ghost file
@@ -128,8 +130,9 @@ class Cleaner():
         -aliases
         """
         caliope=df
-        calliope = caliope[caliope['locs'].isin(self.regions)]
-        calliope = calliope[calliope['aliases'].isin(self.__aliases)]
+
+        calliope = caliope[caliope['aliases'].isin(self.__aliases)]
+
         return calliope
 
 
@@ -149,13 +152,24 @@ class Cleaner():
         except FileNotFoundError:
             raise FileNotFoundError(f'File {self.data} does not exist. Please check it')
 
-        else:
 
-            self.input_checker(df)
+        else:
+            pass
+            df=self.input_checker(df)
             df = df.dropna()
+            if self.smaller_vers is not None:  # get a small version of the data ( only 3 scenarios )
+                try:
+                    df['spores'] = df['spores'].astype(str)
+                    scenarios = df['spores'].unique().tolist()
+                    scenarios = scenarios[:self.smaller_vers]
+                    cal_dat = df[df['spores'].isin(scenarios)]
+                    self.data = cal_dat
+                except:
+                    raise ValueError('Scenarios out of bonds')
             # Create an empty df with the expected data
+
             gen_df = self.create_df()
-            scenarios = list(df.spores.unique())
+            scenarios = list(cal_dat.spores.unique())
             for scenario in scenarios:
                 df_sub = df.loc[df['spores'] == scenario]   # Create a new df with the data from 1 scenario
                 df_sub['locs'] = df['locs'].apply(self.manage_regions)
@@ -167,6 +181,7 @@ class Cleaner():
                 }).reset_index()
                 gen_df = pd.concat([gen_df, df_sub])
         gen_df['aliases']=gen_df['techs']+'__'+gen_df['carriers']+'___'+gen_df['locs']
+
         pass
         gen_df=self.apply_filters(gen_df)
         self.clean=gen_df
@@ -216,7 +231,6 @@ class Cleaner():
         self.get_mother_data()
 
         dat = self.changer()
-        pass
         self.clean = dat
         return dat
 
@@ -226,7 +240,7 @@ class Cleaner():
     ##############################################################################
 
     # This second part focuses on the modification of the units
-    def data_merge(self):
+    def data_merge(self)->dict[str,int]:
         """
         This function reads the Excel "mother file" and generates a dictionary following the structure:
 
@@ -235,9 +249,9 @@ class Cleaner():
             conversion factor: [int]}}
         """
         df = pd.read_excel(self.mother_ghost)
+
         general_dict = {}
         for index, row in df.iterrows():
-
             alias=row['aliases']
             code = row['BW_DB_FILENAME']
             factor = row['@SimulationToEcoinventFactor']
@@ -263,6 +277,7 @@ class Cleaner():
 
             Returns a list of techs to apply the following function "check elements"
         """
+
         df=self.clean
 
         # Create a modified column name to match  the names
@@ -270,6 +285,7 @@ class Cleaner():
 
 
         df=self.ecoinvent_units_factors(df)
+        pass
 
         # Prepare an enbios-like file    cols = ['spores', 'locs', 'techs', 'carriers', 'units', 'new_vals']
         cols = ['spores', 'locs', 'techs', 'carriers', 'units', 'new_vals','aliases']
@@ -294,8 +310,9 @@ class Cleaner():
 
         *delete the activities with non existing codes in the db
         """
+        pass
         # Create new columns
-        #df=df.copy() # avoid modifications during the loop
+        df=df.copy() # avoid modifications during the loop
         df['new_vals'] = None
         df['Units_new'] = None
         df['codes'] = None
@@ -313,9 +330,8 @@ class Cleaner():
                 message=f" \n{code} from activity, {key} not found in the database. Please check your database. This activitiy will be deleted"
                 warnings.warn(message,Warning)
                 delete.append(key)
+                continue
 
-                continue  # If activity doesn't exists, do nothing
-            pass
             for index, row in df.iterrows():
                 if str(key) == str(row['aliases']):
                     factor = (self.activity_conversion_dictionary[key]['factor'])
@@ -327,17 +343,19 @@ class Cleaner():
                     df.at[index, 'names_db'] = act_name
                 else:
                     pass
+        pass
         df=df.loc[~df['aliases'].isin(delete)]
 
         return df
 
 
     def clean_included_activities(self):
+
         """
         This code filters the technologies only if they are avaliable on the db
         Delete the activities from the ghost mother file
         """
-        ex_data = pd.read_excel(self.mother_file, sheet_name=None)
+        ex_data = pd.read_excel(self.mother_ghost, sheet_name=None)
         # Create the alias
         sheet_name = 'Processors'
         df_mother = ex_data[sheet_name].copy()
@@ -355,17 +373,31 @@ class Cleaner():
                 delete.append(processor)
 
                 pass
-
+        pass
         # Save the modified mother file
         df_mother = df_mother.loc[~df_mother['Processor'].isin(delete)]
-
-
 
         # Save the calliope data
         self.clean_modified = df_cal
         caliope_techs=df_cal['aliases'].unique().tolist()
-        df_mother=df_mother.loc[df_mother['Processor'].isin(caliope_techs)]
+        """
+        Do it the other way around: if a technology defined in the mother file does not exist in the
+        calliope data, delete it.
+        Add a warning with the info
+        
+        """
 
+        initial_processors=df_mother['aliases'].tolist()
+        df_mother=df_mother.loc[df_mother['aliases'].isin(caliope_techs)]
+        final_processors=df_mother['aliases'].tolist()
+        pass
+
+        deleted_processors=[alias for alias in initial_processors if alias not in final_processors]
+        if len(deleted_processors) >0:
+            message=(f"The following aliases are defined in you base file but do not exist in the calliope data \n"
+                     f"Plese check it {deleted_processors}. \n"
+                     f"This could cause further hierarchy errors")
+            warnings.warn(message,Warning)
 
         ex_data[sheet_name] = df_mother
         with pd.ExcelWriter(self.mother_ghost) as writer:
