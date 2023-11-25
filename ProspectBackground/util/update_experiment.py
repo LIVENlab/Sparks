@@ -19,13 +19,16 @@ from pathlib import Path
 
 @dataclass
 class Prospect():
-
     __scenarios=[]
     __Softlink=None
     __exec_time={}
     __results_path=None
-
-    def __init__(self, caliope : Union[str, pd.DataFrame], mother_file: [str], project : [str], database : [str]):
+    __mother_ghost=None
+    def __init__(self,
+                 caliope : Union[str, pd.DataFrame],
+                 mother_file: [str],
+                 project : [str],
+                 database : [str]):
         """
         @param caliope: path to the caliope data (flow_out_sum.csv)
         @type caliope: either str path or pd.Dataframe
@@ -36,7 +39,7 @@ class Prospect():
         @param database: db name in bw
         @type database: str
         """
-        self._default_market = None #
+
         self.project=project
         self.calliope=caliope
         self.mother=mother_file
@@ -47,6 +50,8 @@ class Prospect():
         self.preprocessed_starter=None
         self.database=database
         self.exp=None
+        self._default_market = None  #
+
 
         #Check project and db
         self.BW_project_and_DB()
@@ -107,7 +112,7 @@ class Prospect():
         pass
 
     @timer
-    def preprocess(self,subregions : [bool,Optional] = False):
+    def preprocess(self,small_vers=None, subregions : [bool,Optional] = False):
         """
         cal_file: str path to flow_out_sum data
 
@@ -124,23 +129,24 @@ class Prospect():
             raise NotImplementedError(f'Subregions are not yet implemented')
 
         # Create an instance of the Cleaner class
-        cleaner=Cleaner(self.calliope,self.mother,subregions)
+        cleaner=Cleaner(self.calliope,self.mother,smaller_vers=small_vers,subregions=False)
         self.preprocessed_starter=cleaner.preprocess_data()
         self.preprocessed_units=cleaner.adapt_units()
-        self.locations=cleaner.locations
-        self.excluded_techs_and_regions=cleaner.techs_region_not_included
-
-
+        self.preprocessed_units=cleaner.clean_included_activities()
+        self.__mother_ghost=cleaner.mother_ghost
+        self.locations=cleaner.regions
 
     @timer
-    def data_for_ENBIOS(self,path_save=None,smaller_vers=None):
+    def data_for_ENBIOS(self,path_save=None):
         """
         Transform the data into enbios like dictionary
         """
         # Create an instance of the SoftLInkCalEnb
-        self.__Softlink=SoftLinkCalEnb(self.preprocessed_units,self.mother,smaller_vers)
+        self.__Softlink=SoftLinkCalEnb(self.preprocessed_units,self.__mother_ghost)
         self.__Softlink.run(path_save)
         self.enbios2_data = self.__Softlink.enbios2_data
+
+        self.scenarios=self.__Softlink._scenarios_list_
         self.save_json_data(self.enbios2_data, path_save)
 
 
@@ -154,17 +160,14 @@ class Prospect():
 
 
         market_class=Market_for_electricity(self.enbios2_data,final_key,regions=self.locations, units=Units)
+        #check locaitons:
+
+
         temp=market_class.build_templates()
         self._default_market=temp
 
         pass
-        #for reg in self.locations:
 
-
-        #self.electricity_activities = market_class.get_elec_acts()  # run get list to
-
-        #self.default_market = market_class.template_market_4_electricity(Location,Activity_name,Activity_code,Reference_product,Units)
-        #self.template_code=Activity_code
 
 
     def classic_run(self):
@@ -177,39 +180,41 @@ class Prospect():
 
 
 
-    def updater_run(self,results_path: Union[str,Path]):
+    def updater_run(self,results_path: Path):
+        results_path_=Path(results_path)
+
+        if os.path.exists(results_path_):
+            general = self.enbios2_data
+            general_path = str(self.path_saved)
+
+            try:
+                exp = Experiment(general_path)
+            except Exception as e:
+                # Generally the exception is the unspecificEcoinvent error from ENBIOS
+                from enbios2.base.unit_registry import ecoinvent_units_file_path
+                text_to_write = 'unspecificEcoinventUnit = []'
+                with open(ecoinvent_units_file_path, 'w') as file:
+                    file.write(text_to_write)
+                print(f'error {e} covered and solved')
+                exp=Experiment(general_path)
+                pass
 
 
-        general = self.enbios2_data
-        general_path = str(self.path_saved)
-        scenarios = list(general['scenarios'].keys())
-        try:
-            exp = Experiment(general_path)
-        except Exception as e:
-            # Generally the exception is the unspecificEcoinvent error from ENBIOS
-            from enbios2.base.unit_registry import ecoinvent_units_file_path
-            text_to_write = 'unspecificEcoinventUnit = []'
-            with open(ecoinvent_units_file_path, 'w') as file:
-                file.write(text_to_write)
-            print(f'error {e} covered and solved')
-            exp=Experiment(general_path)
-            pass
+            # check if template created
+            updater=Updater(general, self._default_market)
+            for scenario in self.scenarios:
+                print(f'Analyzing {scenario}')
+                updater.update_results(scenario)
+                self._default_market=updater.template # Actualize the templates
+                exp.run_scenario(scenario)
+                result=exp.result_to_dict()
+                output_name= 'output_scen_'+str(scenario)
+                result_path_scenario=results_path_ / output_name
+                self.save_json_results(result,path=result_path_scenario)
 
-        updater = Updater(self.enbios2_data, self._default_market)
-        updater.update_results('1')  # WORKS
-        self._default_market = updater.template  # Update the dictionary with the new info from Updater
-        # check if template created
-        updater=Updater(general, self._default_market)
 
-        for scenario in scenarios:
-            print(f'Analyzing {scenario}')
-            updater.update_results(scenario)
-            self._default_market=updater.template # Actualize the templates
-            exp.run_scenario(scenario)
-            result=exp.result_to_dict()
-            self.save_json_data(result,results_path)
-
-        pass
+        else:
+            raise FileNotFoundError(f'Please check your path {results_path}')
 
     @property
     def _get_markets(self):
@@ -218,7 +223,19 @@ class Prospect():
     def _print_market(self, country : str):
         self._template_electricity_market[country]
 
+
+
+
+    @staticmethod
+    def save_json_results(data : json , path : Path):
+        with open(path,'w') as file:
+            json.dump(data,file,indent=4)
+        print(f'Result saved in {path}')
+
+
+
     def save_json_data(self,data, path=None):
+        pass
         if path is not None:
             try:
                 with open(path, 'w') as file:
@@ -249,12 +266,5 @@ class Prospect():
 
 
 
-
-if __name__=='__main__':
-    tr=UpdaterExperiment(r'C:\Users\altz7\PycharmProjects\enbios__git\projects\seed\MixUpdater\data\flow_out_sum.csv',r'C:\Users\altz7\PycharmProjects\enbios__git\projects\seed\MixUpdater\data\base_file_simplified.xlsx','Seeds_exp4','db_experiments')
-    tr.preprocess()
-    tr.data_for_ENBIOS()
-    tr.template_electricity('Electricity_generation', Location='PT', Reference_product='electricity production, 2050 in Portugal test',Units='kWh')
-    tr.run()
 
 

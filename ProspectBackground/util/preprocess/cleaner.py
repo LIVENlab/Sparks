@@ -5,7 +5,7 @@
 
 import bw2data.errors
 import pandas as pd
-pd.options.mode.chained_assignment = None
+#pd.options.mode.chained_assignment = None
 import bw2data as bd
 import warnings
 from ProspectBackground.const.const import bw_project,bw_db
@@ -14,6 +14,7 @@ bd.projects.set_current(bw_project)            # Select your project
 database = bd.Database(bw_db)        # Select your db
 import time
 import os
+from ProspectBackground.util.DataTypes.DataTypes import *
 
 
 class Cleaner():
@@ -236,7 +237,10 @@ class Cleaner():
 
 
 
-
+    ##############################################################################
+    """
+    modification of units
+    """
     ##############################################################################
 
     # This second part focuses on the modification of the units
@@ -279,11 +283,9 @@ class Cleaner():
         """
 
         df=self.clean
-
+        pass
         # Create a modified column name to match  the names
         print('Preparing to change and adapt the units...')
-
-
         df=self.ecoinvent_units_factors(df)
         pass
 
@@ -308,9 +310,13 @@ class Cleaner():
         Read the calliope data and extend the information based on self.actvity_conversion dictionary
         *add new columns and apply the conversion factor to the value
 
-        *delete the activities with non existing codes in the db
+        *delete the activities with non-existing codes in the db
         """
+
+        a=EcoInventUnitFactor(df,self.activity_conversion_dictionary)
+        b=a.ecoinvent_units_data()
         pass
+
         # Create new columns
         df=df.copy() # avoid modifications during the loop
         df['new_vals'] = None
@@ -331,9 +337,10 @@ class Cleaner():
                 warnings.warn(message,Warning)
                 delete.append(key)
                 continue
-
+            df.reset_index(inplace=True,drop=True)
             for index, row in df.iterrows():
                 if str(key) == str(row['aliases']):
+
                     factor = (self.activity_conversion_dictionary[key]['factor'])
                     value = float(row['flow_out_sum'])
                     new_val = value * factor
@@ -345,7 +352,7 @@ class Cleaner():
                     pass
         pass
         df=df.loc[~df['aliases'].isin(delete)]
-
+        pass
         return df
 
 
@@ -408,12 +415,6 @@ class Cleaner():
 
         return df_cal
         pass
-
-    def clean_base_ghost(self):
-        """
-        This function filters the other way arround;
-        If the base file has activities which do not exist on the calliope data, delete them
-        """
 
     def adapt_units(self)-> pd.DataFrame:
         "combines some functions under one call"

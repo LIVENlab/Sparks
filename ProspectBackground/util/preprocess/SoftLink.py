@@ -10,7 +10,7 @@ from typing import Optional,Dict,Union,List
 from ProspectBackground.const.const import bw_project,bw_db
 import warnings
 from ProspectBackground.errors.errors import HierarchyError
-from ProspectBackground.util.DataTypes.DataTypes import ActivityData,Scenarios_Dict,ActitiesDict
+from ProspectBackground.util.DataTypes.DataTypes import ActivityData,Scenarios_Dict,ActitiesDict,Hierarchy
 
 
 
@@ -265,21 +265,30 @@ class SoftLinkCalEnb():
                 :param args:
                 :return:
                 """
+
+
         print('Creating tree following the structure defined in the basefile')
         self.get_non_existing_hierarchy()
         df = pd.read_excel(self.motherfile, sheet_name='Dendrogram_top')
         #df2 = pd.read_excel(self.motherfile, sheet_name='Processors')
         df2=self.filtered_mother
+        #a = Hierarchy(processors=df2,parents=df)
+        #a.process_input()
+        #a.process_top_levels()
+
         # Do some changes to match the regions and aliases
 
         df2['Processor'] = df2['Processor'] + '__' + df2['@SimulationCarrier']  # Mark, '__' for carrier split
+        df2=df2.drop('Processor',axis=1)
+        df2=df2.rename(columns={'aliases':'Processor'})
         # Start by the last level of parents
         levels = df['Level'].unique().tolist()
         last_level_parent = int(levels[-1].split('-')[-1])
+
         last_level_processors = 'n-' + str(last_level_parent + 1)
         df2['Level'] = last_level_processors
         df = pd.concat([df, df2[['Processor', 'ParentProcessor', 'Level']]], ignore_index=True, axis=0)
-
+        pass
         levels = df['Level'].unique().tolist()
 
         list_total = []
@@ -287,7 +296,6 @@ class SoftLinkCalEnb():
             df_level = df[df['Level'] == level]
             if level == levels[0]:
                 break
-
             elif level == levels[-1]:
                 last = self.tree_last_level(df_level, *args)
                 global last_list
@@ -312,6 +320,7 @@ class SoftLinkCalEnb():
         :param names: comes from generate scenarios. List of unique aliases
         :return:
         """
+        # TODO: let's avoid hierarchy refinement
         new_rows = []
         for index, row in df.iterrows():
             processor = row['Processor']
@@ -332,7 +341,6 @@ class SoftLinkCalEnb():
             childs = df3['Processor'].unique().tolist()
             last_level[parent] = childs
             last_level_list.append(last_level)
-
         pass
 
         return last_level_list
@@ -444,9 +452,8 @@ class SoftLinkCalEnb():
 
         self.generate_scenarios()
         self.generate_aternative_activities()
-        pass
         self.alternative_hierarchy(*self.final_acts)
-        self.hierarchy_refinement(hierarchy_dict=self.hierarchy_tree)
+        #self.hierarchy_refinement(hierarchy_dict=self.hierarchy_tree)
         for element in self.__delete_keys:
             self.clean_key(element)
 
