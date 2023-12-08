@@ -1,0 +1,111 @@
+Metadata-Version: 2.1
+Name: pandaSDMX
+Version: 1.10.0
+Summary: Statistical Data and Metadata eXchange (SDMX) for the Python data ecosystem
+Home-page: https://github.com/dr-leo/pandasdmx
+Keywords: statistics, SDMX, pandas, data, economics, science
+Author: dr-leo
+Author-email: fhaxbox66@gmail.com
+Requires-Python: >=3.9.6,<3.12
+Description-Content-Type: text/x-rst
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Financial and Insurance Industry
+Classifier: Development Status :: 4 - Beta
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Scientific/Engineering :: Information Analysis
+Classifier: License :: OSI Approved :: Apache Software License
+Requires-Dist: requests >=2.15
+Requires-Dist: lxml >= 4.1
+Requires-Dist: pandas >= 1.2
+Requires-Dist: pydantic >=1.9.2, < 2.0
+Requires-Dist: requests_cache ; extra == "cache"
+Requires-Dist: sphinx >= 2.3 ; extra == "doc"
+Requires-Dist: IPython ; extra == "doc"
+Requires-Dist: appdirs >= 1.4 ; extra == "schema"
+Requires-Dist: pytest >= 5 ; extra == "test"
+Requires-Dist: requests-mock >= 1.4 ; extra == "test"
+Project-URL: Homepage, https://pandasdmx.readthedocs.io/en/latest/
+Provides-Extra: cache
+Provides-Extra: doc
+Provides-Extra: schema
+Provides-Extra: test
+
+pandaSDMX: Statistical Data and Metadata eXchange
+=================================================
+
+.. image:: https://github.com/dr-leo/pandasdmx/workflows/Python%20package/badge.svg
+   :target: https://github.com/dr-leo/pandaSDMX/actions
+   :alt: Github actions CI status
+.. image:: https://codecov.io/gh/dr-leo/pandaSDMX/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/dr-leo/pandaSDMX
+   :alt: Codecov status
+.. image:: https://readthedocs.org/projects/pandasdmx/badge/?version=latest
+   :target: https://pandasdmx.readthedocs.io/en/latest
+   :alt: Documentation Status
+.. image:: https://img.shields.io/pypi/v/pandaSDMX.svg
+   :target: https://pypi.org/project/pandaSDMX
+   :alt: PyPI
+.. image:: https://img.shields.io/conda/dn/conda-forge/pandasdmx.svg
+   :target: https://github.com/conda-forge/pandasdmx-feedstock
+   :alt: conda-forge
+
+`Source code @ Github <https://github.com/dr-leo/pandasdmx/>`_ —
+`Authors <AUTHORS>`_
+
+**pandaSDMX** is an `Apache 2.0-licensed <LICENSE>`_ Python package that
+implements `SDMX <http://www.sdmx.org>`_ 2.1 (`ISO 17369:2013
+<https://www.iso.org/standard/52500.html>`_), a format for exchange of
+**statistical data and metadata** used by national statistical agencies,
+central banks, and international organisations.
+
+**pandaSDMX** can be used to:
+
+- explore the data available from `data providers
+  <https://pandasdmx.readthedocs.io/en/latest/sources.html>`_
+  such as the World Bank, ILO, BIS, ECB, Eurostat, OECD, UNICEF and United Nations;
+- parse data and metadata in SDMX-ML (XML) or SDMX-JSON formats—either:
+
+  - from local and remote files, or
+  - retrieved from pandasdmx web services, with query validation and caching;
+
+- convert data and metadata into `pandas <https://pandas.pydata.org>`_ objects,
+  for use with the analysis, plotting, and other tools in the Python data
+  science ecosystem;
+- apply the `SDMX Information Model
+  <https://pandasdmx.readthedocs.io/en/latest/im.html>`_ to your own data;
+
+…and much more.
+
+
+Documentation
+-------------
+
+* stable: https://pandasdmx.readthedocs.io/ 
+* latest: https://pandasdmx.readthedocs.io/en/latest  or
+* v0.9: https://pandasdmx.readthedocs.io/en/v0.9 for the 0.9 release.
+
+
+License
+-------
+
+Copyright 2014–2023, `pandaSDMX developers <AUTHORS>`_
+
+Licensed under the Apache License, Version 2.0 (the “License”); you may not use
+these files except in compliance with the License. You may obtain a copy of the
+License:
+
+- from the file LICENSE included with the source code, or
+- at http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
+
+pandaSDMX contains code from `SDMX1 <https://sdmx1.readthedocs.io/>`_ which is itself
+a fork of  pandaSDMX.

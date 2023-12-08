@@ -51,7 +51,7 @@ class Market_for_electricity():
 
 
 
-    def get_elec_acts(self,region,present_dict=None)->Dict[str,List[str]]:
+    def get_elec_acts(self,region)->Dict[str,List[str]]:
 
         """
         Update self.electricity_list with the activities that form the market for electricity
@@ -83,12 +83,12 @@ class Market_for_electricity():
         -Units
         """
         Location=region
-        Activity_name=args[0]
-        Activity_code=args[1]
+        Activity_name=args[1]
+        Activity_code=args[0]
         Reference_product=args[2]
         Units=args[3]
+        print(f'Passing market for locaiton {Location}')
         pass
-
 
         # Call create_template to create the df of the inventory
         df = self.create_template_df()
@@ -107,12 +107,11 @@ class Market_for_electricity():
                      "Unit_check": None
                      }
         df.loc[len(df.index)] = first_row
-        self.get_elec_acts(region)
         pass
-
+        self.get_elec_acts(Location)
 
         for activity in self.electricity_list[region]:
-            pass
+
             for key in map_activities.keys():
                 if activity == key:
                     code = map_activities[key]['id']['code']  # This might change
@@ -136,16 +135,19 @@ class Market_for_electricity():
                            "Database": act['database'],
                            "Unit_check": unit_check
                            }
-
                     df.loc[len(df.index)] = row
-        #TODO: Check if needed
-        # df_gruoped = df.groupby('Activity_code')['Amount'].transform('sum')
-        # df['Amount'] = df_gruoped
-        # df = df.drop_duplicates(subset='Activity_code')
-        print(f'Template for future market for electicity in {Location} has been created')
+
+        #check df
+        print('Activity with the following properties will be created')
+
 
         InventoryFromExcel(df)
-
+        try:
+            a=ei.get_node(Activity_code)
+            print(f'activity {a["code"]} in database')
+        except:
+            raise KeyError(f'Activity {Activity_code} has not been registered in the db')
+        pass
         return df
 
     def get_market_ecoinvent(self,region):
@@ -174,13 +176,17 @@ class Market_for_electricity():
         This function adds the market in the template dictionary
         {region : template(pd.DataFrame)}
         """
+
+        pass
         templates={}
         for region in self.regions:
             old_code = self.get_market_ecoinvent(region)
             if old_code is None:
+                print(f'region {region} has no code associated')
                 continue
             else:
                 # Modify the activity code
+                print(f'Creating market for region {region}')
                 Location=region
                 Activity_name='Future_market_for_electricity'+'_'+region
                 Activity_code = 'FM4E' +'_'+ region

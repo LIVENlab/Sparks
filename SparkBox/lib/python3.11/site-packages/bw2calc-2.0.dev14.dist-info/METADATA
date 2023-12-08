@@ -1,0 +1,60 @@
+Metadata-Version: 2.1
+Name: bw2calc
+Version: 2.0.dev14
+Summary: UNKNOWN
+Home-page: https://bitbucket.org/cmutel/brightway2-calc
+Author: Chris Mutel
+Author-email: cmutel@gmail.com
+License: NewBSD 3-clause; LICENSE.txt
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Topic :: Scientific/Engineering :: Information Analysis
+Classifier: Topic :: Scientific/Engineering :: Mathematics
+Classifier: Topic :: Scientific/Engineering :: Visualization
+License-File: LICENSE.txt
+Requires-Dist: bw-processing
+Requires-Dist: matrix-utils
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: scipy
+Requires-Dist: stats-arrays
+
+Brightway2 Calculations
+=======================
+
+.. image:: https://img.shields.io/pypi/v/bw2calc.svg
+   :target: https://pypi.org/project/bw2calc/
+   :alt: pypi version
+
+.. image:: https://img.shields.io/conda/vn/conda-forge/bw2calc.svg
+   :target: https://anaconda.org/conda-forge/bw2calc
+   :alt: conda-forge version
+
+.. image:: https://ci.appveyor.com/api/projects/status/uqixaochulbu6vjv?svg=true
+   :target: https://ci.appveyor.com/project/cmutel/brightway2-calc
+   :alt: bw2calc appveyor build status
+
+.. image:: https://coveralls.io/repos/bitbucket/cmutel/brightway2-calc/badge.svg?branch=master
+    :target: https://coveralls.io/bitbucket/cmutel/brightway2-calc?branch=default
+    :alt: Test coverage report
+
+This package provides the calculation engine for the `Brightway2 life cycle assessment framework <https://brightway.dev>`_. `Online documentation <https://docs.brightway.dev>`_ is available, and the source code is hosted on `Github <https://github.com/brightway-lca/brightway2-calc>`_.
+
+The emphasis here has been on speed of solving the linear systems, for normal LCA calculations, graph traversal, or Monte Carlo uncertainty analysis.
+
+Relies on `bw_processing <https://github.com/brightway-lca/bw_processing>`__ for input array formatting.
+
+

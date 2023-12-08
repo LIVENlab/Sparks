@@ -1,0 +1,1958 @@
+{
+    "general": {
+        "OECDEurope": {
+            "electricity production CSP mix, electricity high voltage, cut-off, U - GLO": {
+                "name": "electricity production, solar thermal parabolic trough, 50 MW",
+                "share": 0.03856491584790567,
+                "carrier": "electricity",
+                "loc": "RoW"
+            },
+            "electricity production, deep geothermal | electricity, high voltage | cut-off, U - IT": {
+                "name": "electricity production, deep geothermal",
+                "share": 0.026554401607328765,
+                "carrier": "electricity, high voltage",
+                "loc": "IT"
+            },
+            "electricity production, deep geothermal | electricity, high voltage | cut-off, U - TR": {
+                "name": "electricity production, deep geothermal",
+                "share": 4.953770464433152e-06,
+                "carrier": "electricity, high voltage",
+                "loc": "TR"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - ES": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.0024510394529140213,
+                "carrier": "electricity, high voltage",
+                "loc": "ES"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - FR": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.003365997353599087,
+                "carrier": "electricity, high voltage",
+                "loc": "FR"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - GB": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.0020596811405665925,
+                "carrier": "electricity, high voltage",
+                "loc": "GB"
+            },
+            "electricity production, hydro, reservoir, alpine region | electricity, high voltage | cut-off, U - FR": {
+                "name": "electricity production, hydro, reservoir, alpine region",
+                "share": 0.005875063342096355,
+                "carrier": "electricity, high voltage",
+                "loc": "FR"
+            },
+            "electricity production, hydro, reservoir, alpine region | electricity, high voltage | cut-off, U - IT": {
+                "name": "electricity production, hydro, reservoir, alpine region",
+                "share": 0.018568540740922342,
+                "carrier": "electricity, high voltage",
+                "loc": "IT"
+            },
+            "electricity production, hydro, reservoir, non-alpine region | electricity, high voltage | cut-off, U - ES": {
+                "name": "electricity production, hydro, reservoir, non-alpine region",
+                "share": 0.004732166210685796,
+                "carrier": "electricity, high voltage",
+                "loc": "ES"
+            },
+            "electricity production, hydro, reservoir, non-alpine region | electricity, high voltage | cut-off, U - TR": {
+                "name": "electricity production, hydro, reservoir, non-alpine region",
+                "share": 0.02018992059539749,
+                "carrier": "electricity, high voltage",
+                "loc": "TR"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - FR": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.029066676176440872,
+                "carrier": "electricity, high voltage",
+                "loc": "FR"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - IT": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.010444395671944351,
+                "carrier": "electricity, high voltage",
+                "loc": "IT"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - TR": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.02018992059539749,
+                "carrier": "electricity, high voltage",
+                "loc": "TR"
+            },
+            "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, hydrogen, combined cycle power plant",
+                "share": 0.01318065303458695,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - ES": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.021465314841446082,
+                "carrier": "electricity, low voltage",
+                "loc": "ES"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - FR": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.012895205380247871,
+                "carrier": "electricity, low voltage",
+                "loc": "FR"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - IT": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.028080421371125968,
+                "carrier": "electricity, low voltage",
+                "loc": "IT"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - ES": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.017563889233077397,
+                "carrier": "electricity, low voltage",
+                "loc": "ES"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - FR": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.010393980198734274,
+                "carrier": "electricity, low voltage",
+                "loc": "FR"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - IT": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.022461002129992087,
+                "carrier": "electricity, low voltage",
+                "loc": "IT"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - ES": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.02404209967468754,
+                "carrier": "electricity, low voltage",
+                "loc": "ES"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - FR": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.007411663977592744,
+                "carrier": "electricity, low voltage",
+                "loc": "FR"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - IT": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.0814060495023434,
+                "carrier": "electricity, low voltage",
+                "loc": "IT"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - ES": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.06270367994894413,
+                "carrier": "electricity, high voltage",
+                "loc": "ES"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - GB": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.004789104430231466,
+                "carrier": "electricity, high voltage",
+                "loc": "GB"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - IT": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.013462170384074702,
+                "carrier": "electricity, high voltage",
+                "loc": "IT"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - GB": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.002782857979729095,
+                "carrier": "electricity, high voltage",
+                "loc": "GB"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - IT": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.0041112686318170045,
+                "carrier": "electricity, high voltage",
+                "loc": "IT"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - TR": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.0028894793670517023,
+                "carrier": "electricity, high voltage",
+                "loc": "TR"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - ES": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.00023778888861129838,
+                "carrier": "electricity, high voltage",
+                "loc": "ES"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - FR": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.0002206878731214089,
+                "carrier": "electricity, high voltage",
+                "loc": "FR"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - GB": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.1580771655121751,
+                "carrier": "electricity, high voltage",
+                "loc": "GB"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - ES": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.11392019795867105,
+                "carrier": "electricity, high voltage",
+                "loc": "ES"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - FR": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.04997574731792047,
+                "carrier": "electricity, high voltage",
+                "loc": "FR"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - GB": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.039646018567024266,
+                "carrier": "electricity, high voltage",
+                "loc": "GB"
+            },
+            "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - IT": {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "share": 0.004346943097316521,
+                "carrier": "electricity, high voltage",
+                "loc": "IT"
+            },
+            "heat and power co-generation, hard coal | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, hard coal",
+                "share": 0.019810648743049598,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+                "share": 0.02614425456450048,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "heat and power co-generation, lignite | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, lignite",
+                "share": 0.03197081696282897,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014 | electricity, high voltage | cut-off, U - ES": {
+                "name": "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",
+                "share": 0.011456516244636335,
+                "carrier": "electricity, high voltage",
+                "loc": "ES"
+            },
+            "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014 | electricity, high voltage | cut-off, U - GB": {
+                "name": "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",
+                "share": 0.0237631088644512,
+                "carrier": "electricity, high voltage",
+                "loc": "GB"
+            },
+            "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014 | electricity, high voltage | cut-off, U - IT": {
+                "name": "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",
+                "share": 0.008721706630455866,
+                "carrier": "electricity, high voltage",
+                "loc": "IT"
+            }
+        },
+        "Latin America": {
+            "electricity production CSP mix, electricity high voltage, cut-off, U - GLO": {
+                "name": "electricity production, solar thermal parabolic trough, 50 MW",
+                "share": 0.07462154629959628,
+                "carrier": "electricity",
+                "loc": "RoW"
+            },
+            "electricity production, deep geothermal | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, deep geothermal",
+                "share": 0.037100439946949296,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, hydro, reservoir, alpine region | electricity, high voltage | cut-off, U - PE": {
+                "name": "electricity production, hydro, reservoir, alpine region",
+                "share": 0.011838565331446997,
+                "carrier": "electricity, high voltage",
+                "loc": "PE"
+            },
+            "electricity production, hydro, reservoir, tropical region | electricity, high voltage | cut-off, U - BR": {
+                "name": "electricity production, hydro, reservoir, tropical region",
+                "share": 0.2166204971119078,
+                "carrier": "electricity, high voltage",
+                "loc": "BR"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - CL": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.01117472408012947,
+                "carrier": "electricity, high voltage",
+                "loc": "CL"
+            },
+            "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, hydrogen, combined cycle power plant",
+                "share": 0.017235637455669358,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - RoW": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.055539650730031496,
+                "carrier": "electricity, low voltage",
+                "loc": "RoW"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - RoW": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.055539650730031496,
+                "carrier": "electricity, low voltage",
+                "loc": "RoW"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - RoW": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.11107930146006299,
+                "carrier": "electricity, low voltage",
+                "loc": "RoW"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - BR": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.012058097154644225,
+                "carrier": "electricity, high voltage",
+                "loc": "BR"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - CL": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.00026712221102698143,
+                "carrier": "electricity, high voltage",
+                "loc": "CL"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - PE": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 1.2119271071133896e-07,
+                "carrier": "electricity, high voltage",
+                "loc": "PE"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - BR": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.004637729674863164,
+                "carrier": "electricity, high voltage",
+                "loc": "BR"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.07288045478712527,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - BR": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.18875559776693074,
+                "carrier": "electricity, high voltage",
+                "loc": "BR"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - CL": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.01638184223696816,
+                "carrier": "electricity, high voltage",
+                "loc": "CL"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - PE": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 4.056491607793958e-05,
+                "carrier": "electricity, high voltage",
+                "loc": "PE"
+            },
+            "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - PE": {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "share": 0.00024693984858973375,
+                "carrier": "electricity, high voltage",
+                "loc": "PE"
+            },
+            "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+                "share": 0.003213423932412931,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "heat and power co-generation, wood chips, 6667 kW | electricity, high voltage | cut-off, U - CL": {
+                "name": "heat and power co-generation, wood chips, 6667 kW",
+                "share": 0.01333024550586512,
+                "carrier": "electricity, high voltage",
+                "loc": "CL"
+            },
+            "heat and power co-generation, wood chips, 6667 kW | electricity, high voltage | cut-off, U - PE": {
+                "name": "heat and power co-generation, wood chips, 6667 kW",
+                "share": 0.0015924454338543084,
+                "carrier": "electricity, high voltage",
+                "loc": "PE"
+            },
+            "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014 | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",
+                "share": 0.09583955960413754,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            }
+        },
+        "India": {
+            "electricity production CSP mix, electricity high voltage, cut-off, U - GLO": {
+                "name": "electricity production, solar thermal parabolic trough, 50 MW",
+                "share": 0.10321932311667802,
+                "carrier": "electricity",
+                "loc": "RoW"
+            },
+            "electricity production, deep geothermal | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, deep geothermal",
+                "share": 0.04777934400706907,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, hydro, reservoir, alpine region | electricity, high voltage | cut-off, U - IN": {
+                "name": "electricity production, hydro, reservoir, alpine region",
+                "share": 0.03347487379696175,
+                "carrier": "electricity, high voltage",
+                "loc": "IN"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - IN": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.004563459080528725,
+                "carrier": "electricity, high voltage",
+                "loc": "IN"
+            },
+            "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, hydrogen, combined cycle power plant",
+                "share": 0.013550289779920718,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - IN": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.0972749214047713,
+                "carrier": "electricity, low voltage",
+                "loc": "IN"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - IN": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.079539714739813,
+                "carrier": "electricity, low voltage",
+                "loc": "IN"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - RoW": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.1768146361445843,
+                "carrier": "electricity, low voltage",
+                "loc": "RoW"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - IN": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.0996921142849769,
+                "carrier": "electricity, high voltage",
+                "loc": "IN"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - IN": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.06046084639699098,
+                "carrier": "electricity, high voltage",
+                "loc": "IN"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.05788791711168067,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - IN": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.17827879964287274,
+                "carrier": "electricity, high voltage",
+                "loc": "IN"
+            },
+            "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - IN": {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "share": 0.001938725749175916,
+                "carrier": "electricity, high voltage",
+                "loc": "IN"
+            },
+            "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+                "share": 0.005013446332857689,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "heat and power co-generation, wood chips, 6667 kW | electricity, high voltage | cut-off, U - IN": {
+                "name": "heat and power co-generation, wood chips, 6667 kW",
+                "share": 0.04051035082871071,
+                "carrier": "electricity, high voltage",
+                "loc": "IN"
+            }
+        },
+        "OECD america": {
+            "electricity production CSP mix, electricity high voltage, cut-off, U - GLO": {
+                "name": "electricity production, solar thermal parabolic trough, 50 MW",
+                "share": 0.09422233326552812,
+                "carrier": "electricity",
+                "loc": "RoW"
+            },
+            "electricity production, deep geothermal | electricity, high voltage | cut-off, U - HICC": {
+                "name": "electricity production, deep geothermal",
+                "share": 0.00029789687662564834,
+                "carrier": "electricity, high voltage",
+                "loc": "HICC"
+            },
+            "electricity production, deep geothermal | electricity, high voltage | cut-off, U - MX": {
+                "name": "electricity production, deep geothermal",
+                "share": 0.006380614678798511,
+                "carrier": "electricity, high voltage",
+                "loc": "MX"
+            },
+            "electricity production, deep geothermal | electricity, high voltage | cut-off, U - WECC, US only": {
+                "name": "electricity production, deep geothermal",
+                "share": 0.01749588637858074,
+                "carrier": "electricity, high voltage",
+                "loc": "WECC"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - NPCC, US only": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.00038585514824620925,
+                "carrier": "electricity, high voltage",
+                "loc": "NPCC"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - RFC": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.0007505431430375457,
+                "carrier": "electricity, high voltage",
+                "loc": "RFC"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - SERC": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.001721655117954602,
+                "carrier": "electricity, high voltage",
+                "loc": "SERC"
+            },
+            "electricity production, hydro, reservoir, alpine region | electricity, high voltage | cut-off, U - CA-BC": {
+                "name": "electricity production, hydro, reservoir, alpine region",
+                "share": 0.008780865197373255,
+                "carrier": "electricity, high voltage",
+                "loc": "CA"
+            },
+            "electricity production, hydro, reservoir, alpine region | electricity, high voltage | cut-off, U - NPCC, US only": {
+                "name": "electricity production, hydro, reservoir, alpine region",
+                "share": 0.001013216756186089,
+                "carrier": "electricity, high voltage",
+                "loc": "NPCC"
+            },
+            "electricity production, hydro, reservoir, alpine region | electricity, high voltage | cut-off, U - WECC, US only": {
+                "name": "electricity production, hydro, reservoir, alpine region",
+                "share": 0.006130674759230904,
+                "carrier": "electricity, high voltage",
+                "loc": "WECC"
+            },
+            "electricity production, hydro, reservoir, non-alpine region | electricity, high voltage | cut-off, U - CA-MB": {
+                "name": "electricity production, hydro, reservoir, non-alpine region",
+                "share": 0.00565449960638912,
+                "carrier": "electricity, high voltage",
+                "loc": "CA"
+            },
+            "electricity production, hydro, reservoir, non-alpine region | electricity, high voltage | cut-off, U - CA-ON": {
+                "name": "electricity production, hydro, reservoir, non-alpine region",
+                "share": 0.005186146237424878,
+                "carrier": "electricity, high voltage",
+                "loc": "CA"
+            },
+            "electricity production, hydro, reservoir, non-alpine region | electricity, high voltage | cut-off, U - CA-QC": {
+                "name": "electricity production, hydro, reservoir, non-alpine region",
+                "share": 0.01406119422916929,
+                "carrier": "electricity, high voltage",
+                "loc": "CA"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - CA-QC": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.00856096493674086,
+                "carrier": "electricity, high voltage",
+                "loc": "CA"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - MX": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.005260039731608021,
+                "carrier": "electricity, high voltage",
+                "loc": "MX"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - WECC, US only": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.024523902309692838,
+                "carrier": "electricity, high voltage",
+                "loc": "WECC"
+            },
+            "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, hydrogen, combined cycle power plant",
+                "share": 0.020766080888660905,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - FRCC": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.005298837329328519,
+                "carrier": "electricity, low voltage",
+                "loc": "FRCC"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - RFC": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.011072591429992387,
+                "carrier": "electricity, low voltage",
+                "loc": "RFC"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - WECC, US only": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.07822778666422879,
+                "carrier": "electricity, low voltage",
+                "loc": "WECC"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - FRCC": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.0042895349808849915,
+                "carrier": "electricity, low voltage",
+                "loc": "FRCC"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - RFC": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.00885807314399391,
+                "carrier": "electricity, low voltage",
+                "loc": "RFC"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - WECC, US only": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.062072048114007634,
+                "carrier": "electricity, low voltage",
+                "loc": "WECC"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - CA-ON": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.020782863100481705,
+                "carrier": "electricity, low voltage",
+                "loc": "CA"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - RFC": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.01667942821264249,
+                "carrier": "electricity, low voltage",
+                "loc": "RFC"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - WECC, US only": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.132356580349312,
+                "carrier": "electricity, low voltage",
+                "loc": "WECC"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - MRO, US only": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.006879494909041653,
+                "carrier": "electricity, high voltage",
+                "loc": "MRO"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - TRE": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.0067922939176729,
+                "carrier": "electricity, high voltage",
+                "loc": "TRE"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - WECC, US only": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.008375886570537588,
+                "carrier": "electricity, high voltage",
+                "loc": "WECC"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - MRO, US only": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.0007055892214401697,
+                "carrier": "electricity, high voltage",
+                "loc": "MRO"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - TRE": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.0007004553102600178,
+                "carrier": "electricity, high voltage",
+                "loc": "TRE"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - WECC, US only": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.0008514494622532299,
+                "carrier": "electricity, high voltage",
+                "loc": "WECC"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.10642395351511023,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - MRO, US only": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.08207413823792054,
+                "carrier": "electricity, high voltage",
+                "loc": "MRO"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - TRE": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.08097687904975662,
+                "carrier": "electricity, high voltage",
+                "loc": "TRE"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - WECC, US only": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.0999562066384722,
+                "carrier": "electricity, high voltage",
+                "loc": "WECC"
+            },
+            "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - NPCC, US only": {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "share": 0.003963683884612401,
+                "carrier": "electricity, high voltage",
+                "loc": "NPCC"
+            },
+            "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - RFC": {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "share": 0.005539883457031634,
+                "carrier": "electricity, high voltage",
+                "loc": "RFC"
+            },
+            "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - WECC, US only": {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "share": 0.0025186542159013592,
+                "carrier": "electricity, high voltage",
+                "loc": "WECC"
+            },
+            "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+                "share": 0.018695442605842452,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014 | electricity, high voltage | cut-off, U - CA-BC": {
+                "name": "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",
+                "share": 0.007160626402151286,
+                "carrier": "electricity, high voltage",
+                "loc": "CA"
+            },
+            "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014 | electricity, high voltage | cut-off, U - NPCC, US only": {
+                "name": "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",
+                "share": 0.003522929686010239,
+                "carrier": "electricity, high voltage",
+                "loc": "NPCC"
+            },
+            "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014 | electricity, high voltage | cut-off, U - WECC, US only": {
+                "name": "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",
+                "share": 0.004020159613842555,
+                "carrier": "electricity, high voltage",
+                "loc": "WECC"
+            }
+        },
+        "Global": {
+            "electricity production CSP mix, electricity high voltage, cut-off, U - GLO": {
+                "name": "electricity production, solar thermal parabolic trough, 50 MW",
+                "share": 0.13686902481423197,
+                "carrier": "electricity",
+                "loc": "RoW"
+            },
+            "electricity production, deep geothermal | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, deep geothermal",
+                "share": 0.040772433020312,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.011727253468955194,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, hydro, reservoir, alpine region | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, hydro, reservoir, alpine region",
+                "share": 0.009652917958175737,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, hydro, reservoir, non-alpine region | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, hydro, reservoir, non-alpine region",
+                "share": 0.013736034358626498,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, hydro, reservoir, tropical region | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, hydro, reservoir, tropical region",
+                "share": 0.008959911963603817,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.03502723879996779,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, hydrogen, combined cycle power plant",
+                "share": 0.020282080045174337,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - RoW": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.08726739495951437,
+                "carrier": "electricity, low voltage",
+                "loc": "RoW"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - RoW": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.06517438357735883,
+                "carrier": "electricity, low voltage",
+                "loc": "RoW"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - RoW": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.1524417785368732,
+                "carrier": "electricity, low voltage",
+                "loc": "RoW"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.25910339453223424,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.08415223421778639,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "share": 0.0002491501308619543,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+                "share": 0.022216517752576825,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "heat and power co-generation, wood chips, 6667 kW | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, wood chips, 6667 kW",
+                "share": 0.008856154651547649,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014 | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",
+                "share": 0.04351067285325584,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            }
+        },
+        "MidlleEast": {
+            "electricity production CSP mix, electricity high voltage, cut-off, U - ME": {
+                "name": "electricity production CSP mix, electricity high voltage, cut-off, U - ME",
+                "share": 0.29628774974197175,
+                "carrier": "electricity",
+                "loc": "GLO"
+            },
+            "electricity production, deep geothermal | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, deep geothermal",
+                "share": 0.021921911842447534,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - IR": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.009987581079606957,
+                "carrier": "electricity, high voltage",
+                "loc": "IR"
+            },
+            "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, hydrogen, combined cycle power plant",
+                "share": 0.023914812919033673,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - SA": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.11313897045391723,
+                "carrier": "electricity, low voltage",
+                "loc": "SA"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - SA": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.09256827867130407,
+                "carrier": "electricity, low voltage",
+                "loc": "SA"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - RoW": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.20570724912522131,
+                "carrier": "electricity, low voltage",
+                "loc": "RoW"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - IR": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.1871815368759505,
+                "carrier": "electricity, high voltage",
+                "loc": "IR"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.016782324855462227,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - IR": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.02495753825012673,
+                "carrier": "electricity, high voltage",
+                "loc": "IR"
+            },
+            "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - IR": {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "share": 0.006293371820798335,
+                "carrier": "electricity, high voltage",
+                "loc": "IR"
+            },
+            "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+                "share": 0.001258674364159667,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            }
+        },
+        "africa": {
+            "electricity production CSP mix, electricity high voltage, cut-off, U - GLO": {
+                "name": "electricity production, solar thermal parabolic trough, 50 MW",
+                "share": 0.16077803578187175,
+                "carrier": "electricity",
+                "loc": "RoW"
+            },
+            "electricity production, deep geothermal | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, deep geothermal",
+                "share": 0.05336252075682717,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - ZA": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.017707054427859685,
+                "carrier": "electricity, high voltage",
+                "loc": "ZA"
+            },
+            "electricity production, hydro, reservoir, non-alpine region | electricity, high voltage | cut-off, U - TZ": {
+                "name": "electricity production, hydro, reservoir, non-alpine region",
+                "share": 0.009993596652293232,
+                "carrier": "electricity, high voltage",
+                "loc": "TZ"
+            },
+            "electricity production, hydro, reservoir, non-alpine region | electricity, high voltage | cut-off, U - ZA": {
+                "name": "electricity production, hydro, reservoir, non-alpine region",
+                "share": 0.010658988441527946,
+                "carrier": "electricity, high voltage",
+                "loc": "ZA"
+            },
+            "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, hydrogen, combined cycle power plant",
+                "share": 0.017048728676302607,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - TZ": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.020000022143366675,
+                "carrier": "electricity, low voltage",
+                "loc": "TZ"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - ZA": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.06832254073138497,
+                "carrier": "electricity, low voltage",
+                "loc": "ZA"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - TZ": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.016431943075536002,
+                "carrier": "electricity, low voltage",
+                "loc": "TZ"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - ZA": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.056265621778787606,
+                "carrier": "electricity, low voltage",
+                "loc": "ZA"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - RoW": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.16102012772907526,
+                "carrier": "electricity, low voltage",
+                "loc": "RoW"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - ZA": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.020230076662689916,
+                "carrier": "electricity, high voltage",
+                "loc": "ZA"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.08427357071983142,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - ZA": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.27748164297437683,
+                "carrier": "electricity, high voltage",
+                "loc": "ZA"
+            },
+            "heat and power co-generation, wood chips, 6667 kW | electricity, high voltage | cut-off, U - ZA": {
+                "name": "heat and power co-generation, wood chips, 6667 kW",
+                "share": 0.026425529448269043,
+                "carrier": "electricity, high voltage",
+                "loc": "ZA"
+            }
+        },
+        "Other_Asia": {
+            "electricity production CSP mix, electricity high voltage, cut-off, U - GLO": {
+                "name": "electricity production, solar thermal parabolic trough, 50 MW",
+                "share": 0.17686491115944292,
+                "carrier": "electricity",
+                "loc": "RoW"
+            },
+            "electricity production, deep geothermal | electricity, high voltage | cut-off, U - ID": {
+                "name": "electricity production, deep geothermal",
+                "share": 0.05976937357602915,
+                "carrier": "electricity, high voltage",
+                "loc": "ID"
+            },
+            "electricity production, deep geothermal | electricity, high voltage | cut-off, U - TH": {
+                "name": "electricity production, deep geothermal",
+                "share": 6.6294118855720134e-06,
+                "carrier": "electricity, high voltage",
+                "loc": "TH"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - TW": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.0030129188246409743,
+                "carrier": "electricity, high voltage",
+                "loc": "TW"
+            },
+            "electricity production, hydro, reservoir, tropical region | electricity, high voltage | cut-off, U - ID": {
+                "name": "electricity production, hydro, reservoir, tropical region",
+                "share": 0.01294500290857847,
+                "carrier": "electricity, high voltage",
+                "loc": "ID"
+            },
+            "electricity production, hydro, reservoir, tropical region | electricity, high voltage | cut-off, U - MY": {
+                "name": "electricity production, hydro, reservoir, tropical region",
+                "share": 0.01835141465917684,
+                "carrier": "electricity, high voltage",
+                "loc": "MY"
+            },
+            "electricity production, hydro, reservoir, tropical region | electricity, high voltage | cut-off, U - TH": {
+                "name": "electricity production, hydro, reservoir, tropical region",
+                "share": 0.00898305010368392,
+                "carrier": "electricity, high voltage",
+                "loc": "TH"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - TW": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.005808582805349834,
+                "carrier": "electricity, high voltage",
+                "loc": "TW"
+            },
+            "electricity production, natural gas, combined cycle power plant | electricity, high voltage | cut-off, U - ID": {
+                "name": "electricity production, natural gas, combined cycle power plant",
+                "share": 0.0040863217842283745,
+                "carrier": "electricity, high voltage",
+                "loc": "ID"
+            },
+            "electricity production, natural gas, combined cycle power plant | electricity, high voltage | cut-off, U - MY": {
+                "name": "electricity production, natural gas, combined cycle power plant",
+                "share": 0.006371639742530714,
+                "carrier": "electricity, high voltage",
+                "loc": "MY"
+            },
+            "electricity production, natural gas, combined cycle power plant | electricity, high voltage | cut-off, U - TH": {
+                "name": "electricity production, natural gas, combined cycle power plant",
+                "share": 0.012586736189816167,
+                "carrier": "electricity, high voltage",
+                "loc": "TH"
+            },
+            "electricity production, natural gas, conventional power plant | electricity, high voltage | cut-off, U - MY": {
+                "name": "electricity production, natural gas, conventional power plant",
+                "share": 0.003411758942969656,
+                "carrier": "electricity, high voltage",
+                "loc": "MY"
+            },
+            "electricity production, natural gas, conventional power plant | electricity, high voltage | cut-off, U - TH": {
+                "name": "electricity production, natural gas, conventional power plant",
+                "share": 0.005794085189672242,
+                "carrier": "electricity, high voltage",
+                "loc": "TH"
+            },
+            "electricity production, natural gas, conventional power plant | electricity, high voltage | cut-off, U - TW": {
+                "name": "electricity production, natural gas, conventional power plant",
+                "share": 0.009918336507558535,
+                "carrier": "electricity, high voltage",
+                "loc": "TW"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - MY": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.005677298182253196,
+                "carrier": "electricity, low voltage",
+                "loc": "MY"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - TH": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.058843359716856135,
+                "carrier": "electricity, low voltage",
+                "loc": "TH"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - TW": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.03197081498752435,
+                "carrier": "electricity, low voltage",
+                "loc": "TW"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - MY": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.004541838545802557,
+                "carrier": "electricity, low voltage",
+                "loc": "MY"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - TH": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.04829375339311699,
+                "carrier": "electricity, low voltage",
+                "loc": "TH"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - TW": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.02609862447961171,
+                "carrier": "electricity, low voltage",
+                "loc": "TW"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - RoW": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.17542568930516494,
+                "carrier": "electricity, low voltage",
+                "loc": "RoW"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - ID": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.0008452480745976846,
+                "carrier": "electricity, high voltage",
+                "loc": "ID"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - TW": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.0071015466017549265,
+                "carrier": "electricity, high voltage",
+                "loc": "TW"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.07241829518214848,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - TW": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.20673391218442116,
+                "carrier": "electricity, high voltage",
+                "loc": "TW"
+            },
+            "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - MY": {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "share": 9.652248287157562e-05,
+                "carrier": "electricity, high voltage",
+                "loc": "MY"
+            },
+            "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - TH": {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "share": 0.0005261195633537227,
+                "carrier": "electricity, high voltage",
+                "loc": "TH"
+            },
+            "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - TW": {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "share": 4.8093413328853384e-05,
+                "carrier": "electricity, high voltage",
+                "loc": "TW"
+            },
+            "heat and power co-generation, natural gas, conventional power plant, 100MW electrical | electricity, high voltage | cut-off, U - TW": {
+                "name": "heat and power co-generation, natural gas, conventional power plant, 100MW electrical",
+                "share": 0.007576038083033763,
+                "carrier": "electricity, high voltage",
+                "loc": "TW"
+            },
+            "heat and power co-generation, wood chips, 6667 kW | electricity, high voltage | cut-off, U - MY": {
+                "name": "heat and power co-generation, wood chips, 6667 kW",
+                "share": 0.003783681328565764,
+                "carrier": "electricity, high voltage",
+                "loc": "MY"
+            },
+            "heat and power co-generation, wood chips, 6667 kW | electricity, high voltage | cut-off, U - TH": {
+                "name": "heat and power co-generation, wood chips, 6667 kW",
+                "share": 0.020566492022009157,
+                "carrier": "electricity, high voltage",
+                "loc": "TH"
+            },
+            "heat and power co-generation, wood chips, 6667 kW | electricity, high voltage | cut-off, U - TW": {
+                "name": "heat and power co-generation, wood chips, 6667 kW",
+                "share": 0.001541910648021603,
+                "carrier": "electricity, high voltage",
+                "loc": "TW"
+            }
+        },
+        "Eurasia": {
+            "electricity production CSP mix, electricity high voltage, cut-off, U - GLO": {
+                "name": "electricity production, solar thermal parabolic trough, 50 MW",
+                "share": 0.02658389424991444,
+                "carrier": "electricity",
+                "loc": "RoW"
+            },
+            "electricity production, deep geothermal | electricity, high voltage | cut-off, U - RU": {
+                "name": "electricity production, deep geothermal",
+                "share": 0.06521771886509375,
+                "carrier": "electricity, high voltage",
+                "loc": "RU"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - BG": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.00047871540038808304,
+                "carrier": "electricity, high voltage",
+                "loc": "BG"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - RU": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.0005724175203483544,
+                "carrier": "electricity, high voltage",
+                "loc": "RU"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - UA": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.00032347038442708865,
+                "carrier": "electricity, high voltage",
+                "loc": "UA"
+            },
+            "electricity production, hydro, reservoir, non-alpine region | electricity, high voltage | cut-off, U - RU": {
+                "name": "electricity production, hydro, reservoir, non-alpine region",
+                "share": 0.016491650033615222,
+                "carrier": "electricity, high voltage",
+                "loc": "RU"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - RO": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.007118604154209058,
+                "carrier": "electricity, high voltage",
+                "loc": "RO"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - RU": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.05016787657284631,
+                "carrier": "electricity, high voltage",
+                "loc": "RU"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - UA": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.006643863626210314,
+                "carrier": "electricity, high voltage",
+                "loc": "UA"
+            },
+            "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, hydrogen, combined cycle power plant",
+                "share": 0.020965759513697706,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - BG": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.05170631202482108,
+                "carrier": "electricity, low voltage",
+                "loc": "BG"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - RO": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.00040820772651174535,
+                "carrier": "electricity, low voltage",
+                "loc": "RO"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - UA": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.005272683134110044,
+                "carrier": "electricity, low voltage",
+                "loc": "UA"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - BG": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.042317534315050934,
+                "carrier": "electricity, low voltage",
+                "loc": "BG"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - RO": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.00033137895030496976,
+                "carrier": "electricity, low voltage",
+                "loc": "RO"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - UA": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.004320198438915972,
+                "carrier": "electricity, low voltage",
+                "loc": "UA"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - RoW": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.10435631458971474,
+                "carrier": "electricity, low voltage",
+                "loc": "RoW"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - BG": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.015476499450765867,
+                "carrier": "electricity, high voltage",
+                "loc": "BG"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - RO": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.005288103036210522,
+                "carrier": "electricity, high voltage",
+                "loc": "RO"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - UA": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.002042078317836112,
+                "carrier": "electricity, high voltage",
+                "loc": "UA"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - BG": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.0196035659709701,
+                "carrier": "electricity, high voltage",
+                "loc": "BG"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - RO": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.043230242321021024,
+                "carrier": "electricity, high voltage",
+                "loc": "RO"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - UA": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.002917254739765875,
+                "carrier": "electricity, high voltage",
+                "loc": "UA"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.1266770993204425,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - BG": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.058277025518056295,
+                "carrier": "electricity, high voltage",
+                "loc": "BG"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - RO": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.15339905557540692,
+                "carrier": "electricity, high voltage",
+                "loc": "RO"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - UA": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.01706594022763037,
+                "carrier": "electricity, high voltage",
+                "loc": "UA"
+            },
+            "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - RO": {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "share": 0.004267869611587308,
+                "carrier": "electricity, high voltage",
+                "loc": "RO"
+            },
+            "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+                "share": 0.06513592226740171,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "heat and power co-generation, wood chips, 6667 kW | electricity, high voltage | cut-off, U - BG": {
+                "name": "heat and power co-generation, wood chips, 6667 kW",
+                "share": 0.014078096992978241,
+                "carrier": "electricity, high voltage",
+                "loc": "BG"
+            },
+            "heat and power co-generation, wood chips, 6667 kW | electricity, high voltage | cut-off, U - UA": {
+                "name": "heat and power co-generation, wood chips, 6667 kW",
+                "share": 0.02865676373174385,
+                "carrier": "electricity, high voltage",
+                "loc": "UA"
+            },
+            "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014 | electricity, high voltage | cut-off, U - RO": {
+                "name": "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",
+                "share": 0.040605730875959256,
+                "carrier": "electricity, high voltage",
+                "loc": "RO"
+            }
+        },
+        "China": {
+            "electricity production CSP mix, electricity high voltage, cut-off, U - GLO": {
+                "name": "electricity production, solar thermal parabolic trough, 50 MW",
+                "share": 0.20801379543429502,
+                "carrier": "electricity",
+                "loc": "RoW"
+            },
+            "electricity production, deep geothermal | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, deep geothermal",
+                "share": 0.035100777337389005,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - CN-GD": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.0006292817687359101,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - CN-HE": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.00016444307555934829,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - CN-ZJ": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.0003965980057607812,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - CN-HU": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.03473618143138934,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - CN-SC": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.03906006700639108,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - CN-YN": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.03133505589746479,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, hydrogen, combined cycle power plant",
+                "share": 0.011040956155713277,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - CN-JS": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.011633211259178882,
+                "carrier": "electricity, low voltage",
+                "loc": "CN"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - CN-NX": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.021604518373590682,
+                "carrier": "electricity, low voltage",
+                "loc": "CN"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - CN-QH": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.03877731852873375,
+                "carrier": "electricity, low voltage",
+                "loc": "CN"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - CN-JS": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.009694310006484987,
+                "carrier": "electricity, low voltage",
+                "loc": "CN"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - CN-NX": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.018003752227526607,
+                "carrier": "electricity, low voltage",
+                "loc": "CN"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - CN-QH": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.03231441902347915,
+                "carrier": "electricity, low voltage",
+                "loc": "CN"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - CN-JS": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.021357394464837278,
+                "carrier": "electricity, low voltage",
+                "loc": "CN"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - CN-NX": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.03883162629970414,
+                "carrier": "electricity, low voltage",
+                "loc": "CN"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - CN-QH": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.07183850865445265,
+                "carrier": "electricity, low voltage",
+                "loc": "CN"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - CN-GS": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.005539476544291391,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - CN-HB": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.007339806421186093,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - CN-NM": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.01647994271926689,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - CN-GS": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.013571717533513907,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - CN-HB": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.01828027259616159,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - CN-NM": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.04126910025497086,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - CN-JS": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.04014616119945672,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - CN-SD": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.010211692266011523,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - CN-SH": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.01863928912831919,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - CN-GS": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.01620296889205232,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - CN-HB": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.02174244543634371,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - CN-NM": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.04888588050337153,
+                "carrier": "electricity, high voltage",
+                "loc": "CN"
+            },
+            "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "share": 0.0021351673696930577,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+                "share": 0.04656804006513657,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "heat and power co-generation, wood chips, 6667 kW | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, wood chips, 6667 kW",
+                "share": 0.06845505599958827,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            }
+        },
+        "OECD_Pacific": {
+            "electricity production CSP mix, electricity high voltage, cut-off, U - GLO": {
+                "name": "electricity production, solar thermal parabolic trough, 50 MW",
+                "share": 0.07653072052633443,
+                "carrier": "electricity",
+                "loc": "RoW"
+            },
+            "electricity production, deep geothermal | electricity, high voltage | cut-off, U - JP": {
+                "name": "electricity production, deep geothermal",
+                "share": 0.054805277492837194,
+                "carrier": "electricity, high voltage",
+                "loc": "JP"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - AU": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 2.6214420387879083e-05,
+                "carrier": "electricity, high voltage",
+                "loc": "AU"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - JP": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.004697589258447548,
+                "carrier": "electricity, high voltage",
+                "loc": "JP"
+            },
+            "electricity production, hydro, pumped storage | electricity, high voltage | cut-off, U - KR": {
+                "name": "electricity production, hydro, pumped storage",
+                "share": 0.002118770355957715,
+                "carrier": "electricity, high voltage",
+                "loc": "KR"
+            },
+            "electricity production, hydro, reservoir, alpine region | electricity, high voltage | cut-off, U - JP": {
+                "name": "electricity production, hydro, reservoir, alpine region",
+                "share": 0.00868740079144249,
+                "carrier": "electricity, high voltage",
+                "loc": "JP"
+            },
+            "electricity production, hydro, reservoir, non-alpine region | electricity, high voltage | cut-off, U - KR": {
+                "name": "electricity production, hydro, reservoir, non-alpine region",
+                "share": 0.0004566075405743302,
+                "carrier": "electricity, high voltage",
+                "loc": "KR"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - AU": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.006432065511535058,
+                "carrier": "electricity, high voltage",
+                "loc": "AU"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - JP": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.03475531105065264,
+                "carrier": "electricity, high voltage",
+                "loc": "JP"
+            },
+            "electricity production, hydro, run-of-river | electricity, high voltage | cut-off, U - KR": {
+                "name": "electricity production, hydro, run-of-river",
+                "share": 0.0018264301622973207,
+                "carrier": "electricity, high voltage",
+                "loc": "KR"
+            },
+            "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+                "name": "electricity production, hydrogen, combined cycle power plant",
+                "share": 0.04890170139011709,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - AU": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.014918411252235182,
+                "carrier": "electricity, low voltage",
+                "loc": "AU"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - JP": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.07424709458191929,
+                "carrier": "electricity, low voltage",
+                "loc": "JP"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - KR": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "share": 0.002716218811461762,
+                "carrier": "electricity, low voltage",
+                "loc": "KR"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - AU": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.011929193413197333,
+                "carrier": "electricity, low voltage",
+                "loc": "AU"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - JP": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.060325764347809424,
+                "carrier": "electricity, low voltage",
+                "loc": "JP"
+            },
+            "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - KR": {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "share": 0.002263515676218135,
+                "carrier": "electricity, low voltage",
+                "loc": "KR"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - AU": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.0017711317011654126,
+                "carrier": "electricity, low voltage",
+                "loc": "AU"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - JP": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.03958422459859288,
+                "carrier": "electricity, low voltage",
+                "loc": "JP"
+            },
+            "electricity production, photovoltaic, 570kWp open ground installation, multi-Si | electricity, low voltage | cut-off, U - KR": {
+                "name": "electricity production, photovoltaic, 570kWp open ground installation, multi-Si",
+                "share": 0.12504484178308284,
+                "carrier": "electricity, low voltage",
+                "loc": "KR"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - AU": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.0013746837298776451,
+                "carrier": "electricity, high voltage",
+                "loc": "AU"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - JP": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.014404841401187394,
+                "carrier": "electricity, high voltage",
+                "loc": "JP"
+            },
+            "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - KR": {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "share": 0.0014052788250852877,
+                "carrier": "electricity, high voltage",
+                "loc": "KR"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - AU": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.00536985831983455,
+                "carrier": "electricity, high voltage",
+                "loc": "AU"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - JP": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.012552790363891873,
+                "carrier": "electricity, high voltage",
+                "loc": "JP"
+            },
+            "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - KR": {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "share": 0.0018067870608239414,
+                "carrier": "electricity, high voltage",
+                "loc": "KR"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - JP": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.09140863292884738,
+                "carrier": "electricity, high voltage",
+                "loc": "JP"
+            },
+            "electricity production, wind, 1-3MW turbine, offshore | electricity, high voltage | cut-off, U - KR": {
+                "name": "electricity production, wind, 1-3MW turbine, offshore",
+                "share": 0.00974449218168995,
+                "carrier": "electricity, high voltage",
+                "loc": "KR"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - AU": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.12028482636429393,
+                "carrier": "electricity, high voltage",
+                "loc": "AU"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - JP": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.07058372286581824,
+                "carrier": "electricity, high voltage",
+                "loc": "JP"
+            },
+            "electricity production, wind, 1-3MW turbine, onshore | electricity, high voltage | cut-off, U - KR": {
+                "name": "electricity production, wind, 1-3MW turbine, onshore",
+                "share": 0.015558444134872828,
+                "carrier": "electricity, high voltage",
+                "loc": "KR"
+            },
+            "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - AU": {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "share": 0.0023368026863873747,
+                "carrier": "electricity, high voltage",
+                "loc": "AU"
+            },
+            "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - KR": {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "share": 0.001097608853949285,
+                "carrier": "electricity, high voltage",
+                "loc": "KR"
+            },
+            "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+                "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+                "share": 0.018304976831381985,
+                "carrier": "electricity, high voltage",
+                "loc": "RoW"
+            },
+            "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014 | electricity, high voltage | cut-off, U - AU": {
+                "name": "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",
+                "share": 0.0022213558756459194,
+                "carrier": "electricity, high voltage",
+                "loc": "AU"
+            },
+            "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014 | electricity, high voltage | cut-off, U - JP": {
+                "name": "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",
+                "share": 0.0587343660044027,
+                "carrier": "electricity, high voltage",
+                "loc": "JP"
+            },
+            "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014 | electricity, high voltage | cut-off, U - KR": {
+                "name": "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014",
+                "share": 0.0007720469057439885,
+                "carrier": "electricity, high voltage",
+                "loc": "KR"
+            }
+        }
+    },
+    "mapping": {
+        "OECDEurope": [
+            "AT",
+            "BE",
+            "CH",
+            "CZ",
+            "DK",
+            "EE",
+            "ES",
+            "FI",
+            "FR",
+            "GB",
+            "GR",
+            "HU",
+            "IE",
+            "IS",
+            "IT",
+            "LU",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "SE",
+            "SK",
+            "TR"
+        ],
+        "Latin America": [
+            "BR",
+            "CL",
+            "PE"
+        ],
+        "India": [
+            "IN"
+        ],
+        "OECD america": [
+            "CA-AB",
+            "CA-BC",
+            "CA-MB",
+            "CA-NB",
+            "CA-NF",
+            "CA-NS",
+            "CA-NT",
+            "CA-NU",
+            "CA-ON",
+            "CA-PE",
+            "CA-QC",
+            "CA-SK",
+            "CA-YK",
+            "MX",
+            "ASCC",
+            "FRCC",
+            "HICC",
+            "MRO",
+            "TRE",
+            "WECC",
+            "NPCC",
+            "SPP",
+            "RFC",
+            "SERC"
+        ],
+        "Global": [
+            "RoW"
+        ],
+        "MidlleEast": [
+            "IR",
+            "SA"
+        ],
+        "africa": [
+            "ZA",
+            "TZ"
+        ],
+        "Other_Asia": [
+            "ID",
+            "MY",
+            "TH",
+            "TW"
+        ],
+        "Eurasia": [
+            "BA",
+            "BG",
+            "CY",
+            "HR",
+            "LT",
+            "LV",
+            "MK",
+            "MT",
+            "RO",
+            "RS",
+            "RU",
+            "SI",
+            "UA"
+        ],
+        "China": [
+            "CN-GD",
+            "CN-GX",
+            "CN-GZ",
+            "CN-HA",
+            "CN-YN",
+            "CN-ZJ",
+            "CN-AH",
+            "CN-BJ",
+            "CN-CQ",
+            "CN-FJ",
+            "CN-GS",
+            "CN-HB",
+            "CN-HE",
+            "CN-HL",
+            "CN-HN",
+            "CN-HU",
+            "CN-JL",
+            "CN-JS",
+            "CN-JX",
+            "CN-LN",
+            "CN-NM",
+            "CN-NX",
+            "CN-QH",
+            "CN-SA",
+            "CN-SC",
+            "CN-SD",
+            "CN-SH",
+            "CN-SX",
+            "CN-TJ",
+            "CN-XJ",
+            "CN-XZ",
+            "CN-ZJ"
+        ],
+        "OECD_Pacific": [
+            "AU",
+            "JP",
+            "KR"
+        ]
+    }
+}

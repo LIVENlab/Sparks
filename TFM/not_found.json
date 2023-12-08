@@ -1,0 +1,123 @@
+{
+    "OECDEurope": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+            "name": "electricity production, hydrogen, combined cycle power plant",
+            "location": "RoW",
+            "full": "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW"
+        },
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+            "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+            "location": "RoW",
+            "full": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW"
+        }
+    },
+    "Latin America": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+            "name": "electricity production, hydrogen, combined cycle power plant",
+            "location": "RoW",
+            "full": "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW"
+        },
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+            "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+            "location": "RoW",
+            "full": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW"
+        }
+    },
+    "India": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+            "name": "electricity production, hydrogen, combined cycle power plant",
+            "location": "RoW",
+            "full": "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW"
+        },
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+            "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+            "location": "RoW",
+            "full": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW"
+        }
+    },
+    "OECD america": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+            "name": "electricity production, hydrogen, combined cycle power plant",
+            "location": "RoW",
+            "full": "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW"
+        },
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+            "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+            "location": "RoW",
+            "full": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW"
+        }
+    },
+    "Global": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+            "name": "electricity production, hydrogen, combined cycle power plant",
+            "location": "RoW",
+            "full": "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW"
+        },
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+            "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+            "location": "RoW",
+            "full": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW"
+        }
+    },
+    "MidlleEast": {
+        "electricity production CSP mix, electricity high voltage, cut-off, U - ME": {
+            "name": "electricity production CSP mix, electricity high voltage, cut-off, U - ME",
+            "location": "GLO",
+            "full": "electricity production CSP mix, electricity high voltage, cut-off, U - ME"
+        },
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+            "name": "electricity production, hydrogen, combined cycle power plant",
+            "location": "RoW",
+            "full": "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW"
+        },
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+            "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+            "location": "RoW",
+            "full": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW"
+        }
+    },
+    "africa": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+            "name": "electricity production, hydrogen, combined cycle power plant",
+            "location": "RoW",
+            "full": "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW"
+        }
+    },
+    "Other_Asia": {},
+    "Eurasia": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+            "name": "electricity production, hydrogen, combined cycle power plant",
+            "location": "RoW",
+            "full": "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW"
+        },
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+            "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+            "location": "RoW",
+            "full": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW"
+        }
+    },
+    "China": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+            "name": "electricity production, hydrogen, combined cycle power plant",
+            "location": "RoW",
+            "full": "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW"
+        },
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+            "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+            "location": "RoW",
+            "full": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW"
+        }
+    },
+    "OECD_Pacific": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
+            "name": "electricity production, hydrogen, combined cycle power plant",
+            "location": "RoW",
+            "full": "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW"
+        },
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
+            "name": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical",
+            "location": "RoW",
+            "full": "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW"
+        }
+    }
+}

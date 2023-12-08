@@ -1,0 +1,14 @@
+{
+  "OECDEurope": ["AL", "AT", "BE", "BG", "CH", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GB", "GR", "HR", "HU", "IE", "IS", "IT", "LT", "LU", "LV", "ME", "MK", "NL", "NO", "PL", "PT", "RO", "RS", "SE", "SI", "SK"],
+  "Latin America": ["BR-South-eastern/Mid-western grid","BR-North-eastern grid", "CU", "EC", "GT", "HN", "HT", "MX", "NI", "PA", "PE", "SV", "VE", "BO", "CL", "BR-Northern grid", "BR-Southern grid", "UY", "CR", "JM"],
+  "India": ["IN-Western grid", "IN-Southern grid", "IN-Eastern grid", "IN-Northern grid", "IN-North-eastern grid"],
+  "OECD america": ["CA-QC", "US-ASCC", "US-RFC", "US-MRO", "US-HICC", "US-TRE", "US-PR", "US-NPCC", "US-SERC", "US-WECC", "CA-AB", "CA-ON", "CA-NS", "CA-NU", "CA-SK", "CA-NT", "CA-MB", "CA-YK", "CA-BC", "CA-NF"],
+  "MidlleEast": ["JO", "BH", "IL", "LB", "OM", "SA", "AE", "KW", "YE", "IQ", "QA", "SY"],
+  "africa": ["CM", "TZ", "ER", "ET", "GH", "NE", "NG", "ZA", "CD", "LY", "MA", "SN", "TN", "CG", "CI","GA", "AO", "SS", "ZW","MZ", "KE", "SD", "DZ", "DO", "TT", "AR", "ZM", "MU", "BJ", "BW", "MT", "IR", "XK", "TG", "NA", "CW", "CA-NB", "EG", "MD", "BA", "PY", "CA-PE", "NP", "CO"],
+  "Other_Asia": ["AM", "AZ", "GE", "KG", "KZ", "TM", "UZ", "KP", "LK", "KH", "MN", "PK", "TJ", "BD", "GI", "MM", "TR", "CY", "UA"],
+  "Eurasia": ["BY", "RU"],
+  "China": ["CN-SWG", "CN-NWG", "CN-NCGC", "CN-ECGC", "CN-CSG", "CN-CCG", "CN-NECG"],
+  "OECD_Pacific": ["AU", "NZ", "JP", "KR", "TW", "HK", "SG", "BN", "MY", "TH", "VN", "ID", "PH"]
+}
+
+

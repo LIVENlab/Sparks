@@ -1,0 +1,181 @@
+Metadata-Version: 2.1
+Name: frictionless
+Version: 5.16.0
+Summary: Data management framework for Python that provides functionality to describe, extract, validate, and transform tabular data
+Project-URL: homepage, https://github.com/frictionlessdata/frictionless-py
+Project-URL: changelog, https://github.com/frictionlessdata/framework/blob/main/CHANGELOG.md
+Author-email: Open Knowledge Foundation <info@okfn.org>
+License-Expression: MIT
+License-File: AUTHORS.md
+License-File: LICENSE.md
+Keywords: data package,data validation,frictionless data,json schema,json table schema,open data,tabular data package
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Requires-Dist: attrs>=22.2.0
+Requires-Dist: chardet>=3.0
+Requires-Dist: humanize>=4.2
+Requires-Dist: isodate>=0.6
+Requires-Dist: jinja2>=3.0
+Requires-Dist: jsonschema<4.18
+Requires-Dist: marko>=1.0
+Requires-Dist: petl>=1.6
+Requires-Dist: pydantic>=2.0
+Requires-Dist: python-dateutil>=2.8
+Requires-Dist: python-slugify>=1.2
+Requires-Dist: pyyaml>=5.3
+Requires-Dist: requests>=2.10
+Requires-Dist: rfc3986>=1.4
+Requires-Dist: simpleeval>=0.9.11
+Requires-Dist: stringcase>=1.2
+Requires-Dist: tabulate>=0.8.10
+Requires-Dist: typer[all]>=0.5
+Requires-Dist: typing-extensions>=4.3
+Requires-Dist: validators>=0.18
+Provides-Extra: aws
+Requires-Dist: boto3>=1.9; extra == 'aws'
+Provides-Extra: bigquery
+Requires-Dist: google-api-python-client>=1.12.1; extra == 'bigquery'
+Provides-Extra: ckan
+Requires-Dist: frictionless-ckan-mapper>=1.0; extra == 'ckan'
+Provides-Extra: csv
+Provides-Extra: datasette
+Requires-Dist: datasette>=0.64.2; extra == 'datasette'
+Provides-Extra: dev
+Requires-Dist: black; extra == 'dev'
+Requires-Dist: hatch; extra == 'dev'
+Requires-Dist: httpx; extra == 'dev'
+Requires-Dist: ipython; extra == 'dev'
+Requires-Dist: isort; extra == 'dev'
+Requires-Dist: livemark; extra == 'dev'
+Requires-Dist: moto; extra == 'dev'
+Requires-Dist: neovim; extra == 'dev'
+Requires-Dist: oauth2client; extra == 'dev'
+Requires-Dist: pyright==1.1.317; extra == 'dev'
+Requires-Dist: pytest; extra == 'dev'
+Requires-Dist: pytest-cov; extra == 'dev'
+Requires-Dist: pytest-dotenv; extra == 'dev'
+Requires-Dist: pytest-lazy-fixture; extra == 'dev'
+Requires-Dist: pytest-mock; extra == 'dev'
+Requires-Dist: pytest-only; extra == 'dev'
+Requires-Dist: pytest-timeout; extra == 'dev'
+Requires-Dist: pytest-vcr; extra == 'dev'
+Requires-Dist: requests-mock; extra == 'dev'
+Requires-Dist: ruff; extra == 'dev'
+Requires-Dist: yattag; extra == 'dev'
+Provides-Extra: duckdb
+Requires-Dist: duckdb-engine>=0.7; extra == 'duckdb'
+Requires-Dist: duckdb>=0.8; extra == 'duckdb'
+Requires-Dist: sqlalchemy>=1.4; extra == 'duckdb'
+Provides-Extra: excel
+Requires-Dist: openpyxl>=3.0; extra == 'excel'
+Requires-Dist: tableschema-to-template>=0.0; extra == 'excel'
+Requires-Dist: xlrd>=1.2; extra == 'excel'
+Requires-Dist: xlwt>=1.2; extra == 'excel'
+Provides-Extra: github
+Requires-Dist: pygithub>=1.50; extra == 'github'
+Provides-Extra: gsheets
+Requires-Dist: pygsheets>=2.0; extra == 'gsheets'
+Provides-Extra: html
+Requires-Dist: pyquery>=1.4; extra == 'html'
+Provides-Extra: json
+Requires-Dist: ijson>=3.0; extra == 'json'
+Requires-Dist: jsonlines>=1.2; extra == 'json'
+Provides-Extra: mysql
+Requires-Dist: pymysql>=1.0; extra == 'mysql'
+Requires-Dist: sqlalchemy>=1.4; extra == 'mysql'
+Provides-Extra: ods
+Requires-Dist: ezodf>=0.3; extra == 'ods'
+Requires-Dist: lxml>=4.0; extra == 'ods'
+Provides-Extra: pandas
+Requires-Dist: pandas>=1.0; extra == 'pandas'
+Provides-Extra: parquet
+Requires-Dist: fastparquet>=0.8; extra == 'parquet'
+Provides-Extra: postgresql
+Requires-Dist: psycopg2>=2.9; extra == 'postgresql'
+Requires-Dist: psycopg>=3.0; extra == 'postgresql'
+Requires-Dist: sqlalchemy>=1.4; extra == 'postgresql'
+Provides-Extra: spss
+Requires-Dist: savreaderwriter>=3.0; extra == 'spss'
+Provides-Extra: sql
+Requires-Dist: sqlalchemy>=1.4; extra == 'sql'
+Provides-Extra: visidata
+Requires-Dist: visidata>=2.10; extra == 'visidata'
+Provides-Extra: wkt
+Requires-Dist: grako>=3.99; extra == 'wkt'
+Provides-Extra: zenodo
+Requires-Dist: pyzenodo3>=1.0; extra == 'zenodo'
+Description-Content-Type: text/markdown
+
+# frictionless-py
+
+[![Build](https://img.shields.io/github/actions/workflow/status/frictionlessdata/frictionless-py/general.yaml?branch=main)](https://github.com/frictionlessdata/frictionless-py/actions)
+[![Coverage](https://img.shields.io/codecov/c/github/frictionlessdata/frictionless-py/main)](https://codecov.io/gh/frictionlessdata/frictionless-py)
+[![Release](https://img.shields.io/pypi/v/frictionless.svg)](https://pypi.python.org/pypi/frictionless)
+[![Citation](https://zenodo.org/badge/28409905.svg)](https://zenodo.org/badge/latestdoi/28409905)
+[![Codebase](https://img.shields.io/badge/codebase-github-brightgreen)](https://github.com/frictionlessdata/frictionless-py)
+[![Support](https://img.shields.io/badge/support-slack-brightgreen)](https://join.slack.com/t/frictionlessdata/shared_invite/zt-17kpbffnm-tRfDW_wJgOw8tJVLvZTrBg)
+
+```markdown remark type=primary
+Migrating from an older version? Please read **[v5](blog/2022/08-22-frictionless-framework-v5.html)** announcement and migration guide.
+```
+
+Data management framework for Python that provides functionality to describe, extract, validate, and transform tabular data (DEVT Framework). It supports a great deal of data sources and formats, as well as provides popular platforms integrations. The framework is powered by the lightweight yet comprehensive [Frictionless Standards](https://specs.frictionlessdata.io/).
+
+## Purpose
+
+- **Describe your data**: You can infer, edit and save metadata of your data tables. It's a first step for ensuring data quality and usability. Frictionless metadata includes general information about your data like textual description, as well as, field types and other tabular data details.
+- **Extract your data**: You can read your data using a unified tabular interface. Data quality and consistency are guaranteed by a schema. Frictionless supports various file schemes like HTTP, FTP, and S3 and data formats like CSV, XLS, JSON, SQL, and others.
+- **Validate your data**: You can validate data tables, resources, and datasets. Frictionless generates a unified validation report, as well as supports a lot of options to customize the validation process.
+- **Transform your data**: You can clean, reshape, and transfer your data tables and datasets. Frictionless provides a pipeline capability and a lower-level interface to work with the data.
+
+## Features
+
+- Open Source (MIT)
+- Powerful Python framework
+- Convenient command-line interface
+- Low memory consumption for data of any size
+- Reasonable performance on big data
+- Support for compressed files
+- Custom checks and formats
+- Fully pluggable architecture
+- The included API server
+- More than 1000+ tests
+
+## Installation
+
+```bash
+$ pip install frictionless
+```
+
+## Example
+
+```bash
+$ frictionless validate data/invalid.csv
+[invalid] data/invalid.csv
+
+  row    field  code              message
+-----  -------  ----------------  --------------------------------------------
+             3  blank-header      Header in field at position "3" is blank
+             4  duplicate-header  Header "name" in field "4" is duplicated
+    2        3  missing-cell      Row "2" has a missing cell in field "field3"
+    2        4  missing-cell      Row "2" has a missing cell in field "name2"
+    3        3  missing-cell      Row "3" has a missing cell in field "field3"
+    3        4  missing-cell      Row "3" has a missing cell in field "name2"
+    4           blank-row         Row "4" is completely blank
+    5        5  extra-cell        Row "5" has an extra value in field  "5"
+```
+
+## Documentation
+
+Please visit our documentation portal:
+- https://framework.frictionlessdata.io
