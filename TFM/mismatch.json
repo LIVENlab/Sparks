@@ -1,0 +1,40 @@
+{
+    "OECD_Pacific": {
+        "electricity production, wind, <1MW turbine, onshore | electricity, high voltage | cut-off, U - BR": [
+            {
+                "name": "electricity production, wind, <1MW turbine, onshore",
+                "region": "RoW"
+            }
+        ],
+        "electricity production, wind, >3MW turbine, onshore | electricity, high voltage | cut-off, U - BR": [
+            {
+                "name": "electricity production, wind, >3MW turbine, onshore",
+                "region": "RoW"
+            }
+        ],
+        "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - IN": [
+            {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "region": "RoW"
+            }
+        ],
+        "heat and power co-generation, biogas, gas engine | electricity, high voltage | cut-off, U - IN": [
+            {
+                "name": "heat and power co-generation, biogas, gas engine",
+                "region": "RoW"
+            }
+        ],
+        "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted | electricity, low voltage | cut-off, U - FRCC": [
+            {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted",
+                "region": "RoW"
+            }
+        ],
+        "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted | electricity, low voltage | cut-off, U - FRCC": [
+            {
+                "name": "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted",
+                "region": "RoW"
+            }
+        ]
+    }
+}

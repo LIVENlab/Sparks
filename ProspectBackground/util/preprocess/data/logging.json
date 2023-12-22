@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "disable_existing_loggers": false,
+  "formatters": {
+    "raw": {
+      "format": "%(message)s"
+    },
+    "simple": {
+      "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    }
+  },
+  "handlers": {
+    "console": {
+      "class": "logging.StreamHandler",
+      "level": "DEBUG",
+      "formatter": "simple",
+      "stream": "ext://sys.stdout"
+    }
+  },
+  "loggers": {
+    ".........venv.lib.python3.11.site-packages.enbios2.generic.files": {
+      "level": "DEBUG",
+      "handlers": [
+        "console"
+      ],
+      "propagate": false
+    },
+    ".........venv.lib.python3.11.site-packages.enbios2.generic.tree.basic_tree": {
+      "level": "DEBUG",
+      "handlers": [
+        "console"
+      ],
+      "propagate": false
+    },
+    ".........venv.lib.python3.11.site-packages.enbios2.base.scenario": {
+      "level": "DEBUG",
+      "handlers": [
+        "console"
+      ],
+      "propagate": false
+    },
+    ".........venv.lib.python3.11.site-packages.enbios2.ecoinvent.ecoinvent_index": {
+      "level": "DEBUG",
+      "handlers": [
+        "console"
+      ],
+      "propagate": false
+    },
+    ".........venv.lib.python3.11.site-packages.enbios2.base.experiment": {
+      "level": "DEBUG",
+      "handlers": [
+        "console"
+      ],
+      "propagate": false
+    }
+  },
+  "root": {
+    "level": "INFO",
+    "handlers": [
+      "console"
+    ]
+  }
+}
