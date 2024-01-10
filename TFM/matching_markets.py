@@ -17,7 +17,7 @@ class Matching:
     def export_usa_data(self):
         """
         modify the ecoinvent data to facilitate programming tasks
-        {region : {act_name { code, share}}}
+        {region : {act_name {code, share}}}
 
         If there's no activity: TO BE INCLUDED
         """
@@ -37,12 +37,16 @@ class Matching:
                             "share": val['share'],
                             "code": activties['code']
                         }
-                    except:
+                        pass
+
+                        """"
+                        pass
                         self.__TO_BE_INCLUDED.append(val['name'])
                         internal[val['name']] = {
                             "share": val['share'],
                             "code": "TO_BE_INCLUDED"
                         }
+                        """
                 new[k]=internal
             self.exporter=new
             with open('clean.json','w') as file:

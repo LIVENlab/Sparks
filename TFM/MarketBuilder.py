@@ -38,13 +38,17 @@ class MarketBuilder():
     For the treatment of the data, check other classes and functions {}
     """
     def __init__(self):
-        self.market_mapping=self.load_data("written.json")
-        self.data=self.load_data("clean.json")
+        self.market_mapping=self.load_data("written.json") #JSON data with the grouped markets
+        self.data=self.load_data("clean.json") #markets + ecoinvent info
+        self.errors={} # summary of missing information and errors
 
         pass
 
     @staticmethod
     def check_loop(func):
+        """
+        Check that a modification happens
+        """
         def wrapper(*args, **kwargs):
             print(f'Checking input from {func.__name__}, market {args[1]["name"]}')
             market = args[1]
@@ -55,14 +59,19 @@ class MarketBuilder():
             market1=args[1]
             tech_final=[e for e in market1.technosphere()]
             assert tech_start != tech_final
-
-
             return
 
         return wrapper
 
 
     def iter(self):
+        """
+        Iter through the data (regions --> markets) and:
+            -Check that the activity exists
+            -pop the inputs
+            -create new data
+        """
+
         for key,value in self.market_mapping.items():
             print(f"Changing markets in region {key}...")
             for v in value:
@@ -75,9 +84,8 @@ class MarketBuilder():
                 self.input_changer(market, key)
     @staticmethod
     def pop_inputs(activity: bw2data.backends.proxies.Activity):
-
         """
-        Delete all the inputs but transportation of electricity
+        Delete all the inputs of a bw activity except transmission
         """
         pass
         to_delete = [e for e in activity.technosphere()
@@ -88,9 +96,11 @@ class MarketBuilder():
 
     @check_loop
     def input_changer(self, market: bw2data.backends.proxies.Activity, region:str):
+
         """
         Extract the data from one specific region and use it as an input
         """
+
         data_region=self.data[region] # select the data from one region
         for key,value in data_region.items():
             try:
@@ -98,12 +108,12 @@ class MarketBuilder():
                 exchange=market.new_exchange(input=new_input,type='technosphere',amount=value["share"])
                 exchange.save()
                 if exchange in market.technosphere():
-                    print(f" new exchange included {exchange}")
+                    pass
+                    print(f" new exchange included in market for electricity {market['location']} from group {region}: \n {exchange}")
             except bw2data.errors.UnknownObject:
-                warnings.warn(f'Acivity with code {key},{value["code"]} not in the db', Warning)
+                warnings.warn(f'Acivity {key}, with code {value["code"]} not in the db', Warning)
+                self.__storerror__(key,value)
                 continue
-
-
 
 
 
@@ -135,7 +145,12 @@ class MarketBuilder():
         return data
 
 
-
+    def __storerror__(self,name: str,code:str):
+        """
+        get error info and store it in self.errors
+        """
+        self.errors[name]=code
+        pass
 
     def simple_test(self):
         """
@@ -149,7 +164,6 @@ class MarketBuilder():
             e.delete()
         ex=act1.new_exchange(input=add, amount=10,type='technosphere')
         ex.save()
-
 
         for a in act1.technosphere():
             print(a)
