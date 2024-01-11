@@ -52,7 +52,7 @@
             "share": 0.02018992059539749,
             "code": "e8e0dd0732344066d9ac25ace339e509"
         },
-        "electricity production, hydrogen, combined cycle power plant": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.01318065303458695,
             "code": "TO_BE_INCLUDED"
         },
@@ -148,7 +148,7 @@
             "share": 0.019810648743049598,
             "code": "4e7fc9f68228d0d2e57f809700e18817"
         },
-        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical": {
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.02614425456450048,
             "code": "TO_BE_INCLUDED"
         },
@@ -182,15 +182,15 @@
             "share": 0.011838565331446997,
             "code": "4febe93e25b6a9a98cde9f17c87df0a8"
         },
-        "electricity production, hydro, reservoir, tropical region": {
+        "electricity production, hydro, reservoir, tropical region_BR": {
             "share": 0.2166204971119078,
-            "code": "TO_BE_INCLUDED"
+            "code": "d265d0a2a31c49d908fa0216bd32c597"
         },
         "electricity production, hydro, run-of-river_CL": {
             "share": 0.01117472408012947,
             "code": "0873932e22eec1348aae65876def5cf6"
         },
-        "electricity production, hydrogen, combined cycle power plant": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.017235637455669358,
             "code": "TO_BE_INCLUDED"
         },
@@ -206,7 +206,7 @@
             "share": 0.11107930146006299,
             "code": "7875f871b542ad937888ecc7edcb61e4"
         },
-        "electricity production, wind, <1MW turbine, onshore_RoW": {
+        "electricity production, wind, <1MW turbine, onshore_BR": {
             "share": 0.012058097154644225,
             "code": "1b3d52e51f2d96149f9d5b57a4aad625"
         },
@@ -218,7 +218,7 @@
             "share": 1.2119271071133896e-07,
             "code": "6eaf4a5d40901d93ce8dcc394642bc2b"
         },
-        "electricity production, wind, >3MW turbine, onshore_RoW": {
+        "electricity production, wind, >3MW turbine, onshore_BR": {
             "share": 0.004637729674863164,
             "code": "ccb4503a5b0208224e4c3898741678c0"
         },
@@ -226,9 +226,9 @@
             "share": 0.07288045478712527,
             "code": "d299ea41bf9d4c1c09e00c63e8032b3e"
         },
-        "electricity production, wind, 1-3MW turbine, onshore": {
+        "electricity production, wind, 1-3MW turbine, onshore_BR": {
             "share": 0.18875559776693074,
-            "code": "TO_BE_INCLUDED"
+            "code": "d99174ae84566acfd6441f8acdc22316"
         },
         "electricity production, wind, 1-3MW turbine, onshore_CL": {
             "share": 0.01638184223696816,
@@ -242,13 +242,13 @@
             "share": 0.00024693984858973375,
             "code": "1eefb07f644126b07c2bcf219dbd7e72"
         },
-        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical": {
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.003213423932412931,
             "code": "TO_BE_INCLUDED"
         },
-        "heat and power co-generation, wood chips, 6667 kW": {
+        "heat and power co-generation, wood chips, 6667 kW_CL": {
             "share": 0.01333024550586512,
-            "code": "TO_BE_INCLUDED"
+            "code": "c3ad06adb40abf42cccfb6cc2c7dcb1b"
         },
         "heat and power co-generation, wood chips, 6667 kW_PE": {
             "share": 0.0015924454338543084,
@@ -268,23 +268,23 @@
             "share": 0.04777934400706907,
             "code": "1fc2c44a0fd98672ec99fad9f9dd6c15"
         },
-        "electricity production, hydro, reservoir, alpine region": {
+        "electricity production, hydro, reservoir, alpine region_IN": {
             "share": 0.03347487379696175,
-            "code": "TO_BE_INCLUDED"
+            "code": "1dc3a121e316a0afcbbaeda434959405"
         },
-        "electricity production, hydro, run-of-river": {
+        "electricity production, hydro, run-of-river_IN": {
             "share": 0.004563459080528725,
-            "code": "TO_BE_INCLUDED"
+            "code": "5ba63ed16f06202013636fcfcbde35c9"
         },
-        "electricity production, hydrogen, combined cycle power plant": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.013550289779920718,
             "code": "TO_BE_INCLUDED"
         },
-        "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted": {
+        "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted_IN": {
             "share": 0.0972749214047713,
-            "code": "TO_BE_INCLUDED"
+            "code": "669648c6c0f9008f5a6ab609dc619a13"
         },
-        "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted_RoW": {
+        "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted_IN": {
             "share": 0.079539714739813,
             "code": "2e4338b776dcad39a50faa3861c6d3ea"
         },
@@ -292,11 +292,11 @@
             "share": 0.1768146361445843,
             "code": "7875f871b542ad937888ecc7edcb61e4"
         },
-        "electricity production, wind, <1MW turbine, onshore": {
+        "electricity production, wind, <1MW turbine, onshore_IN": {
             "share": 0.0996921142849769,
-            "code": "TO_BE_INCLUDED"
+            "code": "04308ee3f084f5cd291d349bd00f14ac"
         },
-        "electricity production, wind, >3MW turbine, onshore_IN-TN": {
+        "electricity production, wind, >3MW turbine, onshore_IN": {
             "share": 0.06046084639699098,
             "code": "8c2bbf3fcdb091a716a8b6a459f7a498"
         },
@@ -304,21 +304,21 @@
             "share": 0.05788791711168067,
             "code": "d299ea41bf9d4c1c09e00c63e8032b3e"
         },
-        "electricity production, wind, 1-3MW turbine, onshore": {
+        "electricity production, wind, 1-3MW turbine, onshore_IN": {
             "share": 0.17827879964287274,
-            "code": "TO_BE_INCLUDED"
+            "code": "09f8fee87905f7d7539c0e5576398c92"
         },
-        "heat and power co-generation, biogas, gas engine_RoW": {
+        "heat and power co-generation, biogas, gas engine_IN": {
             "share": 0.001938725749175916,
             "code": "c98e693d48f095cfee5af2761a2ac490"
         },
-        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical": {
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.005013446332857689,
             "code": "TO_BE_INCLUDED"
         },
-        "heat and power co-generation, wood chips, 6667 kW": {
+        "heat and power co-generation, wood chips, 6667 kW_IN": {
             "share": 0.04051035082871071,
-            "code": "TO_BE_INCLUDED"
+            "code": "fa04a02999cfd4d364093e75576ca046"
         }
     },
     "OECD america": {
@@ -326,7 +326,7 @@
             "share": 0.09422233326552812,
             "code": "982ad6e78403f0c2c451ce08f246ac00"
         },
-        "electricity production, deep geothermal_US-HICC": {
+        "electricity production, deep geothermal_HICC": {
             "share": 0.00029789687662564834,
             "code": "f410f9b38134341d50d7b0f271edc030"
         },
@@ -334,111 +334,111 @@
             "share": 0.006380614678798511,
             "code": "2dfa5c76700bd8c32987c173bc3fa9c9"
         },
-        "electricity production, deep geothermal_US-WECC": {
+        "electricity production, deep geothermal_WECC": {
             "share": 0.01749588637858074,
             "code": "a8546b5b4c04c906e02a9c5830d134ee"
         },
-        "electricity production, hydro, pumped storage_US-NPCC": {
+        "electricity production, hydro, pumped storage_NPCC": {
             "share": 0.00038585514824620925,
             "code": "76d22dbb147dd07caad70304eccea189"
         },
-        "electricity production, hydro, pumped storage_US-RFC": {
+        "electricity production, hydro, pumped storage_RFC": {
             "share": 0.0007505431430375457,
             "code": "448ab7474d8d3a2b1b8d898b0504048a"
         },
-        "electricity production, hydro, pumped storage_US-SERC": {
+        "electricity production, hydro, pumped storage_SERC": {
             "share": 0.001721655117954602,
             "code": "76006979afb5948bd98ea061cac6bd96"
         },
-        "electricity production, hydro, reservoir, alpine region": {
+        "electricity production, hydro, reservoir, alpine region_CA": {
             "share": 0.008780865197373255,
-            "code": "TO_BE_INCLUDED"
+            "code": "40fd0b8bc394b925f5a271ea918b7194"
         },
-        "electricity production, hydro, reservoir, alpine region_US-NPCC": {
+        "electricity production, hydro, reservoir, alpine region_NPCC": {
             "share": 0.001013216756186089,
             "code": "12d6dffb38c3113e7d23a7a3914e1cf2"
         },
-        "electricity production, hydro, reservoir, alpine region_US-WECC": {
+        "electricity production, hydro, reservoir, alpine region_WECC": {
             "share": 0.006130674759230904,
             "code": "78686819d31278e0033b4d7547beb1be"
         },
-        "electricity production, hydro, reservoir, non-alpine region": {
+        "electricity production, hydro, reservoir, non-alpine region_CA": {
             "share": 0.01406119422916929,
-            "code": "TO_BE_INCLUDED"
+            "code": "09e9d7899a45e27b8d2dd3d8f9ef0f14"
         },
-        "electricity production, hydro, run-of-river": {
+        "electricity production, hydro, run-of-river_CA": {
             "share": 0.00856096493674086,
-            "code": "TO_BE_INCLUDED"
+            "code": "dc0150633520f4460198e83a77ac137c"
         },
         "electricity production, hydro, run-of-river_MX": {
             "share": 0.005260039731608021,
             "code": "ed05d10a45448f3eba04a4161fcfc138"
         },
-        "electricity production, hydro, run-of-river_US-WECC": {
+        "electricity production, hydro, run-of-river_WECC": {
             "share": 0.024523902309692838,
             "code": "74dad9b74f547d2acc9adf4ab63db169"
         },
-        "electricity production, hydrogen, combined cycle power plant": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.020766080888660905,
             "code": "TO_BE_INCLUDED"
         },
-        "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted_RoW": {
+        "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted_FRCC": {
             "share": 0.005298837329328519,
             "code": "49515892fd642a1294a1131a8dc2b90b"
         },
-        "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted_US-RFC": {
+        "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted_RFC": {
             "share": 0.011072591429992387,
             "code": "9642d0d6ee4062b22018bcba411ade20"
         },
-        "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted_US-WECC": {
+        "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted_WECC": {
             "share": 0.07822778666422879,
             "code": "3790a09140b73387b5afbcc742cc2eb2"
         },
-        "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted_RoW": {
+        "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted_FRCC": {
             "share": 0.0042895349808849915,
             "code": "2e4338b776dcad39a50faa3861c6d3ea"
         },
-        "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted_US-RFC": {
+        "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted_RFC": {
             "share": 0.00885807314399391,
             "code": "49c26838dbd32a2fe64ddc1ab78a5a0c"
         },
-        "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted_US-WECC": {
+        "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted_WECC": {
             "share": 0.062072048114007634,
             "code": "a9aad722535b3b5a06c9bb216052cec6"
         },
-        "electricity production, photovoltaic, 570kWp open ground installation, multi-Si": {
+        "electricity production, photovoltaic, 570kWp open ground installation, multi-Si_CA": {
             "share": 0.020782863100481705,
-            "code": "TO_BE_INCLUDED"
+            "code": "04602b21b6ea1e781c2e4a486084d108"
         },
-        "electricity production, photovoltaic, 570kWp open ground installation, multi-Si_US-RFC": {
+        "electricity production, photovoltaic, 570kWp open ground installation, multi-Si_RFC": {
             "share": 0.01667942821264249,
             "code": "b42f658cc3593a074932edc747397ee7"
         },
-        "electricity production, photovoltaic, 570kWp open ground installation, multi-Si_US-WECC": {
+        "electricity production, photovoltaic, 570kWp open ground installation, multi-Si_WECC": {
             "share": 0.132356580349312,
             "code": "235ab01cede8b7d89fe23635dbdce144"
         },
-        "electricity production, wind, <1MW turbine, onshore_US-MRO": {
+        "electricity production, wind, <1MW turbine, onshore_MRO": {
             "share": 0.006879494909041653,
             "code": "9ddfc1e9b24bd5920357f4b8a50e335d"
         },
-        "electricity production, wind, <1MW turbine, onshore_US-TRE": {
+        "electricity production, wind, <1MW turbine, onshore_TRE": {
             "share": 0.0067922939176729,
             "code": "b84dc9e9291f76bab55c5a854124f9c6"
         },
-        "electricity production, wind, <1MW turbine, onshore_US-WECC": {
+        "electricity production, wind, <1MW turbine, onshore_WECC": {
             "share": 0.008375886570537588,
             "code": "d44615de3879dfb41a8816864b77ed85"
         },
-        "electricity production, wind, >3MW turbine, onshore_US-MRO": {
+        "electricity production, wind, >3MW turbine, onshore_MRO": {
             "share": 0.0007055892214401697,
             "code": "66598bf6922fe26bc7919e880693a596"
         },
-        "electricity production, wind, >3MW turbine, onshore_US-TRE": {
+        "electricity production, wind, >3MW turbine, onshore_TRE": {
             "share": 0.0007004553102600178,
             "code": "96a3867c2412ffa9fb07c2d13b2148b4"
         },
-        "electricity production, wind, >3MW turbine, onshore_US-WECC": {
+        "electricity production, wind, >3MW turbine, onshore_WECC": {
             "share": 0.0008514494622532299,
             "code": "55ee19adb0352e9f949e59fd840732fb"
         },
@@ -446,43 +446,43 @@
             "share": 0.10642395351511023,
             "code": "d299ea41bf9d4c1c09e00c63e8032b3e"
         },
-        "electricity production, wind, 1-3MW turbine, onshore_US-MRO": {
+        "electricity production, wind, 1-3MW turbine, onshore_MRO": {
             "share": 0.08207413823792054,
             "code": "0ae627638645725722f2ade15a2a8974"
         },
-        "electricity production, wind, 1-3MW turbine, onshore_US-TRE": {
+        "electricity production, wind, 1-3MW turbine, onshore_TRE": {
             "share": 0.08097687904975662,
             "code": "2485d8637620e35ead65421c6bb623ff"
         },
-        "electricity production, wind, 1-3MW turbine, onshore_US-WECC": {
+        "electricity production, wind, 1-3MW turbine, onshore_WECC": {
             "share": 0.0999562066384722,
             "code": "f8e92978f14a9e0118a3515752fee659"
         },
-        "heat and power co-generation, biogas, gas engine_US-NPCC": {
+        "heat and power co-generation, biogas, gas engine_NPCC": {
             "share": 0.003963683884612401,
             "code": "410cfb8f0b2a74f7e729016c4ac7ae61"
         },
-        "heat and power co-generation, biogas, gas engine_US-RFC": {
+        "heat and power co-generation, biogas, gas engine_RFC": {
             "share": 0.005539883457031634,
             "code": "a0a7fedd7ddc16278b02e9393aaf1951"
         },
-        "heat and power co-generation, biogas, gas engine_US-WECC": {
+        "heat and power co-generation, biogas, gas engine_WECC": {
             "share": 0.0025186542159013592,
             "code": "78dd937eb4912e8464925397d19f9ea3"
         },
-        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical": {
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.018695442605842452,
             "code": "TO_BE_INCLUDED"
         },
-        "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014": {
+        "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014_CA": {
             "share": 0.007160626402151286,
-            "code": "TO_BE_INCLUDED"
+            "code": "11b9f6dc5626c437b9aea1e3763df744"
         },
-        "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014_US-NPCC": {
+        "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014_NPCC": {
             "share": 0.003522929686010239,
             "code": "5a529992dafc3e88a0e545a4a149a5ae"
         },
-        "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014_US-WECC": {
+        "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014_WECC": {
             "share": 0.004020159613842555,
             "code": "5f319b74c063c4cef0f7c74a99f51191"
         }
@@ -516,7 +516,7 @@
             "share": 0.03502723879996779,
             "code": "2880b6c13294aad8ae1722830aef0a68"
         },
-        "electricity production, hydrogen, combined cycle power plant": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.020282080045174337,
             "code": "TO_BE_INCLUDED"
         },
@@ -544,13 +544,13 @@
             "share": 0.0002491501308619543,
             "code": "c98e693d48f095cfee5af2761a2ac490"
         },
-        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical": {
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.022216517752576825,
             "code": "TO_BE_INCLUDED"
         },
-        "heat and power co-generation, wood chips, 6667 kW": {
+        "heat and power co-generation, wood chips, 6667 kW_RoW": {
             "share": 0.008856154651547649,
-            "code": "TO_BE_INCLUDED"
+            "code": "d518b73bd8df9379ab0de06270002705"
         },
         "heat and power co-generation, wood chips, 6667 kW, state-of-the-art 2014_RoW": {
             "share": 0.04351067285325584,
@@ -570,7 +570,7 @@
             "share": 0.009987581079606957,
             "code": "9a304a93df5c60123364118faad5b387"
         },
-        "electricity production, hydrogen, combined cycle power plant": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.023914812919033673,
             "code": "TO_BE_INCLUDED"
         },
@@ -602,7 +602,7 @@
             "share": 0.006293371820798335,
             "code": "1028b7488bda2bbcc51de692b41b224f"
         },
-        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical": {
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.001258674364159667,
             "code": "TO_BE_INCLUDED"
         }
@@ -628,7 +628,7 @@
             "share": 0.010658988441527946,
             "code": "12d8ebb4ecf6412285ad7e02ce82fc50"
         },
-        "electricity production, hydrogen, combined cycle power plant": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.017048728676302607,
             "code": "TO_BE_INCLUDED"
         },
@@ -664,9 +664,9 @@
             "share": 0.27748164297437683,
             "code": "d0600cd7a5bb205cdf50cd4aa8a94c86"
         },
-        "heat and power co-generation, wood chips, 6667 kW": {
+        "heat and power co-generation, wood chips, 6667 kW_ZA": {
             "share": 0.026425529448269043,
-            "code": "TO_BE_INCLUDED"
+            "code": "a47005e883e68095fe2a193400528ad3"
         }
     },
     "Other_Asia": {
@@ -836,7 +836,7 @@
             "share": 0.006643863626210314,
             "code": "3935eb338f2e723af7efc7e6173d1ec1"
         },
-        "electricity production, hydrogen, combined cycle power plant": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.020965759513697706,
             "code": "TO_BE_INCLUDED"
         },
@@ -912,13 +912,13 @@
             "share": 0.004267869611587308,
             "code": "5d2a82dd05ef6cd85d1aeb20eb274b37"
         },
-        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical": {
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.06513592226740171,
             "code": "TO_BE_INCLUDED"
         },
-        "heat and power co-generation, wood chips, 6667 kW": {
+        "heat and power co-generation, wood chips, 6667 kW_BG": {
             "share": 0.014078096992978241,
-            "code": "TO_BE_INCLUDED"
+            "code": "1dac0c6c1bd8839b44bf9ff6cd760d1c"
         },
         "heat and power co-generation, wood chips, 6667 kW_UA": {
             "share": 0.02865676373174385,
@@ -938,57 +938,57 @@
             "share": 0.035100777337389005,
             "code": "1fc2c44a0fd98672ec99fad9f9dd6c15"
         },
-        "electricity production, hydro, pumped storage": {
+        "electricity production, hydro, pumped storage_CN": {
             "share": 0.0003965980057607812,
-            "code": "TO_BE_INCLUDED"
+            "code": "69a9f1562a37df940411a6bc39def255"
         },
-        "electricity production, hydro, run-of-river": {
+        "electricity production, hydro, run-of-river_CN": {
             "share": 0.03133505589746479,
-            "code": "TO_BE_INCLUDED"
+            "code": "53f5c392074699288f8a1a360021f650"
         },
-        "electricity production, hydrogen, combined cycle power plant": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.011040956155713277,
             "code": "TO_BE_INCLUDED"
         },
-        "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted": {
+        "electricity production, photovoltaic, 3kWp slanted-roof installation, multi-Si, panel, mounted_CN": {
             "share": 0.03877731852873375,
-            "code": "TO_BE_INCLUDED"
+            "code": "a958c44d51b2e08568c8d5d05ded4590"
         },
-        "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted": {
+        "electricity production, photovoltaic, 3kWp slanted-roof installation, single-Si, panel, mounted_CN": {
             "share": 0.03231441902347915,
-            "code": "TO_BE_INCLUDED"
+            "code": "053ea709a349acc1b64d585be383a5ac"
         },
-        "electricity production, photovoltaic, 570kWp open ground installation, multi-Si": {
+        "electricity production, photovoltaic, 570kWp open ground installation, multi-Si_CN": {
             "share": 0.07183850865445265,
-            "code": "TO_BE_INCLUDED"
+            "code": "ca4b184d2b92f9dbeb596b6357c95854"
         },
-        "electricity production, wind, <1MW turbine, onshore": {
+        "electricity production, wind, <1MW turbine, onshore_CN": {
             "share": 0.01647994271926689,
-            "code": "TO_BE_INCLUDED"
+            "code": "9045236918ab90d6bd910aee232d2635"
         },
-        "electricity production, wind, >3MW turbine, onshore": {
+        "electricity production, wind, >3MW turbine, onshore_CN": {
             "share": 0.04126910025497086,
-            "code": "TO_BE_INCLUDED"
+            "code": "18b3e229cec9b4434a977ecfef3f8b0d"
         },
-        "electricity production, wind, 1-3MW turbine, offshore": {
+        "electricity production, wind, 1-3MW turbine, offshore_CN": {
             "share": 0.01863928912831919,
-            "code": "TO_BE_INCLUDED"
+            "code": "a4ef65d568fc4f85a32a89e7d805714f"
         },
-        "electricity production, wind, 1-3MW turbine, onshore": {
+        "electricity production, wind, 1-3MW turbine, onshore_CN": {
             "share": 0.04888588050337153,
-            "code": "TO_BE_INCLUDED"
+            "code": "f09511e65303facaae3794ac49afd067"
         },
         "heat and power co-generation, biogas, gas engine_RoW": {
             "share": 0.0021351673696930577,
             "code": "c98e693d48f095cfee5af2761a2ac490"
         },
-        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical": {
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.04656804006513657,
             "code": "TO_BE_INCLUDED"
         },
-        "heat and power co-generation, wood chips, 6667 kW": {
+        "heat and power co-generation, wood chips, 6667 kW_RoW": {
             "share": 0.06845505599958827,
-            "code": "TO_BE_INCLUDED"
+            "code": "b52c5c14d038291b05abbc1d2f3754da"
         }
     },
     "OECD_Pacific": {
@@ -1032,7 +1032,7 @@
             "share": 0.0018264301622973207,
             "code": "300c527685393523eceae26400291397"
         },
-        "electricity production, hydrogen, combined cycle power plant": {
+        "electricity production, hydrogen, combined cycle power plant | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.04890170139011709,
             "code": "TO_BE_INCLUDED"
         },
@@ -1124,7 +1124,7 @@
             "share": 0.001097608853949285,
             "code": "d8414ff4e51db712a3fb5f0f3f6954f6"
         },
-        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical": {
+        "heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical | electricity, high voltage | cut-off, U - RoW": {
             "share": 0.018304976831381985,
             "code": "TO_BE_INCLUDED"
         },

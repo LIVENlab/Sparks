@@ -6,6 +6,7 @@ from collections import defaultdict
 import os
 bd.projects.set_current(bw_project)            # Select your project
 ei = bd.Database(bw_db)        # Select your db
+
 from typing import List,Dict,Union,Optional
 
 
@@ -24,6 +25,7 @@ class GlobalMarkets:
         self.general={}
         self.region_mapping={}
         self.__not_found=[]
+        self.__lenerrors__=[]
 
     @staticmethod
     def get_paths(path)->list:
@@ -140,62 +142,58 @@ class GlobalMarkets:
         possible_mismatch={}
         not_found={}
         pass
+
         for k in gen.keys():
+            print(f"Processing K...{k}")
 
-            mismatch_region={}
+            mismatch_region = {}
+            not_found_region = {}
 
-            not_found_region={}
-            pass
-            for key,value in gen[k].items():
-                print(key,value)
-                pass
+            for key, value in gen[k].items():
 
-                activities=[{'name':a['name'],'unit':a['unit'],'location':a['location'],'code':a['code']}
-                            for a in ei if
-                            str(value['name']) in str(a['name']) and value['loc'] == str(a['location']) and str(a['unit'])=='kilowatt hour']
 
-                if len(activities)>1:
-                    activities = activities[0]
+                activities = [{'name': a['name'], 'unit': a['unit'], 'location': a['location'], 'code': a['code']}
+                              for a in ei if
+                              str(value['name']) in str(a['name']) and value['loc'] == str(a['location']) and str(
+                                  a['unit']) == 'kilowatt hour']
 
-                if len(activities)<1:
-                    pass
-                    activities = [{'name': a['name'], 'unit': a['unit'], 'location': a['location'], 'code': a['code']}
-                                  for a in ei if
-                                  str(value['name']) in str(a['name']) and value['loc'] in str(a['location']) and str(
-                                      a['unit']) == 'kilowatt hour']
-                    if len(activities)>1:
+                if len(activities) > 1:
+                    activities = [activities[0]]
+                elif len(activities) < 1:
+                    activities = [
+                        {'name': a['name'], 'unit': a['unit'], 'location': a['location'], 'code': a['code']}
+                        for a in ei if
+                        str(value['name']) in str(a['name']) and value['loc'] in str(a['location']) and str(
+                            a['unit']) == 'kilowatt hour']
+                    if len(activities) > 1:
                         # if there are multiple options, just get the first one
-                        activities=activities[0]
-                    elif len(activities)<1:
-                        pass
-
+                        activities = [activities[0]]
+                    elif len(activities) < 1:
                         # If still no activity, try RoW assignation
-
                         activities = [
-                            {'name': a['name'], 'unit': a['unit'], 'location': a['location'], 'code': a['code']} for a
+                            {'name': a['name'], 'unit': a['unit'], 'location': a['location'], 'code': a['code']} for
+                            a
                             in ei if str(value['name']) in str(a['name']) and 'RoW' == str(a['location']) and str(
                                 a['unit']) == 'kilowatt hour']
-                        if len(activities)<1:
-                            pass
-                            not_found_region[key]={
-                                'name':value['name'],
-                                'location':value['loc'],
-                                "full":key
+                        if len(activities) > 1:
+                            activities = [activities[0]]
+
+                        if len(activities) < 1:
+                            not_found_region[key] = {
+                                'name': value['name'],
+                                'location': value['loc'],
+                                "full": key
                             }
                         else:
-                            possible_mismatch[key]=[{"name":a['name'],"region":a['location']} for a in activities]
+                            possible_mismatch[key] = [{"name": a['name'], "region": a['location']} for a in
+                                                      activities]
+
+                if len(activities) > 0:
+                    activities = activities[0]
+
+                gen[k][key]['activities'] = activities
 
 
-
-                gen[k][key]['activities']=activities
-                #gen[k][key].update(activities)
-                # TODO: Follow from here
-                """
-                ecoinvent_names[key]={
-                    "acts":activities,
-                    "carrier":value['carrier'],
-                "location_theory":value['loc']}
-                """
             #ecoinvent_data[k]=ecoinvent_names
             mismatch_region[k] = possible_mismatch
             not_found[k]=not_found_region
@@ -204,7 +202,7 @@ class GlobalMarkets:
         self.ecoinvent_mapping=ecoinvent_data
         self.save_json_standard('ecoinvent_map.json',gen)
         self.save_json_standard('not_found.json',not_found)
-        self.save_json_standard('mismatch.json',mismatch_region)
+
         pass
 
 
@@ -310,11 +308,12 @@ class GlobalMarkets:
     # df=pd.read_excel(path)
 
 
-data=GlobalMarkets(r'/home/lex/Documents/ICTA')
+data=GlobalMarkets(r'/home/lex/Documents/ICTA/Data_Global_Markets')
 #data.get_data2()
 data.get_data()
 
 data.check_ecoinvent_keys()
+pass
 #regs=data.check_region_markets()
 data.export_usa_data()
 pass
