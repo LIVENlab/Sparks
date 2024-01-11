@@ -83,6 +83,11 @@ class GlobalMarkets:
                         carrier='electricity'
                         extra='RoW'
                         pass
+                    if "hydrogen" in str(name):
+                        name="heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical"
+                        carrier='electricity'
+                        extra='Row'
+
                     else:
                         carrier = total[1].strip()
                         extra = total[2].split(',')[1].split('-')[1].strip()
