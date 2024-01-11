@@ -83,7 +83,8 @@ class GlobalMarkets:
                         carrier='electricity'
                         extra='RoW'
                         pass
-                    if "hydrogen" in str(name):
+
+                    elif "hydrogen" in str(name):
                         name="heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical"
                         carrier='electricity'
                         extra='Row'
