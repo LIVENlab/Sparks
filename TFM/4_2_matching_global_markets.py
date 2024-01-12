@@ -1,14 +1,9 @@
 import bw2data as bd
-import pandas as pd
-from ProspectBackground.const.const import bw_project,bw_db
 import json
-from collections import defaultdict
-import os
-bd.projects.set_current(bw_project)            # Select your project
-ei = bd.Database(bw_db)        # Select your db
-from typing import List,Dict,Union,Optional
 
 
+bd.projects.set_current('Lex_TFM')
+ei=bd.Database('ecoinvent')
 class Matching:
     def __init__(self):
         self.exporter=None

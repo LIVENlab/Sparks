@@ -10,8 +10,8 @@ from ProspectBackground.const.const import bw_project,bw_db
 import json
 from bw2data.errors import UnknownObject
 from bw2data.backends import Activity, ActivityDataset
-bd.projects.set_current(bw_project)            # Select your project
-ei = bd.Database(bw_db)        # Select your db
+bd.projects.set_current('TFM_Lex')            # Select your project
+ei = bd.Database('ecoinvent')        # Select your db
 
 
 class MarketBuilder():
@@ -77,8 +77,8 @@ class MarketBuilder():
                 except:
                     print(f" No activity for {v}")
                     continue
-                self.pop_inputs(market)  # pop inputs
-                self.input_changer(market, key)
+                self.pop_inputs(activ_markets)  # pop inputs
+                self.input_changer(activ_markets, key)
     @staticmethod
     def pop_inputs(activity: bw2data.backends.proxies.Activity):
         """
@@ -101,7 +101,8 @@ class MarketBuilder():
         data_region=self.data[region] # select the data from one region
         for key,value in data_region.items():
             try:
-                new_input=ei.get_node(value['code'])    # get the activity from dict
+                new_input = list(ActivityDataset.select().where(ActivityDataset.code == value['code']))
+                new_input=Activity(new_input[0])
                 exchange=market.new_exchange(input=new_input,type='technosphere',amount=value["share"])
                 exchange.save()
                 if exchange in market.technosphere():
@@ -164,14 +165,10 @@ class MarketBuilder():
 
         for a in act1.technosphere():
             print(a)
-        pass
 
 
 
-        pass
 
-
-        pass
 markets=MarketBuilder()
 markets.iter()
 #markets.market_checker()

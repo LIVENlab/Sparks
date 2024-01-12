@@ -4,14 +4,17 @@ from ProspectBackground.const.const import bw_project,bw_db
 import json
 from collections import defaultdict
 import os
-bd.projects.set_current(bw_project)            # Select your project
-ei = bd.Database(bw_db)        # Select your db
+bd.projects.set_current('TFM_Lex')            # Select your project
+ei = bd.Database('ecoinvent')        # Select your db
 
 from typing import List,Dict,Union,Optional
 from bw2data.backends import Activity, ActivityDataset
 
 pass
 
+activities=list( ActivityDataset.select().where(ActivityDataset.name=='heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical'))
+print([(a.name, a.database, a.location) for a in activities])
+pass
 
 class GlobalMarkets:
     """
@@ -78,7 +81,7 @@ class GlobalMarkets:
                     name = total[0].strip()  # Elimina espacios al inicio y al final
                         # replace one inventory
                     pass
-                    if str(name)==str("electricity production CSP mix, electricity high voltage, cut-off, U - GLO"):
+                    if str(name)==str("electricity production CSP mix, electricity high voltage, cut-off, U - GLO") or 'electricity production CSP mix' in str(name):
 
                         name=str("electricity production, solar thermal parabolic trough, 50 MW")
                         carrier='electricity, high voltage'
@@ -87,7 +90,7 @@ class GlobalMarkets:
 
                     elif "hydrogen" in str(name):
                         name="heat and power co-generation, hydrogen, combined cycle power plant, 400MW electrical"
-                        carrier='electricity'
+                        carrier='electricity, high voltage'
                         extra='Row'
 
                     else:
@@ -157,13 +160,7 @@ class GlobalMarkets:
             not_found_region = {}
 
             for key, value in gen[k].items():
-                pass
-                """
-                activities = [{'name': a['name'], 'unit': a['unit'], 'location': a['location'], 'code': a['code']}
-                              for a in ei if
-                              str(value['name']) in str(a['name']) and value['loc'] == str(a['location']) and str(
-                                  a['unit']) == 'kilowatt hour']
-                """
+
 
 
                 activities = list(ActivityDataset.select().where(ActivityDataset.name == value['name'],
@@ -178,50 +175,18 @@ class GlobalMarkets:
                     activities = list(ActivityDataset.select().where(ActivityDataset.name == value['name'],
                                                                      ActivityDataset.location.contains('RoW'),
                                                                      ActivityDataset.product == value['carrier']))
-
-                    raise Exception(f" Exception at {value['name']}")
-                    pass
+                    try:
+                        b=Activity(activities[0])
+                    except:
+                        raise Exception(f" Exception at {value['name']}")
+                        pass
 
                     print([(a.name, a.database, a.location) for a in activities])
                 activ_dict = {"name": b['name'],
                               "unit": b['unit'],
                               "location": b['location'],
                               "code": b['code']}
-                """
-                if len(activities) > 1:
-                    activities = [activities[0]]
-                elif len(activities) < 1:
-                    activities = [
-                        {'name': a['name'], 'unit': a['unit'], 'location': a['location'], 'code': a['code']}
-                        for a in ei if
-                        str(value['name']) in str(a['name']) and value['loc'] in str(a['location']) and str(
-                            a['unit']) == 'kilowatt hour']
-                    if len(activities) > 1:
-                        # if there are multiple options, just get the first one
-                        activities = [activities[0]]
-                    elif len(activities) < 1:
-                        # If still no activity, try RoW assignation
-                        activities = [
-                            {'name': a['name'], 'unit': a['unit'], 'location': a['location'], 'code': a['code']} for
-                            a
-                            in ei if str(value['name']) in str(a['name']) and 'RoW' == str(a['location']) and str(
-                                a['unit']) == 'kilowatt hour']
-                        if len(activities) > 1:
-                            activities = [activities[0]]
 
-                        if len(activities) < 1:
-                            not_found_region[key] = {
-                                'name': value['name'],
-                                'location': value['loc'],
-                                "full": key
-                            }
-                        else:
-                            possible_mismatch[key] = [{"name": a['name'], "region": a['location']} for a in
-                                                      activities]
-
-                if len(activities) > 0:
-                    activities = activities[0]
-                """
                 gen[k][key]['activities'] = activ_dict
 
 
@@ -339,7 +304,7 @@ class GlobalMarkets:
     # df=pd.read_excel(path)
 
 
-data=GlobalMarkets(r'/home/lex/Documents/ICTA/Data_Global_Markets')
+data=GlobalMarkets(r'C:\Users\Administrator\Downloads\Data_Global_Markets')
 #data.get_data2()
 data.get_data()
 
