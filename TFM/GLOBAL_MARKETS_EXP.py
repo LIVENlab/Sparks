@@ -8,8 +8,9 @@ bd.projects.set_current(bw_project)            # Select your project
 ei = bd.Database(bw_db)        # Select your db
 
 from typing import List,Dict,Union,Optional
+from bw2data.backends import Activity, ActivityDataset
 
-
+pass
 
 
 class GlobalMarkets:
@@ -80,7 +81,7 @@ class GlobalMarkets:
                     if str(name)==str("electricity production CSP mix, electricity high voltage, cut-off, U - GLO"):
 
                         name=str("electricity production, solar thermal parabolic trough, 50 MW")
-                        carrier='electricity'
+                        carrier='electricity, high voltage'
                         extra='RoW'
                         pass
 
@@ -109,7 +110,7 @@ class GlobalMarkets:
                     general[location[0]][name] = {
                         "name":name.strip(),
                         "share": row['share_50'],
-                        "carrier": 'electricity',
+                        "carrier": 'electricity, high voltage',
                         "loc": 'GLO'
                     }
 
@@ -156,13 +157,30 @@ class GlobalMarkets:
             not_found_region = {}
 
             for key, value in gen[k].items():
-
-
+                pass
+                """
                 activities = [{'name': a['name'], 'unit': a['unit'], 'location': a['location'], 'code': a['code']}
                               for a in ei if
                               str(value['name']) in str(a['name']) and value['loc'] == str(a['location']) and str(
                                   a['unit']) == 'kilowatt hour']
+                """
 
+
+                activities = list(ActivityDataset.select().where(ActivityDataset.name == value['name'],ActivityDataset.location == value['loc'], ActivityDataset.product == value['carrier']))
+                try:
+                    b=Activity(activities[0])
+                    activ_dict={"name":b['name'],
+                                "unit": b['unit'],
+                                "location": b['location'],
+                                "code": b['code']}
+
+                except:
+                    raise Exception(f" Exception at {value['name']}")
+                    pass
+
+                    print([(a.name, a.database, a.location) for a in activities])
+
+                """
                 if len(activities) > 1:
                     activities = [activities[0]]
                 elif len(activities) < 1:
@@ -196,8 +214,8 @@ class GlobalMarkets:
 
                 if len(activities) > 0:
                     activities = activities[0]
-
-                gen[k][key]['activities'] = activities
+                """
+                gen[k][key]['activities'] = activ_dict
 
 
             #ecoinvent_data[k]=ecoinvent_names
