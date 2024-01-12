@@ -171,18 +171,22 @@ class GlobalMarkets:
                                                                  ActivityDataset.product == value['carrier']))
                 try:
                     b=Activity(activities[0])
-                    activ_dict={"name":b['name'],
-                                "unit": b['unit'],
-                                "location": b['location'],
-                                "code": b['code']}
+
 
                 except:
+                    # if location is not recognised, consider RoW
+                    activities = list(ActivityDataset.select().where(ActivityDataset.name == value['name'],
+                                                                     ActivityDataset.location.contains('RoW'),
+                                                                     ActivityDataset.product == value['carrier']))
 
                     raise Exception(f" Exception at {value['name']}")
                     pass
 
                     print([(a.name, a.database, a.location) for a in activities])
-
+                activ_dict = {"name": b['name'],
+                              "unit": b['unit'],
+                              "location": b['location'],
+                              "code": b['code']}
                 """
                 if len(activities) > 1:
                     activities = [activities[0]]
