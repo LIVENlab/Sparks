@@ -8,19 +8,11 @@ import bw2data.backends
 import pandas as pd
 from ProspectBackground.const.const import bw_project,bw_db
 import json
-from collections import defaultdict
-import os
+from bw2data.errors import UnknownObject
+from bw2data.backends import Activity, ActivityDataset
 bd.projects.set_current(bw_project)            # Select your project
 ei = bd.Database(bw_db)        # Select your db
-from typing import List,Dict,Union,Optional
 
-"""
-try:
-    ei.copy('copy_test') #fes una copia de la db sencera
-    ei_copy=bd.Database('copy_test')
-except AssertionError:
-    ei_copy=bd.Database('copy_test')
-"""
 
 class MarketBuilder():
     """
@@ -76,7 +68,12 @@ class MarketBuilder():
             print(f"Changing markets in region {key}...")
             for v in value:
                 try:
-                    market = ei.get_node(name='market for electricity, high voltage', location=v)   # get the market activity to change
+
+                    #market = ei.get_node(name='market for electricity, high voltage', location=v)   # get the market activity to change
+                    market= list(ActivityDataset.select().where(ActivityDataset.name =="market for electricity, high voltage",
+                                                                ActivityDataset.location.contains(v)))
+                    activ_markets=Activity(market[0])
+
                 except:
                     print(f" No activity for {v}")
                     continue
