@@ -166,7 +166,9 @@ class GlobalMarkets:
                 """
 
 
-                activities = list(ActivityDataset.select().where(ActivityDataset.name == value['name'],ActivityDataset.location == value['loc'], ActivityDataset.product == value['carrier']))
+                activities = list(ActivityDataset.select().where(ActivityDataset.name == value['name'],
+                                                                 ActivityDataset.location == value['loc'],
+                                                                 ActivityDataset.product.contains(value['carrier'])))
                 try:
                     b=Activity(activities[0])
                     activ_dict={"name":b['name'],
@@ -175,6 +177,7 @@ class GlobalMarkets:
                                 "code": b['code']}
 
                 except:
+
                     raise Exception(f" Exception at {value['name']}")
                     pass
 
