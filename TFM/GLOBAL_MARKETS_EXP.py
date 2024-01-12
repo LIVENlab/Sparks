@@ -167,8 +167,8 @@ class GlobalMarkets:
 
 
                 activities = list(ActivityDataset.select().where(ActivityDataset.name == value['name'],
-                                                                 ActivityDataset.location == value['loc'],
-                                                                 ActivityDataset.product.contains(value['carrier'])))
+                                                                 ActivityDataset.location.contains(value['loc']),
+                                                                 ActivityDataset.product == value['carrier']))
                 try:
                     b=Activity(activities[0])
                     activ_dict={"name":b['name'],
