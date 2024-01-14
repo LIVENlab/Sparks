@@ -97,6 +97,7 @@ class Cleaner():
             raise FileNotFoundError(f'File {self.data} does not exist. Please check it')
 
         else:
+            pass
 
             self.input_checker(df)
             df = df.dropna()
@@ -180,8 +181,11 @@ class Cleaner():
         Run different functions of the class under one call
         @return: final_df: calliope data cleaned. Check definitions of the class for more information
         """
+        pass
         dat = self.changer()
+        pass
         final_df = self.filter_techs(dat)
+        pass
         self.clean=final_df
         return final_df
 
@@ -208,6 +212,7 @@ class Cleaner():
                 'code': code
             }
         self.activity_conversion_dictionary=general_dict
+        pass
         return general_dict
 
 
@@ -224,13 +229,16 @@ class Cleaner():
 
             Returns a list of techs to apply the following function "check elements"
         """
+        pass
         df=self.clean
+
         # Create a modified column name to match  the names
         print('Preparing to change and adapt the units...')
 
         df['names2'] = self.join_techs_and_carriers(df)
         pass
         df=self.ecoinvent_units_factors(df)
+
         pass
         # Prepare an enbios-like file    cols = ['spores', 'locs', 'techs', 'carriers', 'units', 'new_vals']
         cols = ['spores', 'locs', 'techs', 'carriers', 'units', 'new_vals']
@@ -244,7 +252,9 @@ class Cleaner():
 
 
     def adapt_units(self):
+        pass
         self.data_merge()
+        pass
         modified_units_df=self.modify_data()
         return modified_units_df
 
@@ -288,7 +298,9 @@ class Cleaner():
                 message=f" \n{code} from activity, {key} not found in the database. Please check your database"
                 warnings.warn(message,Warning)
                 continue  # If activity doesn't exist, don't do anything
+            df=df.reset_index(drop=True)
             for index, row in df.iterrows():
+                pass
                 if str(key) == str(row['names2']):
                     factor = (self.activity_conversion_dictionary[key]['factor'])
                     value = float(row['flow_out_sum'])
@@ -299,6 +311,7 @@ class Cleaner():
                     df.at[index, 'names_db'] = act_name
                 else:
                     pass
+        pass
         return df
 
 
