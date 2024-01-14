@@ -117,6 +117,7 @@ class Prospect():
         self.preprocessed_starter=cleaner.preprocess_data()
         pass
         self.preprocessed_units=cleaner.adapt_units()
+        pass
         self.exluded_techs_and_regions=cleaner.techs_region_not_included
 
 
@@ -132,7 +133,9 @@ class Prospect():
         Transform the data into enbios like dictionary
         """
         # Create an instance of the SoftLInkCalEnb
+        pass
         self.SoftLink=SoftLinkCalEnb(self.preprocessed_units,self.mother,smaller_vers)
+        pass
         self.SoftLink.run(path_save)
         self.enbios2_data = self.SoftLink.enbios2_data
         self.save_json_data(self.enbios2_data, path_save)
