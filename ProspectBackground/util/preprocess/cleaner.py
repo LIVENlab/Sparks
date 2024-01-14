@@ -10,7 +10,10 @@ import bw2data as bd
 import warnings
 from ProspectBackground.const.const import bw_project,bw_db
 from typing import Dict,Union,Optional
+
+
 bd.projects.set_current(bw_project)            # Select your project
+
 database = bd.Database(bw_db)        # Select your db
 
 
@@ -86,6 +89,7 @@ class Cleaner():
         """
 
         print('Adapting input data...')
+        pass
         try:
             df = pd.read_csv(self.data, delimiter=',')
             self.data=df
@@ -124,6 +128,8 @@ class Cleaner():
         If the name is not defined in the "Processor column, it will be removed
         *Update: the function also filters if the technology with region included is not defined
         """
+
+        pass
         df_names=df.copy()
         df_names['tecregion']=df_names['techs'] + df_names['locs']
         df_techs = pd.read_excel(self.mother_file, sheet_name='Processors')
@@ -223,9 +229,12 @@ class Cleaner():
         print('Preparing to change and adapt the units...')
 
         df['names2'] = self.join_techs_and_carriers(df)
+        pass
         df=self.ecoinvent_units_factors(df)
+        pass
         # Prepare an enbios-like file    cols = ['spores', 'locs', 'techs', 'carriers', 'units', 'new_vals']
         cols = ['spores', 'locs', 'techs', 'carriers', 'units', 'new_vals']
+        pass
         df = df[cols]
         df.rename(columns={'spores': 'scenarios', 'new_vals': 'flow_out_sum'}, inplace=True)
         df.dropna(axis=0, inplace=True)
@@ -262,6 +271,7 @@ class Cleaner():
         """
         # Create new columns
         #df=df.copy() # avoid modifications during the loop
+        pass
         df['new_vals'] = None
         df['Units_new'] = None
         df['codes'] = None
@@ -273,11 +283,11 @@ class Cleaner():
                 activity = database.get_node(code)
                 unit = activity['unit']
                 act_name = activity['name']
-            except bw2data.errors.UnknownObject:
+            except (bw2data.errors.UnknownObject, KeyError) as e:
+                pass
                 message=f" \n{code} from activity, {key} not found in the database. Please check your database"
                 warnings.warn(message,Warning)
-
-                continue  # If activity doesn't exists, do nothing
+                continue  # If activity doesn't exist, don't do anything
             for index, row in df.iterrows():
                 if str(key) == str(row['names2']):
                     factor = (self.activity_conversion_dictionary[key]['factor'])

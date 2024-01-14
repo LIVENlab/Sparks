@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from ProspectBackground.util.preprocess.template_market_4_electricity import Market_for_electricity
 from ProspectBackground.util.updater.background_updater import Updater
 import time
-
+pass
 @dataclass
 class Prospect():
 
@@ -113,7 +113,9 @@ class Prospect():
 
         # Create an instance of the Cleaner class
         cleaner=Cleaner(self.calliope,self.mother,subregions)
+        pass
         self.preprocessed_starter=cleaner.preprocess_data()
+        pass
         self.preprocessed_units=cleaner.adapt_units()
         self.exluded_techs_and_regions=cleaner.techs_region_not_included
 
@@ -164,11 +166,25 @@ class Prospect():
 
 
     def classic_run(self):
-
         general_path=self.path_saved
-        self.exp = Experiment(general_path)
-        self.exp.run()
-        result=self.exp.result_to_dict()
+
+        try:
+            exp = Experiment(general_path)
+            exp.run()
+        except Exception as e:
+            # Generally the exception is the unspecificEcoinvent error from ENBIOS
+            from enbios2.base.unit_registry import ecoinvent_units_file_path
+            text_to_write = 'unspecificEcoinventUnit = []'
+
+            with open(ecoinvent_units_file_path, 'w') as file:
+                file.write(text_to_write)
+            print(f'error {e} covered and solved')
+            exp=Experiment(general_path)
+            pass
+
+        result=exp.result_to_dict()
+        return result
+
 
 
 
@@ -186,6 +202,7 @@ class Prospect():
         scenarios = list(general['scenarios'].keys())
         try:
             exp = Experiment(general_path)
+            exp.run()
         except Exception as e:
             # Generally the exception is the unspecificEcoinvent error from ENBIOS
             from enbios2.base.unit_registry import ecoinvent_units_file_path
@@ -243,11 +260,6 @@ class Prospect():
 
 
 
-if __name__=='__main__':
-    tr=UpdaterExperiment(r'C:\Users\altz7\PycharmProjects\enbios__git\projects\seed\MixUpdater\data\flow_out_sum.csv',r'C:\Users\altz7\PycharmProjects\enbios__git\projects\seed\MixUpdater\data\base_file_simplified.xlsx','Seeds_exp4','db_experiments')
-    tr.preprocess()
-    tr.data_for_ENBIOS()
-    tr.template_electricity('Electricity_generation', Location='PT', Reference_product='electricity production, 2050 in Portugal test',Units='kWh')
-    tr.run()
+
 
 

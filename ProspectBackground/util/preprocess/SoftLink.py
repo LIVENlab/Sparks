@@ -81,7 +81,7 @@ class SoftLinkCalEnb():
             scen_dict[scenario]['activities'] = info
 
         # GENERATE KEYS FOR THE SCENARIOS
-
+        pass
         scens = random.choice(list(scen_dict.keys()))  # select a random scenario from the list
 
         acts = list(scen_dict[scens]['activities'].keys())

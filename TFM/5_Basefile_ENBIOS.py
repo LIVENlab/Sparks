@@ -7,7 +7,7 @@ enbios_mod = Prospect(r'C:\Users\Administrator\Documents\Alex\flow_out.csv',
 pass
 enbios_mod.preprocess(subregions=False)
 enbios_mod.data_for_ENBIOS()
-#enbios_mod.classic_run()
+enbios_mod.classic_run()
 
 
 #df=pd.read_csv(r'C:\Users\altz7\PycharmProjects\enbios__git\projects\data_sentinel\flow_out_sum.csv',delimiter=',')
