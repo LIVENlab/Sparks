@@ -22,7 +22,7 @@ class Cleaner():
     """
     The main objectives of this class are:
         *Clean the input data
-        *Modify the units of the input data
+        *Modify the units of the input data //
     """
     def __init__(self, caliope, motherfile, subregions : [Optional,bool]= False):
         """
