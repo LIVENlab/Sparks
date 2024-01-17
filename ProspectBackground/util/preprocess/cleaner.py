@@ -116,6 +116,7 @@ class Cleaner():
                     "flow_out_sum": "sum"
                 }).reset_index()
                 gen_df = pd.concat([gen_df, df_sub])
+                pass
 
 
 
@@ -133,6 +134,7 @@ class Cleaner():
         pass
         df_names=df.copy()
         df_names['tecregion']=df_names['techs'] + df_names['locs']
+
         df_techs = pd.read_excel(self.mother_file, sheet_name='Processors')
         df_techs['tecregion']= df_techs['Processor']+df_techs['Region']
 
@@ -160,18 +162,20 @@ class Cleaner():
 
     def manage_regions(self,arg):
 
-
+        pass
         # Special issue for the Portugal Analysis
         if arg == 'ESP-sink':
             region = 'ESP'
 
-        if self.subregions is True:
+        #if self.subregions is True:
             # If the used is not interested in having subregions, the location will be the same
-            region=str(arg)
+         #   region=str(arg)
+
         else:
-            # If the user is interested in having subregions, get the first part
-            # CZE_1 = CZE
-            region = arg.split('_')[0]
+
+            region=arg.split('-')[0]
+            region=region.split('_')[0]
+
 
         return region
 
