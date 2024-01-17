@@ -107,16 +107,21 @@ class Hierarchy:
 
 
 
-    @staticmethod
-    def get_general_results():
+
+    def get_general_results(self):
 
         out_results = OrderedDict()
         with open('results_TFM.json') as file:
             d = json.load(file, object_pairs_hook=OrderedDict)
+
         pass
         for scen in range(len(d)):
             scen_name = scen
-            out_results[scen_name] = d[scen]['results']
+            pass
+            bb=self.recrusive_dict(d[scen],2)
+            out_results[scen_name] = bb
+            #out_results[scen_name] = d[scen]['results']
+            # TODO: add function that allows to transform the dataframe
             a = pd.DataFrame.from_dict(out_results)
             pass
             a = a.T
@@ -124,6 +129,26 @@ class Hierarchy:
         pass
         return a
 
+
+    def recrusive_dict(self,
+                       dictionary,
+                       depth,
+                       count_depth=0)->dict:
+
+        """ Only allows to get proper results till level 2""" # TODO
+
+        if count_depth==depth-1:
+            dictionary_iter=dictionary['children']
+            result_final={}
+            for element in dictionary_iter:
+                result_final[element['alias']]=element['results']
+            return result_final
+
+        elif "children" in dictionary:
+            for child in dictionary['children']:
+                result=self.recrusive_dict(child,depth,count_depth+1)
+                if result is not None:
+                    return result
 
 
 aaa=Hierarchy(hierarchy_tree=hierarchy)
