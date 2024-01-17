@@ -113,10 +113,6 @@ def join_impacts_input():
     """
     df_energy = pd.read_csv(r'flow_out_clean.csv',delimiter=',')
     df_energy=df_energy.drop(df_energy.columns[0],axis=1)
-    pass
-
-    pass
-
     df_energy = df_energy.groupby(['scenarios', 'techs'])['flow_out_sum'].sum().reset_index()
     df_energy = df_energy.pivot(index='scenarios', columns='techs', values='flow_out_sum')
     pass
@@ -125,7 +121,7 @@ def join_impacts_input():
     pass
 
     result = pd.concat([res, df_energy], axis=1)
-
+    pass
     return result
 
 

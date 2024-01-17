@@ -1,5 +1,8 @@
-
 import pandas as pd
+import numpy as np
+# Copied from enbios' input
+from collections import OrderedDict
+import json
 
 
 hierarchy = {
@@ -45,8 +48,6 @@ hierarchy = {
 
 class Hierarchy:
 
-
-
     def __init__(self,hierarchy_tree: dict):
         self.hierarchy=hierarchy
         self.df_hierarchy=self.hierarchy_to_df(hierarchy_tree)
@@ -65,27 +66,68 @@ class Hierarchy:
         } for i in hierarchy.keys() for j in hierarchy[i].keys() for k in hierarchy[i][j].keys() for l in hierarchy[i][j][k])
         return df
 
+    def group_by_level(self,
+                       level:str)->dict:
 
-    def group_by_level(level:str)->pd.DataFrame:
+        hierarchy=self.df_hierarchy
+        energy=self._energy_pivot
+        keys=hierarchy[level].unique().tolist()
+
+        output = {}
+        for key in keys:
+            filtered_hierarchy = hierarchy[hierarchy[level] == key]
+            activities_to_filter=filtered_hierarchy['Activity'].unique().tolist()
+            pass
+            energy_filtered=energy.filter(activities_to_filter)
+            energy_filtered[key]=energy_filtered.sum(axis=1)
+            output[key]=energy_filtered[key].tolist()
 
 
-        pass
+        output = pd.DataFrame.from_dict(output)
+        self.energy_by_level = output
+        return output
 
 
     def join_impacts_input(self):
         """
-        Join in the same df the energy inputs + results
+        Join in the same df the energy inputs
         """
         df_energy = pd.read_csv(r'flow_out_clean.csv', delimiter=',')
+        pass
         df_energy = df_energy.drop(df_energy.columns[0], axis=1)
-
-        df_energy = df_energy.groupby(['scenarios', 'techs'])['flow_out_sum'].sum().reset_index()
-        df_energy = df_energy.pivot(index='scenarios', columns='techs', values='flow_out_sum')
+        df_energy = df_energy.groupby(['scenarios', 'aliases'])['flow_out_sum'].sum().reset_index()
+        df_energy = df_energy.pivot(index='scenarios', columns='aliases', values='flow_out_sum')
         self.__energy_pivot=df_energy
         return df_energy
 
+    def join_impacts_levels(self):
+        pass
+
+
+
+
+
+    @staticmethod
+    def get_general_results():
+
+        out_results = OrderedDict()
+        with open('results_TFM.json') as file:
+            d = json.load(file, object_pairs_hook=OrderedDict)
+        pass
+        for scen in range(len(d)):
+            scen_name = scen
+            out_results[scen_name] = d[scen]['results']
+            a = pd.DataFrame.from_dict(out_results)
+            pass
+            a = a.T
+        a = a.drop('global temperature change potential (GTP100)', axis=1)
+        pass
+        return a
 
 
 
 aaa=Hierarchy(hierarchy_tree=hierarchy)
+aaa.group_by_level('Level_2')
+aaa.get_general_results()
+
 pass
