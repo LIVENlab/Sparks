@@ -109,9 +109,9 @@ class Cleaner():
                 df_sub = df.loc[df['spores'] == scenario]   # Create a new df with the data from 1 scenario
 
                 df_sub['locs'] = df['locs'].apply(self.manage_regions)
-                df_sub = df_sub.groupby(['techs', 'locs']).agg({
+                df_sub = df_sub.groupby(['techs', 'locs', 'carriers']).agg({
                     "spores": "first",
-                    "carriers": "first",
+                    #"carriers": "first",
                     "unit": "first",
                     "flow_out_sum": "sum"
                 }).reset_index()
@@ -185,7 +185,7 @@ class Cleaner():
         Run different functions of the class under one call
         @return: final_df: calliope data cleaned. Check definitions of the class for more information
         """
-        pass
+
         dat = self.changer()
         pass
         final_df = self.filter_techs(dat)
