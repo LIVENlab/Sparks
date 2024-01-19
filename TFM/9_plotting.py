@@ -112,7 +112,8 @@ def join_impacts_input():
     Join in the same df the energy inputs + results
     """
     df_energy = pd.read_csv(r'flow_out_clean.csv',delimiter=',')
-    df_energy=df_energy.drop(df_energy.columns[0],axis=1)
+    pass
+    #df_energy=df_energy.drop(df_energy.columns[0],axis=1)
     df_energy = df_energy.groupby(['scenarios', 'techs'])['flow_out_sum'].sum().reset_index()
     df_energy = df_energy.pivot(index='scenarios', columns='techs', values='flow_out_sum')
     pass
@@ -251,17 +252,19 @@ def Pearson_correlation():
         -Have no outliers
     """
     df = join_impacts_input()
-    X = df.drop(columns=df.columns[:11], axis=1)  # Características predictoras
+    X = df.drop(columns=df.columns[:11], axis=1)
     Y = df[df.columns[:11]]
+    pass
     correlation_matrix = pd.DataFrame(index=X.columns, columns=Y.columns)
 
     for col in Y.columns:
         var_y = Y[col]
         for cols in X.columns:
             var_x = X[cols]
+
             correlation, _ = pearsonr(var_x, var_y)
 
-            # Almacenar el coeficiente en la matriz de correlación
+
             correlation_matrix.loc[cols, col] = correlation
     plt.figure(figsize=(10, 6))
     sns.heatmap(correlation_matrix.astype(float), annot=True, cmap='coolwarm', linewidths=0.5)
@@ -320,7 +323,7 @@ def Spearman_correlation():
     return correlation_matrix
 
 
-# Call the function to compute and visualize the Spearman correlation
+
 correlation_matrix = Spearman_correlation()
 
 import numpy as np
@@ -328,7 +331,7 @@ from scipy.stats import kendalltau
 
 
 def Kendall():
-    df = join_impacts_input()  # You'll need to define your 'join_impacts_input' function.
+    df = join_impacts_input()
     # Splitting the DataFrame into predictor variables (X) and output variables (Y)
     X = df.drop(columns=df.columns[:11], axis=1)  # Predictor features
     Y = df[df.columns[:11]]  # Output variables
