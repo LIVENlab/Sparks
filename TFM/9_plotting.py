@@ -15,19 +15,19 @@ from collections import OrderedDict
 def get_general_results():
 
     out_results=OrderedDict()
-    with open('results_TFM.json') as file:
+    with open('results_TFM_update.json') as file:
         d=json.load(file, object_pairs_hook=OrderedDict)
     pass
     for scen in range(len(d)):
         scen_name=scen
         out_results[scen_name]=d[scen]['results']
+        pass
         a=pd.DataFrame.from_dict(out_results)
         pass
         a=a.T
-    a=a.drop('global temperature change potential (GTP100)',axis=1)
+    a=a.drop(['exergy content',"global hectares","water pollutants","global temperature change potential (GTP100)"],axis=1)
     pass
     return a
-
 
 
 def get_normalized_value():
@@ -39,27 +39,32 @@ def get_normalized_value():
 
     res = get_general_results()
     info_norm = {}
-    pass
+
+    normalized_df = pd.DataFrame(index=res.index)  # Nuevo DataFrame para almacenar las columnas normalizadas
+
     for col in res.columns:
         name = str(col)
         name_modified = name + "_"
 
         min_ = np.min(res[col])
         max_ = np.max(res[col])
-        res[name_modified] = (res[col] - min_) / (max_ - min_)
+        normalized_df[name_modified] = (res[col] - min_) / (max_ - min_)
         info_norm[col] = {
             "max": max_,
             "min": min_,
-            "scenario_max": res[col].idxmax().item(),
-            "scenario_min": res[col].idxmin().item()
+            "scenario_max": normalized_df[name_modified].idxmax().item(),
+            "scenario_min": normalized_df[name_modified].idxmin().item()
         }
-        # drop the original cols
-        res = res.drop(col, axis=1)
-    pass
-    return res
+    normalized_df.columns = [col.rstrip('_') for col in normalized_df.columns]
+
+    return normalized_df
 
 
-def visualize1(spore: None):
+
+import seaborn as sns
+
+
+def visualize1(spore=None):
     """
     General Violin plot of results
     """
@@ -69,49 +74,66 @@ def visualize1(spore: None):
     mi_paleta = sns.color_palette("coolwarm", n_colors=5)  # Cambia la paleta aquí
     sns.set(style="whitegrid", palette=mi_paleta)
     legend_labels = ['Spore', 'Cost-Optimized Spore']
+
     # Configurar el tamaño del gráfico
     plt.figure(figsize=(18, 12))
-    plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+
+    # Ajustar el espacio alrededor del gráfico
+    plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.2)
+
     # Crear un gráfico de violín horizontal
-    sns.violinplot(data=df, orient='h', inner='quart', cut=0, palette='Set2',alpha=0.6)
-    # Configurar etiquetas y título
-    plt.xlabel("Valor Impact")
-    plt.ylabel("Indicator")
-    # sns.set_yticklabels(df.columns, fontsize=9)  # Cambia el tamaño de fuente aquí
-    sns.stripplot(data=df, orient='h', color='black', alpha=0.4, jitter=0.2,label=legend_labels[0])
+    ax = sns.violinplot(data=df, orient='h', inner='quart', cut=0, palette='Set2', alpha=0.6)
+
+    # Configurar etiquetas y título con ajuste de fontsize
+    ax.set_xlabel("Impact", fontsize=14)
+    ax.set_ylabel("Environmental Indicators", fontsize=16)
+
+    # Configurar el tamaño de fuente de los ticks en los ejes
+    ax.tick_params(axis='both', which='major', labelsize=12)
+
+    # Configurar el tamaño de fuente de los ticks en el eje y
+    ax.tick_params(axis='y', which='major', labelsize=17)
+
+    # Configurar el título con un color más oscuro
+    #ax.set_title("Normalized environmental impacts in Portugal", fontsize=18, color='black', fontweight='bold')
+
+    sns.stripplot(data=df, orient='h', color='black', alpha=0.4, jitter=0.2, label=legend_labels[0])
 
     # Add the selected spore. Spore 0 is the one that we would get with TIMES
     if spore is not None:
         df_selected = df.iloc[[spore]]
-        sns.stripplot(data=df_selected, orient='h', color='red', jitter=1, size=13, marker='*',
+        sns.stripplot(data=df_selected, orient='h', color='red', jitter=1, size=15, marker='*',
                       label=legend_labels[1])
-    pass
-    plt.title("Normalized environmental impacts in Portugal", fontsize=18)
 
-    for l in plt.gca().lines:
+    for l in ax.lines:
         l.set_linewidth(2)
 
     # Mostrar el gráfico
     plt.grid(True)
+
     # Añadir una leyenda única usando Matplotlib
-    handles, labels = plt.gca().get_legend_handles_labels()
+    handles, labels = ax.get_legend_handles_labels()
     unique_labels = list(set(labels))
     unique_handles = [handles[labels.index(label)] for label in unique_labels]
+
+    # Ajustar la ubicación de la leyenda
     plt.legend(unique_handles, unique_labels, loc='upper right', fontsize='medium')
-    # Guardar el gráfico en alta resolución
-    plt.savefig('plots/violin_plot.png', dpi=900, bbox_inches='tight')
+    plt.savefig('plots/violin_plot.png', dpi=1000, bbox_inches='tight')
     plt.legend(fontsize='medium')
-    # Mostrar el gráfico
+
+
 
 
 visualize1(spore=0)
+
+
 pass
 
 def join_impacts_input():
     """
     Join in the same df the energy inputs + results
     """
-    df_energy = pd.read_csv(r'flow_out_clean.csv',delimiter=',')
+    df_energy = pd.read_csv(r'flow_out_processed.csv',delimiter=',')
     pass
     #df_energy=df_energy.drop(df_energy.columns[0],axis=1)
     df_energy = df_energy.groupby(['scenarios', 'techs'])['flow_out_sum'].sum().reset_index()
@@ -127,7 +149,7 @@ def join_impacts_input():
 
 
 aa = join_impacts_input
-
+visualize1(spore=0)
 
 import matplotlib.pyplot as plt
 from sklearn.model_selection import cross_val_score, train_test_split
@@ -193,26 +215,47 @@ def study_result():
 #study_result()
 
 
-def corr_matrix_Y():
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+def correlation_matrix_analysis():
     """
-    Study the correlation among the outputs (impacts)
+    Analyze the correlation among the outputs (impacts).
     (Simple correlation)
-
     """
+    # Assuming `join_impacts_input()` returns the required DataFrame
     df = join_impacts_input()
-    df = df.drop(columns=df.columns[11:])
-    pass
 
+    # Drop unnecessary columns
+    df = df.drop(columns=df.columns[8:])
+
+    # Calculate correlation matrix
     correlation_matrix = df.corr()
 
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', cbar=True)
-    plt.title('Correlación entre Objetivos')
-    plt.savefig("plots/correlation_matrix.png", dpi=800, bbox_inches='tight')
+    # Set up the matplotlib figure
+    plt.figure(figsize=(10, 8))
+
+    # Customize the seaborn style for a clean and professional look
+    sns.set(style="whitegrid")
+
+    # Customize the heatmap with the "coolwarm" color palette and white borders
+    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', cbar=True, fmt=".2f", linewidths=.5, linecolor='white', square=True)
+
+    # Rotate x-axis labels for better readability
+    plt.xticks(rotation=45, ha="right")
+
+    # Save the plot with high resolution and tight bounding box
+    plt.savefig("plots/correlation_matrix.png", dpi=900, bbox_inches='tight')
+
+    # Show the plot
+    plt.show()
 
 
 
-corr_matrix_Y()
+
+correlation_matrix_analysis()
+# Call the function to generate the heatmap
+
 
 
 def multi_colinearity():
@@ -232,7 +275,7 @@ def multi_colinearity():
     print(vif)
 
 
-multi_colinearity()
+#multi_colinearity()
 
 
 def Pearson_correlation():
@@ -357,19 +400,3 @@ Kendall()
 
 ####### part 2: Second level of the dendrogram
 
-def get_general_results():
-
-
-    out_results=OrderedDict()
-    with open('results_TFM.json') as file:
-        d=json.load(file, object_pairs_hook=OrderedDict)
-
-    for scen in range(len(d)):
-        scen_name=scen
-
-        out_results[scen_name]=d[scen]['results']
-        a=pd.DataFrame.from_dict(out_results)
-        a=a.T
-    a=a.drop('global temperature change potential (GTP100)',axis=1)
-    pass
-    return a

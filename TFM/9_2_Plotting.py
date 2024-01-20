@@ -154,7 +154,8 @@ class Hierarchy:
         """
         df_energy = pd.read_csv(r'flow_out_clean.csv', delimiter=',')
         pass
-        df_energy = df_energy.drop(df_energy.columns[0], axis=1)
+
+        pass
         df_energy = df_energy.groupby(['scenarios', 'aliases'])['flow_out_sum'].sum().reset_index()
         df_energy = df_energy.pivot(index='scenarios', columns='aliases', values='flow_out_sum')
         self.__energy_pivot=df_energy
@@ -306,7 +307,7 @@ class Hierarchy:
 aaa=Hierarchy(hierarchy_tree=hierarchy)
 aaa.group_by_level('Level_2')
 aaa.get_general_results()
-aaa.plot_pearsons_heatmap()
+#aaa.plot_pearsons_heatmap()
 #aaa.sensitivity_index()
 
 pass
