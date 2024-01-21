@@ -7,7 +7,7 @@ import json
 import seaborn as sns
 from sklearn.ensemble import RandomForestRegressor
 from statsmodels.stats.outliers_influence  import variance_inflation_factor
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, davies_bouldin_score, pairwise_distances_argmin_min, confusion_matrix
 from sklearn.model_selection import cross_val_score
 from scipy.stats import pearsonr
 import matplotlib.pyplot as plt
@@ -68,8 +68,10 @@ def visualize1(spore=None):
     """
     General Violin plot of results
     """
+
     df = get_normalized_value()
-    pass
+
+
 
     mi_paleta = sns.color_palette("coolwarm", n_colors=5)  # Cambia la paleta aquí
     sns.set(style="whitegrid", palette=mi_paleta)
@@ -121,10 +123,135 @@ def visualize1(spore=None):
     plt.savefig('plots/violin_plot.png', dpi=1000, bbox_inches='tight')
     plt.legend(fontsize='medium')
 
-
-
-
 visualize1(spore=0)
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn import metrics
+def clusters():
+    df=get_normalized_value()
+    df=df.drop('biotic resources', axis=1)
+    X=df.values
+    scaler=StandardScaler()
+    X_scaled =scaler.fit_transform(X)
+
+    n_clusters=2
+
+    k_means=KMeans(n_clusters=n_clusters,random_state=42)
+    df['cluster']=k_means.fit_predict(X_scaled)
+    inertia = k_means.inertia_
+
+    # Calcular la silueta
+    silhouette_score = metrics.silhouette_score(X_scaled, df['cluster'])
+    davies_bouldin=davies_bouldin_score(X_scaled, df['cluster'])
+
+
+
+    # Visualizar la matriz de confusión
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(confusion_matrix(df['cluster'], df['cluster']), annot=True, fmt='d', cmap='viridis', cbar=False)
+    plt.xlabel('Predicho')
+    plt.ylabel('Verdadero')
+    plt.title('Matriz de Confusión')
+    plt.savefig('plots/confusion.png')
+
+
+
+    # Visualizar la matriz de c
+
+    # Visualizar los resultados
+    plt.figure(figsize=(12, 6))
+
+    # Visualizar los clusters en un gráfico
+    sns.scatterplot(data=df, x=df.index, y='cluster', palette='viridis', marker='o', hue='cluster')
+    plt.xlabel('Escenario')
+    plt.ylabel('Cluster')
+    plt.title('Clustering de Escenarios')
+
+    # Mostrar la inercia y la silueta en el gráfico
+    plt.text(1, -0.5, f'Inercia: {inertia:.2f}', fontsize=12)
+    plt.text(1, -0.75, f'Silueta: {silhouette_score:.2f}', fontsize=12)
+
+    print(f'Silueta: {silhouette_score:.2f}')
+    print(f'Davies-Bouldin: {davies_bouldin:.2f}')
+    plt.savefig(r'plots/clustering.png')
+    plt.show()
+
+    # Verificar los resultados
+    b=df.groupby('cluster').mean()
+    return df,b
+
+
+
+def visualize_single_column(column_name):
+    """
+    Violin plot and strip plot for a single column
+    """
+
+    # Supongamos que df es tu DataFrame después de la agrupación por kmeans
+    # y que has añadido la columna "cluster"
+    b1, df = clusters()
+    df = b1
+    pass
+
+    # Ajusta la paleta de colores para tener dos colores, uno para cada valor de "cluster"
+    mi_paleta = sns.color_palette("coolwarm", n_colors=2)
+
+    sns.set(style="whitegrid", palette=mi_paleta)
+    legend_labels = ['Spore', 'Cost-Optimized Spore']
+
+    # Configurar el tamaño del gráfico
+    plt.figure(figsize=(10, 6))
+
+    # Ajustar el espacio alrededor del gráfico
+    plt.subplots_adjust(left=0.15, right=0.95, top=0.9, bottom=0.2)
+
+    # Crear un gráfico de violín horizontal para la columna específica
+    ax = sns.violinplot(x=df[column_name], orient='h', inner='quart', cut=0, palette='Set2', alpha=0.1, linewidth=1)  # Ajusta el alpha y el linewidth aquí
+
+    # Añadir los puntos del stripplot con diferente color según el valor de "cluster"
+    sns.stripplot(x=df[column_name], orient='h', hue=df["cluster"], palette=mi_paleta, alpha=0.7, jitter=0.2, ax=ax, size=5, linewidth=0.5)  # Ajusta el alpha y el size aquí
+
+    # Configurar etiquetas y título con ajuste de fontsize
+    ax.set_xlabel("Impact", fontsize=14)
+    ax.set_ylabel(column_name, fontsize=12)
+
+    # Configurar el tamaño de fuente de los ticks en los ejes
+    ax.tick_params(axis='both', which='major', labelsize=8)  # Ajusta el labelsize aquí
+
+    # Configurar el tamaño de fuente de los ticks en el eje y
+    ax.tick_params(axis='y', which='major', labelsize=12)  # Ajusta el labelsize aquí
+
+    # Configurar las líneas de la cuadrícula
+    ax.grid(which='both', linestyle='-', linewidth='0.2', color='gray')  # Ajusta el linestyle, linewidth y color aquí
+
+    # Añadir una leyenda única usando Matplotlib
+    handles, labels = ax.get_legend_handles_labels()
+    unique_labels = list(set(labels))
+    unique_handles = [handles[labels.index(label)] for label in unique_labels]
+
+    # Cambiar el título de la leyenda
+
+    legend = ax.legend(unique_handles, unique_labels, loc='upper right', fontsize='small', title='Cluster Group')
+    legend.get_title().set_fontsize('10')  # Ajusta el tamaño del título de la leyenda
+    plt.tight_layout(pad=2)
+
+
+    # Guardar el gráfico con alta calidad
+    plt.savefig(f'plots/violin_strip_plot_{column_name}.png', dpi=1000, bbox_inches='tight')  # Ajusta el dpi aquí
+    plt.show()
+
+
+# Llamada a la función para una columna específica
+visualize_single_column("water consumption potential (WCP)")
+
+
+
+
+
+
+
+
 
 
 pass
@@ -253,7 +380,7 @@ def correlation_matrix_analysis():
 
 
 
-correlation_matrix_analysis()
+#correlation_matrix_analysis()
 # Call the function to generate the heatmap
 
 
@@ -319,7 +446,7 @@ def Pearson_correlation():
     return correlation_matrix
 
 
-pearrr = Pearson_correlation()
+#pearrr = Pearson_correlation()
 
 from scipy.stats import spearmanr
 
@@ -367,7 +494,7 @@ def Spearman_correlation():
 
 
 
-correlation_matrix = Spearman_correlation()
+#correlation_matrix = Spearman_correlation()
 
 import numpy as np
 from scipy.stats import kendalltau
@@ -395,7 +522,7 @@ def Kendall():
     plt.savefig('plots/kendall.png', dpi=800, bbox_inches='tight')
 
 # Example usage:
-Kendall()
+#Kendall()
 
 
 ####### part 2: Second level of the dendrogram
