@@ -1,15 +1,11 @@
 import pandas as pd
-import numpy as np
-# Copied from enbios' input
+
 from collections import OrderedDict
-import json
+
 import matplotlib.pyplot as plt
-import numpy as np
-import seaborn
-from matplotlib import gridspec
+
 from scipy.stats import pearsonr, ttest_ind
-import seaborn as sns
-import xgboost as xgb
+
 import shap
 import numpy as np
 import json
@@ -17,9 +13,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 from sklearn import metrics
 import seaborn as sns
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from statsmodels.stats.outliers_influence  import variance_inflation_factor
-from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error, davies_bouldin_score
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error, davies_bouldin_score, accuracy_score, \
+    precision_score, recall_score, confusion_matrix
 from sklearn.model_selection import cross_val_score, train_test_split, GridSearchCV
 hierarchy={
             "Generation": [
@@ -122,6 +119,7 @@ class Subplots:
 
         self.get_level_n3()
         self.energy_categories_n3()
+        self.charachteristics_l_4()
 
     def get_general_results_n1(self):
         out_results = OrderedDict()
@@ -643,19 +641,43 @@ class Subplots:
             t_stat, p_value = ttest_ind(cluster_0_data[feature], cluster_1_data[feature])
             print(f'Prueba t para {feature}: Estadístico t={t_stat}, Valor p={p_value}')
 
-        # Añadir una columna con las diferencias absolutas entre las medias
-        means_df['Diferencia'] = means_df['Cluster 1'] - means_df['Cluster 0']
+        means_df = means_df.reset_index().melt(id_vars='index', var_name='Cluster', value_name='Media')
 
-        # Utilizar la paleta "colorblind" de seaborn
-        sns.set_palette("colorblind")
+        # Definir colores personalizados
+        colores_personalizados = {'Cluster 0': '#4CAF50', 'Cluster 1': '#2196F3'}
 
         # Visualizar las diferencias absolutas en forma de gráfico de barras agrupadas
-        means_df[['Cluster 0', 'Cluster 1']].plot(kind='bar', colormap='viridis', figsize=(10, 6))
-        plt.bar(means_df.index, means_df['Diferencia'], color='black', alpha=0.3, label='Diferencia')
-        plt.title('Diferencias Absolutas entre Medias en Cluster 0 y 1')
-        plt.ylabel('Media')
+        plt.figure(figsize=(12, 8))
+
+        # Crear un objeto de ejes
+        ax = sns.barplot(x='index', y='Media', hue='Cluster', data=means_df,
+                         palette=colores_personalizados, saturation=0.8, linewidth=0.1, edgecolor='black',alpha=0.7)
+
+        # Añadir leyenda pequeñita y fina
+        ax.legend(title='Cluster', loc='upper right', bbox_to_anchor=(1, 1), frameon=True, fontsize='medium',
+                  handlelength=0.1, edgecolor='black', framealpha=0.1)
+
+        # Ajustar la apariencia del gráfico
+        plt.ylabel('Mean value', fontsize=12)
+        plt.xlabel('')
+        #plt.xlabel('n-3 level')
+        plt.xticks(rotation=35, ha='right')
+        ax.tick_params(axis='x', which='major', labelsize=12)
+
+        # Ajustar las líneas de los ejes
+        for spine in ax.spines.values():
+            spine.set_linewidth(0.5)
+
+        # Quitar las líneas de los ejes derecho y superior
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+
+        # Añadir leyenda pequeñita y fina
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1), frameon=False, fontsize='medium')
+        plt.tight_layout()
+        # Guardar la figura con alta resolución
+        plt.savefig('plots/means_lvl3.png', dpi=900, bbox_inches='tight')
         plt.show()
-        plt.savefig('plots/means_lvl3.png', dpi=300)
 
     def clusters(self):
         df = self.level1_normalized
@@ -697,6 +719,86 @@ class Subplots:
         return df, b
 
 
+
+    def charachteristics_l_4(self):
+
+            """
+            Join in the same df the energy inputs + results
+            """
+            b, df = self.clusters()
+            b = b['cluster']
+            df_energy = pd.read_csv(r'flow_out_processed.csv', delimiter=',')
+            pass
+            # df_energy=df_energy.drop(df_energy.columns[0],axis=1)
+            df_energy = df_energy.groupby(['scenarios', 'techs'])['flow_out_sum'].sum().reset_index()
+            df_energy = df_energy.pivot(index='scenarios', columns='techs', values='flow_out_sum')
+
+            result = pd.concat([df_energy,b], axis=1)
+
+            X = result.drop('cluster', axis=1)  # Elimina la columna binaria como variable de entrada
+            y = result['cluster']
+
+            # Dividir los datos en conjuntos de entrenamiento y prueba
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+            # Entrenar el modelo Random Forest con hiperparámetros ajustados
+            clf = RandomForestClassifier(n_estimators=500, max_depth=10, random_state=42)
+            clf.fit(X_train, y_train)
+
+            # Realizar predicciones en el conjunto de prueba
+            y_pred = clf.predict(X_test)
+
+            # Calcular métricas de rendimiento
+            accuracy = accuracy_score(y_test, y_pred)
+            precision = precision_score(y_test, y_pred)
+            recall = recall_score(y_test, y_pred)
+            conf_matrix = confusion_matrix(y_test, y_pred)
+
+            # Imprimir métricas
+            print(f'Accuracy: {accuracy:.4f}')
+            print(f'Precision: {precision:.4f}')
+            print(f'Recall: {recall:.4f}')
+            print(f'Confusion Matrix:\n{conf_matrix}')
+
+            # Obtener la importancia de las características
+            importances = clf.feature_importances_
+            feature_names = X.columns
+
+            # Crear un DataFrame con las importancias y los nombres de las características
+            feature_importance_df = pd.DataFrame({'Feature': feature_names, 'Importance': importances})
+
+            # Ordenar el DataFrame por importancia en orden descendente
+            feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
+
+            # Visualizar la importancia de las características
+            plt.figure(figsize=(12, 8))
+            sns.barplot(x='Importance', y='Feature', data=feature_importance_df, palette='viridis')
+
+            plt.xlabel('Importance')
+            plt.ylabel('')
+            plt.xticks(ha='right', fontsize=14)  # Ajustar el fontsize aquí
+            plt.yticks(ha='right',fontsize=12)
+            # Crear una subcarpeta "plots" si no existe
+
+            plt.tight_layout()
+            # Guardar el gráfico en la subcarpeta "plots"
+            plt.savefig('plots/feature_importance.png', dpi=800, bbox_inches='tight')
+            plt.show()
+
+            # Obtener valores Shapley
+            explainer = shap.TreeExplainer(clf)
+            shap_values = explainer.shap_values(X_test)
+
+            # Visualizar Shapley values
+            shap.summary_plot(shap_values[1], X_test, plot_type='bar', show=False)
+
+            # Guardar el gráfico de Shapley values en la subcarpeta "plots"
+            plt.savefig('plots/shapley_values.png', dpi=300, bbox_inches='tight')
+            plt.show()
+
+
+
+
 plotty=Subplots()
 bby=plotty.get_general_results_n2()
 #a=plotty.plot_correlation_matrices()
@@ -707,4 +809,4 @@ cmap = sns.color_palette("viridis", as_cmap=True)
 #plotty.random_forest_analyzer()
 #plotty.random_forest_analyzer2()
 plotty.caracteristics()
-plotty.caracteristics_n3()
+#plotty.caracteristics_n3()

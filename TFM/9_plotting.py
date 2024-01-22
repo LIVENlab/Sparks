@@ -177,8 +177,12 @@ def clusters():
     plt.savefig(r'plots/clustering.png')
     plt.show()
 
+    conteo = df['cluster'].value_counts()
+    print('##CONTEO###')
+    print(conteo)
     # Verificar los resultados
     b=df.groupby('cluster').mean()
+
     return df,b
 
 
@@ -213,7 +217,7 @@ def visualize_single_column(column_name):
     sns.stripplot(x=df[column_name], orient='h', hue=df["cluster"], palette=mi_paleta, alpha=0.7, jitter=0.2, ax=ax, size=5, linewidth=0.5)  # Ajusta el alpha y el size aquí
 
     # Configurar etiquetas y título con ajuste de fontsize
-    ax.set_xlabel("Impact", fontsize=14)
+    ax.set_xlabel("Relative Impact", fontsize=12)
     ax.set_ylabel(column_name, fontsize=12)
 
     # Configurar el tamaño de fuente de los ticks en los ejes
@@ -469,8 +473,8 @@ def Spearman_correlation():
     pass
 
     # Splitting the DataFrame into predictor variables (X) and output variables (Y)
-    X = df.drop(columns=df.columns[:11], axis=1)  # Predictor features
-    Y = df[df.columns[:11]]  # Output variables
+    X = df.drop(columns=df.columns[:8], axis=1)  # Predictor features
+    Y = df[df.columns[:8]]  # Output variables
 
     correlation_matrix = pd.DataFrame(index=X.columns, columns=Y.columns)
 
@@ -485,16 +489,13 @@ def Spearman_correlation():
 
     plt.figure(figsize=(10, 6))
     sns.heatmap(correlation_matrix.astype(float), annot=True, cmap='coolwarm', linewidths=0.5)
+    plt.xticks(rotation=45, ha='right')
 
-    plt.title('Spearman Correlation Matrix (Impacts-Technology)', fontsize=18)
     plt.savefig('plots/sparman.png', dpi=800, bbox_inches='tight')
-
 
     return correlation_matrix
 
-
-
-#correlation_matrix = Spearman_correlation()
+correlation_matrix = Spearman_correlation()
 
 import numpy as np
 from scipy.stats import kendalltau
