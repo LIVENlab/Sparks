@@ -68,20 +68,21 @@ hierarchy={
 
 hierarchy_2= {
                 "Electricity_generation": [
-                    "wind_onshore__electricity___PRT",
+"wind_onshore__electricity___PRT",
                     "wind_offshore__electricity___PRT",
                     "hydro_run_of_river__electricity___PRT",
                     "hydro_reservoir__electricity___PRT",
                     "ccgt__electricity___PRT",
                     "chp_biofuel_extraction__electricity___PRT",
                     "open_field_pv__electricity___PRT",
+                    "chp_hydrogen__electricity___PRT",
                     "existing_wind__electricity___PRT",
                     "existing_pv__electricity___PRT",
                     "roof_mounted_pv__electricity___PRT",
                     "chp_wte_back_pressure__electricity___PRT",
                     "chp_methane_extraction__electricity___PRT",
-                    "waste_supply__waste___PRT"
-                ],
+                    "waste_supply__waste___PRT"],
+
                 "Thermal_generation": [
                     "biofuel_supply__biofuel___PRT",
                     "chp_biofuel_extraction__heat___PRT",
@@ -102,7 +103,8 @@ hierarchy_2= {
                 "Conversions": [
                     "biofuel_to_diesel__diesel___PRT",
                     "biofuel_to_methane__methane___PRT",
-                    "biofuel_to_methanol__methanol___PRT"
+                    "biofuel_to_methanol__methanol___PRT",
+                    "electrolysis__hydrogen___PRT"
                 ],
                 "Imports": [
                     "el_import__electricity___ESP"
@@ -401,23 +403,23 @@ class Subplots:
                         square=True, ax=ax, annot=True, fmt=".2f", annot_kws={"size": 12})
 
             # Rotate x-axis labels
-            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=35, ha="right")
 
             # Set fontsize of x-axis tick labels
-            ax.tick_params(axis='x', labelsize=12)
-            ax.tick_params(axis='y',labelsize=12)
+            ax.tick_params(axis='x', labelsize=15)
+            ax.tick_params(axis='y',labelsize=15)
 
             # Adjust the size of the internal title
-            ax.set_title(f'n-2 {key}', fontsize=16)
+            ax.set_title(f'n-1 {key}', fontsize=16)
 
         # Add legend to the left of the plot
         fig.subplots_adjust(right=0.8)
         cbar_ax = fig.add_axes([0.85, 0.15, 0.02, 0.7])  # Adjust the values as needed
         cbar = fig.colorbar(ax.collections[0], cax=cbar_ax)
-        cbar.set_label('Correlation', rotation=270, labelpad=15)
+        cbar.set_label('Correlation Index r', rotation=270, labelpad=15)
 
         # Save the plot with high resolution in PNG format
-        plt.savefig("plots/correlation_matrices.png", dpi=1200, bbox_inches='tight', format='png')
+        plt.savefig("plots/correlation_matrices.png", dpi=1500, bbox_inches='tight', format='png')
 
     # Call the function to generate the plot
 
@@ -457,11 +459,15 @@ class Subplots:
         for main_category, techs in hierarchy.items():
             df.loc[df['aliases'].isin(techs), 'category'] = main_category
 
+        pass
         result_df = df.groupby(['category', 'scenarios']).agg({'flow_out_sum': 'sum'}).reset_index()
         result_df_pivoted = result_df.pivot_table(index='scenarios', columns='category', values='flow_out_sum',
-                                                  fill_value=0).reset_index()
-        result_df_pivoted=result_df_pivoted.set_index('scenarios')
-        self.energy_input_categories=result_df
+                                                  fill_value=0)
+
+        self.general_check=result_df
+        #result_df_pivoted=result_df_pivoted.set_index('scenarios')
+        pass
+        self.energy_input_categories_=result_df_pivoted
 
 
         result_df_pivoted_normalized = result_df_pivoted.apply(lambda col: (col - col.min()) / (col.max() - col.min()))
@@ -473,18 +479,20 @@ class Subplots:
     def energy_categories_n3(self):
         df=pd.read_csv(r'flow_out_processed.csv')
 
-
         df['category'] = None  # Inicializar la columna
 
 
         for main_category, techs in hierarchy_2.items():
             df.loc[df['aliases'].isin(techs), 'category'] = main_category
 
-        result_df = df.groupby(['category', 'scenarios']).agg({'flow_out_sum': 'sum'}).reset_index()
+        result_df = df.groupby(['category', 'scenarios'], sort=False).agg({'flow_out_sum': 'sum'}).reset_index()
+        pass
+        self.lvl_3_check=result_df
         result_df_pivoted = result_df.pivot_table(index='scenarios', columns='category', values='flow_out_sum',
-                                                  fill_value=0).reset_index()
-        result_df_pivoted=result_df_pivoted.set_index('scenarios')
-        self.energy_input_categories_n3=result_df
+                                                  fill_value=0)
+
+        #result_df_pivoted=result_df_pivoted.set_index('scenarios')
+        self.energy_input_categories_n3=result_df_pivoted
 
 
         result_df_pivoted_normalized = result_df_pivoted.apply(lambda col: (col - col.min()) / (col.max() - col.min()))
@@ -599,6 +607,7 @@ class Subplots:
     from scipy.stats import ttest_ind
     def caracteristics(self):
         df=self.join_for_caracteristics_n2()
+        pass
         # Filtrar los datos por cluster 0 y 1
         cluster_0_data = df[df['cluster'] == 0]
         cluster_1_data = df[df['cluster'] == 1]
@@ -797,11 +806,114 @@ class Subplots:
             plt.show()
 
 
+    def get_best_values(self):
+        data=self.level1_normalized
+        top_10={}
+        for col in data.columns:
+            top_10[col]=data.nsmallest(10,col).sort_values(by=col).index.tolist()
+        print("\n Top 10 best for category:")
+        for column,scenario in top_10.items():
+            print(f"{column}: {scenario}")
+
+        # Add here some rules to find the best scenario
+        data['sum_rule_1'] = data['water consumption potential (WCP)'] + data['agricultural land occupation (LOP)']
+        best_water_land = data['sum_rule_1'].idxmin()
+
+        data['sum_rule_2'] = data['water consumption potential (WCP)'] + data['biotic resources']
+        best_water_biotic = data['sum_rule_2'].idxmin()
+
+        data['sum_rule_3'] = data['freshwater ecotoxicity potential (FETP)'] + data[
+            'marine ecotoxicity potential (METP)'] + data['biotic resources']
+        best_biotic_toxic = data['sum_rule_3'].idxmin()
+
+        print(f"rule 1: {best_water_land}, best rule 2: {best_water_biotic}, rule 3: {best_biotic_toxic}")
+
+        # find the best spore
+        data['sum'] = data.drop(['biotic resources', 'sum_rule_1', 'sum_rule_2', 'sum_rule_3'], axis=1).sum(axis=1)
+        best_scenario = data['sum'].idxmin()
+
+        #
+        print(f"rule 1: {best_water_land}, best rule 2: {best_water_biotic}, rule 3: {best_biotic_toxic}")
+        print(f'best overall scenario {best_scenario}')
+
+        # find the best spore
+        data['sum_2'] = data.drop(['sum_rule_1', 'sum_rule_2', 'sum_rule_3','sum'], axis=1).sum(axis=1)
+        best_scenario_2 = data['sum_2'].idxmin()
+
+        #
+        print(f"rule 1: {best_water_land}, best rule 2: {best_water_biotic}, rule 3: {best_biotic_toxic}")
+        print(f'best overall scenario {best_scenario}')
+        print(f'best overall scenario 2 {best_scenario_2}')
+
+        # Worst
+        data['sum_3'] = data.drop(['sum_rule_1', 'sum_rule_2', 'sum_rule_3', 'sum', 'sum_2'], axis=1).sum(axis=1)
+        worst_scen= data['sum_3'].idxmax()
+        print(f" Worst scenario {worst_scen}")
+        pass
+
+    def crear_pie_chart(self, indices_filas):
+        """
+        Crea un gráfico de pastel basado en la selección de una fila de un DataFrame.
+
+        Parameters:
+        - dataframe (pd.DataFrame): El DataFrame que contiene los datos.
+        - indice_fila (int): El índice de la fila a utilizar para el gráfico de pastel.
+
+        Returns:
+        - None: Muestra el gráfico de pastel.
+        """
+
+
+        dataframe=self.energy_input_categories_n3
+
+
+
+        fig, axs = plt.subplots(1, 3, figsize=(15, 5))
+
+        filas_seleccionadas = dataframe.iloc[indices_filas]
+
+        # Especifica la ruta y el nombre del archivo Excel de salida
+        ruta_archivo_excel = 'pie_chart.xlsx'
+
+        # Exporta las filas seleccionadas al archivo Excel
+        filas_seleccionadas.to_excel(ruta_archivo_excel, index=False)
+        pass
+
+        fig, axs = plt.subplots(1, 3, figsize=(15, 5))
+
+        for i, indice_fila in enumerate(indices_filas):
+            # Selecciona la fila especificada por el índice
+            fila_seleccionada = dataframe.iloc[indice_fila]
+
+            # Filtra elementos < 5% y agrupa en "Others"
+            valores_filtrados = fila_seleccionada.where(fila_seleccionada >= fila_seleccionada.sum() * 0.05, other=0)
+            valores_filtrados.loc["Others"] = fila_seleccionada.sum() - valores_filtrados.sum()
+
+            # Configura el gráfico de pastel con porcentajes
+            wedges, texts, autotexts = axs[i].pie(valores_filtrados, labels=valores_filtrados.index, autopct='%1.1f%%',
+                                                  startangle=90, counterclock=False)
+
+            # Añade porcentajes dentro de cada quesito
+            for autotext in autotexts:
+                autotext.set_color('white')
+
+            # Añade un título al gráfico
+            axs[i].set_title(f'Gráfico de Pastel para la Fila {indice_fila}')
+
+        plt.show()
+
+        plt.savefig('plots/pie_chart.png')
+        # Muestra el gráfico de pastel
+        plt.show()
+
+
+
+
 
 
 plotty=Subplots()
 bby=plotty.get_general_results_n2()
-#a=plotty.plot_correlation_matrices()
+a=plotty.plot_correlation_matrices()
 plotty.marginal_contribution()
 
 cmap = sns.color_palette("viridis", as_cmap=True)
@@ -810,3 +922,5 @@ cmap = sns.color_palette("viridis", as_cmap=True)
 #plotty.random_forest_analyzer2()
 plotty.caracteristics()
 #plotty.caracteristics_n3()
+plotty.get_best_values()
+#plotty.crear_pie_chart([83,152,0])

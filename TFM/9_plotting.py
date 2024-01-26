@@ -71,14 +71,12 @@ def visualize1(spore=None):
 
     df = get_normalized_value()
 
-
-
     mi_paleta = sns.color_palette("coolwarm", n_colors=5)  # Cambia la paleta aquí
     sns.set(style="whitegrid", palette=mi_paleta)
     legend_labels = ['Spore', 'Cost-Optimized Spore']
 
     # Configurar el tamaño del gráfico
-    plt.figure(figsize=(18, 12))
+    plt.figure(figsize=(19, 13))
 
     # Ajustar el espacio alrededor del gráfico
     plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.2)
@@ -104,7 +102,7 @@ def visualize1(spore=None):
     # Add the selected spore. Spore 0 is the one that we would get with TIMES
     if spore is not None:
         df_selected = df.iloc[[spore]]
-        sns.stripplot(data=df_selected, orient='h', color='red', jitter=1, size=15, marker='*',
+        sns.stripplot(data=df_selected, orient='h', color='red', jitter=1, size=18, marker='*',
                       label=legend_labels[1])
 
     for l in ax.lines:
@@ -120,7 +118,7 @@ def visualize1(spore=None):
 
     # Ajustar la ubicación de la leyenda
     plt.legend(unique_handles, unique_labels, loc='upper right', fontsize='medium')
-    plt.savefig('plots/violin_plot.png', dpi=1000, bbox_inches='tight')
+    plt.savefig('plots/violin_plot.png', dpi=1500, bbox_inches='tight')
     plt.legend(fontsize='medium')
 
 visualize1(spore=0)
@@ -242,12 +240,12 @@ def visualize_single_column(column_name):
 
 
     # Guardar el gráfico con alta calidad
-    plt.savefig(f'plots/violin_strip_plot_{column_name}.png', dpi=1000, bbox_inches='tight')  # Ajusta el dpi aquí
+    plt.savefig(f'plots/violin_strip_plot_{column_name}.png', dpi=2000, bbox_inches='tight')  # Ajusta el dpi aquí
     plt.show()
 
 
 # Llamada a la función para una columna específica
-visualize_single_column("water consumption potential (WCP)")
+#visualize_single_column("water consumption potential (WCP)")
 
 
 
@@ -280,7 +278,7 @@ def join_impacts_input():
 
 
 aa = join_impacts_input
-visualize1(spore=0)
+#visualize1(spore=0)
 
 import matplotlib.pyplot as plt
 from sklearn.model_selection import cross_val_score, train_test_split
@@ -337,7 +335,7 @@ def study_result():
 
         # Guardar la figura en un archivo
         name = 'plots/p_' + goal + '.png'
-        plt.savefig(name, dpi=800, bbox_inches='tight')
+        plt.savefig(name, dpi=1800, bbox_inches='tight')
 
         # Mostrar el SHAP plot en el notebook (opcional)
 
@@ -364,27 +362,36 @@ def correlation_matrix_analysis():
     correlation_matrix = df.corr()
 
     # Set up the matplotlib figure
-    plt.figure(figsize=(10, 8))
+    fig = plt.figure(figsize=(10, 8))
 
     # Customize the seaborn style for a clean and professional look
     sns.set(style="whitegrid")
 
     # Customize the heatmap with the "coolwarm" color palette and white borders
-    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', cbar=True, fmt=".2f", linewidths=.5, linecolor='white', square=True)
+    heatmap = sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', cbar=True, fmt=".2f", linewidths=.5,
+                          linecolor='white', square=True)
+    plt.title('n-Energy system', fontsize=16)
 
     # Rotate x-axis labels for better readability
-    plt.xticks(rotation=45, ha="right")
+    plt.xticks(rotation=35, ha="right", )
+    plt.tick_params(axis='x', labelsize=15)
+    plt.tick_params(axis='y', labelsize=15)
+
+    # Remove the colorbar created by Seaborn
+    heatmap.collections[0].colorbar.remove()
+
+    # Add a vertical title to the colorbar
+    cbar = fig.colorbar(heatmap.collections[0], fraction=0.046, pad=0.04)
+    cbar.set_label('Correlation Index r', rotation=270, labelpad=15)
 
     # Save the plot with high resolution and tight bounding box
-    plt.savefig("plots/correlation_matrix.png", dpi=900, bbox_inches='tight')
+    plt.savefig("plots/correlation_matrix.png", dpi=1900, bbox_inches='tight')
 
     # Show the plot
     plt.show()
 
 
-
-
-#correlation_matrix_analysis()
+correlation_matrix_analysis()
 # Call the function to generate the heatmap
 
 
@@ -443,7 +450,7 @@ def Pearson_correlation():
     plt.figure(figsize=(10, 6))
     sns.heatmap(correlation_matrix.astype(float), annot=True, cmap='coolwarm', linewidths=0.5)
     plt.title('Pearson Correlation Matrix (Impacts-Technology)', fontsize=18)
-    plt.savefig("plots/pearson.png", dpi=800, bbox_inches='tight')
+    plt.savefig("plots/pearson.png", dpi=1800, bbox_inches='tight')
 
 
 
@@ -491,7 +498,7 @@ def Spearman_correlation():
     sns.heatmap(correlation_matrix.astype(float), annot=True, cmap='coolwarm', linewidths=0.5)
     plt.xticks(rotation=45, ha='right')
 
-    plt.savefig('plots/sparman.png', dpi=800, bbox_inches='tight')
+    plt.savefig('plots/sparman.png', dpi=1800, bbox_inches='tight')
 
     return correlation_matrix
 
@@ -520,7 +527,7 @@ def Kendall():
     plt.xlabel('Output Variables (Y)')
     plt.ylabel('Predictor Variables (X)')
     plt.title('Kendall Correlation Matrix (Impacts-Technology)', fontsize=18)
-    plt.savefig('plots/kendall.png', dpi=800, bbox_inches='tight')
+    plt.savefig('plots/kendall.png', dpi=1800, bbox_inches='tight')
 
 # Example usage:
 #Kendall()
