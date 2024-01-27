@@ -162,7 +162,7 @@ peewee==3.16.2
 petl==1.7.12
 pexpect==4.8.0
 pickleshare==0.7.5
-Pillow==10.0.0
+Pillow==10.2.0
 Pint==0.22
 platformdirs==3.9.1
 plotly==5.15.0
