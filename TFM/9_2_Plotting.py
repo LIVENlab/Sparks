@@ -5,12 +5,10 @@ from collections import OrderedDict
 import json
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn
 from scipy.stats import pearsonr
 import seaborn as sns
 from SALib.analyze import sobol
-from SALib.sample import saltelli
-
+i
 
 
 hierarchy = {
@@ -109,7 +107,6 @@ class Hierarchy:
         -------
         Return: modified DF
         """
-
         res = df
         info_norm = {}
         pass
@@ -132,9 +129,8 @@ class Hierarchy:
 
 
     def get_general_results(self):
-
         out_results = OrderedDict()
-        with open('results_TFM.json') as file:
+        with open('results_TFM_update.json') as file:
             d = json.load(file, object_pairs_hook=OrderedDict)
         pass
         for scen in range(len(d)):
@@ -145,14 +141,14 @@ class Hierarchy:
             a = a.T
         a = a.drop('global temperature change potential (GTP100)', axis=1)
         self.general_impacts=a
-        pass
+
         return a
 
     def join_impacts_input(self):
         """
         Join in the same df the energy inputs
         """
-        df_energy = pd.read_csv(r'flow_out_clean.csv', delimiter=',')
+        df_energy = pd.read_csv(r'flow_out_processed.csv', delimiter=',')
         pass
 
         pass
@@ -261,53 +257,58 @@ class Hierarchy:
             plt.savefig("plots/pearson_2.png", dpi=800, bbox_inches='tight')
 
     def sensitivity_index(self):
-
         df = self.join_df
         X = df.drop(columns=df.columns[:11], axis=1)
         X = X.drop(columns=['Imports_'], axis=1)
-
         Y = df[df.columns[:11]]
 
-
-        problem = {
-            'num_vars': len(X.columns),
-            'names': X.columns.tolist(),
-            'bounds': [[X[col].min(), X[col].max()] for col in X.columns]
-        }
         resultados_df = pd.DataFrame(columns=['Indicador_Impacto', 'Tecnologia', 'Indice_Sensibilidad_Global'])
-        pass
-        # Realizar el Análisis de Sensibilidad de Sobol para cada indicador de impacto y cada tecnología
-        for impacto_column in Y.columns:
-            # Obtener los resultados de impacto para el indicador actual
-            resultados_impacto_actual = Y[impacto_column].values
-            pass
 
-            # Realizar el Análisis de Sensibilidad de Sobol utilizando Monte Carlo
-            sensitivity_indices = sobol.analyze(problem, resultados_impacto_actual)
+        for i, impacto_column in enumerate(Y.columns):
+            # Extract relevant data for the current column
+            params = X.to_numpy()
+
+
+
+            params=params[:250]
+
+            results = Y[impacto_column].to_numpy()
+            results=results[:250]
+            problem = {
+                'num_vars': len(X.columns),
+                'names': X.columns.tolist(),
+                'bounds': [[X[col].min(), X[col].max()] for col in X.columns]
+            }
+            pass
+            # Assuming you have a function resultados_impacto_actual that calculates the impact for each column
+
+            pass
+            sensitivity_indices = sobol.analyze(problem, results, calc_second_order=True)
+
+
             print(f"\nÍndices de Sensibilidad Global para {impacto_column}:")
             print(f'    Índices de primer orden: {sensitivity_indices["S1"]}')
-            print(f'    Índices de segundo orden: {sensitivity_indices["S2"]}')
-            for i, tecnologia in enumerate(problem['names']):
-                resultados_df = resultados_df.append({
-                    'Indicador_Impacto': impacto_column,
-                    'Tecnologia': tecnologia,
-                    'Indice_Sensibilidad_Global': sensitivity_indices['ST'][i]
-                }, ignore_index=True)
+            print(f'    Índices de segundo orden: {sensitivity_indices["ST"]}')
 
-            # Do something with sensitivity_results (e.g., store in sensitivity_index DataFrame)
+            # Append results to the DataFrame
+            resultados_df = pd.concat([
+                resultados_df,
+                pd.DataFrame({
+                    'Indicador_Impacto': [impacto_column] * len(problem['names']),
+                    'Tecnologia': problem['names'],
+                    'Indice_Sensibilidad_Global': sensitivity_indices['ST']
+                })
+            ], ignore_index=True)
 
-        # Return or use sensitivity_index as needed
+        # Display or return the final DataFrame
+        return resultados_df
 
 
-
-
-                #correlation_matrix.loc[cols, col] = correlation
-        pass
 
 aaa=Hierarchy(hierarchy_tree=hierarchy)
 aaa.group_by_level('Level_2')
 aaa.get_general_results()
 #aaa.plot_pearsons_heatmap()
-#aaa.sensitivity_index()
+sens=aaa.sensitivity_index()
 
 pass

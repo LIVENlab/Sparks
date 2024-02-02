@@ -158,7 +158,6 @@ class Subplots:
 
                 generation = pd.DataFrame.from_dict(out_results_[0]['results'], orient='index')
                 generation = generation.T
-                # Agregar una columna 'scen_name' con el valor correspondiente
                 generation['scen_name'] = scen_name
                 generation_list.append(generation)
 
@@ -178,7 +177,7 @@ class Subplots:
                 imports['scen_name'] = scen_name
                 imports_list.append(imports)
 
-            # Concatenar los DataFrames
+
             all_generations = pd.concat(generation_list)
             all_storage = pd.concat(storage_list)
             all_conversions = pd.concat(conversions_list)
@@ -189,13 +188,12 @@ class Subplots:
             all_conversions = all_conversions.drop(columns=columns_to_drop, errors='ignore')
             all_imports = all_imports.drop(columns=columns_to_drop, errors='ignore')
 
-            # Transponer y establecer 'scen_name' como índice
             all_generations = all_generations.set_index('scen_name')
             all_storage = all_storage.set_index('scen_name')
             all_conversions = all_conversions.set_index('scen_name')
             all_imports = all_imports.set_index('scen_name')
 
-            # Further processing or analysis can be added here using the modified DataFrames
+
             final_list={}
             final_list['generation']=all_generations
             final_list['storage']=all_storage
@@ -302,8 +300,8 @@ class Subplots:
 
         for k, v in data.items():
             res = v
-            info_norm = {}  # Initialize info_norm for each DataFrame
-            normalized_df = pd.DataFrame()  # New DataFrame to store normalized values
+            info_norm = {}
+            normalized_df = pd.DataFrame()
 
             for col in res.columns:
                 name = str(col)
@@ -312,7 +310,7 @@ class Subplots:
                 min_ = np.min(res[col])
                 max_ = np.max(res[col])
 
-                # Calculate normalized values and update the new DataFrame
+
                 normalized_df[name_modified] = (res[col] - min_) / (max_ - min_)
 
                 info_norm[col] = {
@@ -326,10 +324,10 @@ class Subplots:
             res = res.drop(res.columns, axis=1)
             normalized_df.columns = [col.rstrip('_') for col in normalized_df.columns]
 
-            # Concatenate the new DataFrame with the original DataFrame
+
             data[k] = pd.concat([res, normalized_df], axis=1)
 
-            # Store info_norm if needed
+
 
         return data
 
@@ -344,8 +342,8 @@ class Subplots:
 
 
         res = df
-        info_norm = {}  # Initialize info_norm for each DataFrame
-        normalized_df = pd.DataFrame()  # New DataFrame to store normalized values
+        info_norm = {}
+        normalized_df = pd.DataFrame()
 
         for col in res.columns:
             name = str(col)
@@ -354,7 +352,7 @@ class Subplots:
             min_ = np.min(res[col])
             max_ = np.max(res[col])
 
-            # Calculate normalized values and update the new DataFrame
+
             normalized_df[name_modified] = (res[col] - min_) / (max_ - min_)
 
             info_norm[col] = {
@@ -364,14 +362,12 @@ class Subplots:
                 "scenario_min": normalized_df[name_modified].idxmin()
             }
 
-        # Drop the original columns from the new DataFrame
+
         res = res.drop(res.columns, axis=1)
         normalized_df.columns = [col.rstrip('_') for col in normalized_df.columns]
 
-        # Concatenate the new DataFrame with the original DataFrame
-        data= pd.concat([res, normalized_df], axis=1)
 
-            # Store info_norm if needed
+        data= pd.concat([res, normalized_df], axis=1)
 
         return data
 
@@ -384,47 +380,37 @@ class Subplots:
         fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(15, 12), sharex=True, sharey=True)
 
 
-        # Adjust spacing between subplots
+
         plt.subplots_adjust(wspace=0.2, hspace=0.2)
 
-        # Iterate through the dictionary and plot each correlation matrix
+
         for (key, df), ax in zip(data_dict.items(), axes.flatten()):
-            # Drop columns if needed
+
             df = df.drop(columns=df.columns[8:])
-
-            # Calculate correlation matrix with shared scale
             correlation_matrix = df.corr()
-
-            # Customize the seaborn style
             sns.set(style="whitegrid")
-
-            # Customize the heatmap with the "coolwarm" color palette and shared scale
             sns.heatmap(correlation_matrix, cmap='coolwarm', cbar=False, vmin=-1, vmax=1, linewidths=.5,
                         square=True, ax=ax, annot=True, fmt=".2f", annot_kws={"size": 12})
 
-            # Rotate x-axis labels
-            ax.set_xticklabels(ax.get_xticklabels(), rotation=35, ha="right")
 
-            # Set fontsize of x-axis tick labels
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=35, ha="right")
             ax.tick_params(axis='x', labelsize=15)
             ax.tick_params(axis='y',labelsize=15)
-
-            # Adjust the size of the internal title
             ax.set_title(f'n-1 {key}', fontsize=16)
 
-        # Add legend to the left of the plot
+
         fig.subplots_adjust(right=0.8)
-        cbar_ax = fig.add_axes([0.85, 0.15, 0.02, 0.7])  # Adjust the values as needed
+        cbar_ax = fig.add_axes([0.85, 0.15, 0.02, 0.7])
         cbar = fig.colorbar(ax.collections[0], cax=cbar_ax)
         cbar.set_label('Correlation Index r', rotation=270, labelpad=15)
 
-        # Save the plot with high resolution in PNG format
+
         plt.savefig("plots/correlation_matrices.png", dpi=1500, bbox_inches='tight', format='png')
 
-    # Call the function to generate the plot
 
 
-    # Llama a la función para generar el gráfico
+
+
 
 
     def marginal_contribution(self):
@@ -439,10 +425,10 @@ class Subplots:
                 contribucion = dataframe[columna] / df_total[columna]
                 contribuciones_columna[key] = contribucion
 
-            # Convertir el diccionario de contribuciones a un DataFrame
+
             df_contribuciones_columna = pd.DataFrame(contribuciones_columna)
 
-            # Agregar el DataFrame de contribuciones al diccionario final
+
             dict_contributions[columna] = df_contribuciones_columna
         return dict_contributions
         pass
@@ -453,7 +439,7 @@ class Subplots:
         df=pd.read_csv(r'flow_out_processed.csv')
 
 
-        df['category'] = None  # Inicializar la columna
+        df['category'] = None
 
 
         for main_category, techs in hierarchy.items():
@@ -477,15 +463,20 @@ class Subplots:
         return result_df_pivoted_normalized
 
     def energy_categories_n3(self):
-        df=pd.read_csv(r'flow_out_processed.csv')
+        df=pd.read_csv(r'/home/lex/PycharmProjects/Sparks_2/TFM/flow_cru.csv')
+        df['aliases']=df['techs']+'__'+df['carriers']+'___'+df['locs']
+        pass
 
-        df['category'] = None  # Inicializar la columna
+        df['category'] = None  #
 
 
         for main_category, techs in hierarchy_2.items():
             df.loc[df['aliases'].isin(techs), 'category'] = main_category
+        pass
 
-        result_df = df.groupby(['category', 'scenarios'], sort=False).agg({'flow_out_sum': 'sum'}).reset_index()
+        result_df = df.groupby(['category', 'spores'], sort=False).agg({'flow_out_sum': 'sum'}).reset_index()
+        result_df.rename(columns={'spores':'scenarios'}, inplace=True)
+
         pass
         self.lvl_3_check=result_df
         result_df_pivoted = result_df.pivot_table(index='scenarios', columns='category', values='flow_out_sum',
@@ -504,13 +495,7 @@ class Subplots:
 
     def plot_heatmap_3rows_with_index_and_scale(self, cmap):
         """
-        Crea un heatmap con 3 filas por cada columna, títulos centrados, números de índice y escala (0-1) a la derecha.
 
-        Parameters:
-        - cmap: Mapa de colores para las celdas.
-
-        Returns:
-        - None (guarda la figura y no la muestra directamente).
         """
         data = self.energy_input_categories
         categories = data.columns
@@ -529,10 +514,7 @@ class Subplots:
             # Espaciar los círculos para las tres filas
             x_spaced = np.linspace(min(x), max(x), 87)
 
-            # Plotear cada círculo individualmente para la fila superior
-            # ...
 
-            # Plotear cada círculo individualmente para la fila superior
             for xi, y_topi, color, index in zip(x_spaced, y_top, colors[:87], range(87)):
                 plt.scatter(xi, y_topi, c=color, s=60, marker='o', edgecolors='none')
                 plt.text(xi, y_topi - 0.1, str(index), ha='center', va='center', fontsize=7.5, color='black', rotation=90)
@@ -570,15 +552,13 @@ class Subplots:
 
         cbar = plt.colorbar(plt.cm.ScalarMappable(cmap=cmap), orientation='vertical', fraction=0.025, pad=0.07)
         cbar.set_label('Relative input value', fontsize=12)
-        # Ajustar el tamaño del texto en la leyenda
 
-        # Ajuste manual de la posición de la leyenda
         cax = cbar.ax
         cax.set_position([0.85, 0.1, 0.02, 0.8])
-        cbar.ax.yaxis.set_tick_params(width=0)  # Ajusta según sea necesario
-        cbar.ax.yaxis.label.set_size(10)  # Ajusta según sea necesario
+        cbar.ax.yaxis.set_tick_params(width=0)
+        cbar.ax.yaxis.label.set_size(10)
 
-        plt.subplots_adjust(hspace=0.5)  # Ajusta el valor según sea necesario
+        plt.subplots_adjust(hspace=0.5)
         plt.margins(x=0.05)
         # Desplazar los subplots hacia la derecha
         plt.subplots_adjust(left=0.1, right=0.95)
@@ -608,26 +588,23 @@ class Subplots:
     def caracteristics(self):
         df=self.join_for_caracteristics_n2()
         pass
-        # Filtrar los datos por cluster 0 y 1
+
         cluster_0_data = df[df['cluster'] == 0]
         cluster_1_data = df[df['cluster'] == 1]
         pass
-        # Calcular las medias para cada composición en ambos clusters
+
         means_0 = cluster_0_data[['Storage', 'Generation', 'Conversions', 'Imports']].mean()
         means_1 = cluster_1_data[['Storage', 'Generation', 'Conversions', 'Imports']].mean()
-        # Crear un DataFrame para visualización
+
         means_df = pd.DataFrame({'Cluster 0': means_0, 'Cluster 1': means_1})
         for feature in ['Storage', 'Generation', 'Conversions', 'Imports']:
             t_stat, p_value = ttest_ind(cluster_0_data[feature], cluster_1_data[feature])
             print(f'Prueba t para {feature}: Estadístico t={t_stat}, Valor p={p_value}')
 
-        # Añadir una columna con las diferencias absolutas entre las medias
-        means_df['Diferencia'] = means_df['Cluster 1'] - means_df['Cluster 0']
 
-        # Utilizar la paleta "colorblind" de seaborn
+        means_df['Diferencia'] = means_df['Cluster 1'] - means_df['Cluster 0']
         sns.set_palette("colorblind")
 
-        # Visualizar las diferencias absolutas en forma de gráfico de barras agrupadas
         means_df[['Cluster 0', 'Cluster 1']].plot(kind='bar', colormap='viridis', figsize=(10, 6))
         plt.bar(means_df.index, means_df['Diferencia'], color='black', alpha=0.3, label='Diferencia')
         plt.title('Diferencias Absolutas entre Medias en Cluster 0 y 1')
@@ -637,14 +614,12 @@ class Subplots:
 
     def caracteristics_n3(self):
         df = self.join_caracteristics_n3()
-        # Filtrar los datos por cluster 0 y 1
         cluster_0_data = df[df['cluster'] == 0]
         cluster_1_data = df[df['cluster'] == 1]
         pass
-        # Calcular las medias para cada composición en ambos clusters
+
         means_0 = cluster_0_data.iloc[:, :-1].mean()
         means_1 = cluster_1_data.iloc[:, :-1].mean()
-        # Crear un DataFrame para visualización
         means_df = pd.DataFrame({'Cluster 0': means_0, 'Cluster 1': means_1})
         for feature in cluster_0_data.iloc[:, :-1].columns:
             t_stat, p_value = ttest_ind(cluster_0_data[feature], cluster_1_data[feature])
@@ -652,39 +627,30 @@ class Subplots:
 
         means_df = means_df.reset_index().melt(id_vars='index', var_name='Cluster', value_name='Media')
 
-        # Definir colores personalizados
-        colores_personalizados = {'Cluster 0': '#4CAF50', 'Cluster 1': '#2196F3'}
 
-        # Visualizar las diferencias absolutas en forma de gráfico de barras agrupadas
+        colores_personalizados = {'Cluster 0': '#4CAF50', 'Cluster 1': '#2196F3'}
         plt.figure(figsize=(12, 8))
 
-        # Crear un objeto de ejes
         ax = sns.barplot(x='index', y='Media', hue='Cluster', data=means_df,
                          palette=colores_personalizados, saturation=0.8, linewidth=0.1, edgecolor='black',alpha=0.7)
 
-        # Añadir leyenda pequeñita y fina
         ax.legend(title='Cluster', loc='upper right', bbox_to_anchor=(1, 1), frameon=True, fontsize='medium',
                   handlelength=0.1, edgecolor='black', framealpha=0.1)
 
-        # Ajustar la apariencia del gráfico
+
         plt.ylabel('Mean value', fontsize=12)
         plt.xlabel('')
-        #plt.xlabel('n-3 level')
         plt.xticks(rotation=35, ha='right')
         ax.tick_params(axis='x', which='major', labelsize=12)
 
-        # Ajustar las líneas de los ejes
         for spine in ax.spines.values():
             spine.set_linewidth(0.5)
-
-        # Quitar las líneas de los ejes derecho y superior
         ax.spines['right'].set_visible(False)
         ax.spines['top'].set_visible(False)
 
-        # Añadir leyenda pequeñita y fina
+
         ax.legend(loc='upper left', bbox_to_anchor=(1, 1), frameon=False, fontsize='medium')
         plt.tight_layout()
-        # Guardar la figura con alta resolución
         plt.savefig('plots/means_lvl3.png', dpi=900, bbox_inches='tight')
         plt.show()
 
@@ -744,64 +710,55 @@ class Subplots:
 
             result = pd.concat([df_energy,b], axis=1)
 
-            X = result.drop('cluster', axis=1)  # Elimina la columna binaria como variable de entrada
+            X = result.drop('cluster', axis=1)
             y = result['cluster']
 
-            # Dividir los datos en conjuntos de entrenamiento y prueba
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-            # Entrenar el modelo Random Forest con hiperparámetros ajustados
             clf = RandomForestClassifier(n_estimators=500, max_depth=10, random_state=42)
             clf.fit(X_train, y_train)
-
-            # Realizar predicciones en el conjunto de prueba
             y_pred = clf.predict(X_test)
-
-            # Calcular métricas de rendimiento
             accuracy = accuracy_score(y_test, y_pred)
             precision = precision_score(y_test, y_pred)
             recall = recall_score(y_test, y_pred)
             conf_matrix = confusion_matrix(y_test, y_pred)
 
-            # Imprimir métricas
+
             print(f'Accuracy: {accuracy:.4f}')
             print(f'Precision: {precision:.4f}')
             print(f'Recall: {recall:.4f}')
             print(f'Confusion Matrix:\n{conf_matrix}')
 
-            # Obtener la importancia de las características
+
             importances = clf.feature_importances_
             feature_names = X.columns
 
-            # Crear un DataFrame con las importancias y los nombres de las características
+
             feature_importance_df = pd.DataFrame({'Feature': feature_names, 'Importance': importances})
 
-            # Ordenar el DataFrame por importancia en orden descendente
             feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
 
-            # Visualizar la importancia de las características
             plt.figure(figsize=(12, 8))
             sns.barplot(x='Importance', y='Feature', data=feature_importance_df, palette='viridis')
 
             plt.xlabel('Importance')
             plt.ylabel('')
-            plt.xticks(ha='right', fontsize=14)  # Ajustar el fontsize aquí
+            plt.xticks(ha='right', fontsize=14)
             plt.yticks(ha='right',fontsize=12)
-            # Crear una subcarpeta "plots" si no existe
 
             plt.tight_layout()
-            # Guardar el gráfico en la subcarpeta "plots"
+
             plt.savefig('plots/feature_importance.png', dpi=800, bbox_inches='tight')
             plt.show()
 
-            # Obtener valores Shapley
+
             explainer = shap.TreeExplainer(clf)
             shap_values = explainer.shap_values(X_test)
 
-            # Visualizar Shapley values
+
             shap.summary_plot(shap_values[1], X_test, plot_type='bar', show=False)
 
-            # Guardar el gráfico de Shapley values en la subcarpeta "plots"
+
             plt.savefig('plots/shapley_values.png', dpi=300, bbox_inches='tight')
             plt.show()
 
@@ -851,60 +808,7 @@ class Subplots:
         print(f" Worst scenario {worst_scen}")
         pass
 
-    def crear_pie_chart(self, indices_filas):
-        """
-        Crea un gráfico de pastel basado en la selección de una fila de un DataFrame.
 
-        Parameters:
-        - dataframe (pd.DataFrame): El DataFrame que contiene los datos.
-        - indice_fila (int): El índice de la fila a utilizar para el gráfico de pastel.
-
-        Returns:
-        - None: Muestra el gráfico de pastel.
-        """
-
-
-        dataframe=self.energy_input_categories_n3
-
-
-
-        fig, axs = plt.subplots(1, 3, figsize=(15, 5))
-
-        filas_seleccionadas = dataframe.iloc[indices_filas]
-
-        # Especifica la ruta y el nombre del archivo Excel de salida
-        ruta_archivo_excel = 'pie_chart.xlsx'
-
-        # Exporta las filas seleccionadas al archivo Excel
-        filas_seleccionadas.to_excel(ruta_archivo_excel, index=False)
-        pass
-
-        fig, axs = plt.subplots(1, 3, figsize=(15, 5))
-
-        for i, indice_fila in enumerate(indices_filas):
-            # Selecciona la fila especificada por el índice
-            fila_seleccionada = dataframe.iloc[indice_fila]
-
-            # Filtra elementos < 5% y agrupa en "Others"
-            valores_filtrados = fila_seleccionada.where(fila_seleccionada >= fila_seleccionada.sum() * 0.05, other=0)
-            valores_filtrados.loc["Others"] = fila_seleccionada.sum() - valores_filtrados.sum()
-
-            # Configura el gráfico de pastel con porcentajes
-            wedges, texts, autotexts = axs[i].pie(valores_filtrados, labels=valores_filtrados.index, autopct='%1.1f%%',
-                                                  startangle=90, counterclock=False)
-
-            # Añade porcentajes dentro de cada quesito
-            for autotext in autotexts:
-                autotext.set_color('white')
-
-            # Añade un título al gráfico
-            axs[i].set_title(f'Gráfico de Pastel para la Fila {indice_fila}')
-
-        plt.show()
-
-        plt.savefig('plots/pie_chart.png')
-        # Muestra el gráfico de pastel
-        plt.show()
 
 
 
