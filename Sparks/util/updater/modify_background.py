@@ -5,8 +5,8 @@ Created on Tue Sep  5 09:31:22 2023
         -LexPascal
 """
 import bw2data as bd
-from ProspectBackground.util.activity_creator import InventoryFromExcel
-from ProspectBackground.const import bw_project,bw_db
+from Sparks.util.activity_creator import InventoryFromExcel
+from Sparks.const import bw_project,bw_db
 
 bd.projects.set_current(bw_project)            # Select your project
 myei = bd.Database(bw_db)        # Select your db

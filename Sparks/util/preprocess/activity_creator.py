@@ -10,7 +10,7 @@ import bw2data as bd
 import pandas as pd
 import time
 from tqdm import tqdm
-from ProspectBackground.const.const import bw_project,bw_db
+from Sparks.const.const import bw_project,bw_db
 
 
 bd.projects.set_current(bw_project)            # Select your project

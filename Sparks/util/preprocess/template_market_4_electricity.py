@@ -3,7 +3,7 @@ from logging import getLogger
 import bw2data as bd
 import pandas as pd
 from bw2data.errors import UnknownObject
-from ProspectBackground.const.const import bw_project,bw_db
+from Sparks.const.const import bw_project,bw_db
 from .activity_creator import InventoryFromExcel
 
 

@@ -8,8 +8,8 @@ import pathlib
 import bw2data as bd
 import pandas as pd
 import typing
-from ProspectBackground.const.const import bw_project,bw_db
-from ProspectBackground.util.updater.recrusive_dict_changer import inventoryModify
+from Sparks.const.const import bw_project,bw_db
+from Sparks.util.updater.recrusive_dict_changer import inventoryModify
 bd.projects.set_current(bw_project)            # Select your project
 ei = bd.Database(bw_db)        # Select your db
 
