@@ -113,12 +113,14 @@ class Prospect():
 
         # Create an instance of the Cleaner class
         cleaner=Cleaner(self.calliope,self.mother,subregions)
+
         pass
         self.preprocessed_starter=cleaner.preprocess_data()
         pass
         self.preprocessed_units=cleaner.adapt_units()
         pass
         self.exluded_techs_and_regions=cleaner.techs_region_not_included
+        pass
 
 
        # preprocessed_units=unit_adapter(self.preprocessed_starter, self.mother)
@@ -238,7 +240,7 @@ class Prospect():
         if path is not None:
             try:
                 with open(path, 'w') as file:
-                    json.dump(data, indent=4)
+                    json.dump(data,file, indent=4)
                 self.path_saved=path
             except FileNotFoundError:
                 raise FileNotFoundError(f'Path {path} does not exist. Please check it')

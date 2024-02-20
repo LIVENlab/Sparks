@@ -1,2 +1,2 @@
-bw_project='Seeds_exp4'
-bw_db='db_experiments'
+bw_project='TFM_Lex'
+bw_db='ecoinvent'
