@@ -8,7 +8,7 @@ import pandas as pd
 pd.options.mode.chained_assignment = None
 import bw2data as bd
 import warnings
-from ProspectBackground.const.const import bw_project,bw_db
+from Sparks.const.const import bw_project,bw_db
 from typing import Dict,Union,Optional
 
 
@@ -20,11 +20,14 @@ database = bd.Database(bw_db)        # Select your db
 
 class Cleaner():
     """
-    The main objectives of this class are:
+
         *Clean the input data
-        *Modify the units of the input data //
+        *Modify the units of the input data
     """
-    def __init__(self, caliope, motherfile, subregions : [Optional,bool]= False):
+    def __init__(self,caliope,
+                 motherfile,
+                 subregions : [Optional,bool]= False):
+
         """
         @param caliope: Calliope data, str path
         @param motherfile: Basefile, str path
@@ -87,96 +90,93 @@ class Cleaner():
         :return:
 
         """
-
         print('Adapting input data...')
-        pass
         try:
             df = pd.read_csv(self.data, delimiter=',')
             self.data=df
+
         except FileNotFoundError:
             raise FileNotFoundError(f'File {self.data} does not exist. Please check it')
 
         else:
-            pass
-
             self.input_checker(df)
             df = df.dropna()
             # Create an empty df with the expected data
             gen_df = self.create_df()
-
             scenarios = list(df.spores.unique())
-            for scenario in scenarios:
-                df_sub = df.loc[df['spores'] == scenario]   # Create a new df with the data from 1 scenario
-
-                df_sub['locs'] = df['locs'].apply(self.manage_regions)
-                df_sub = df_sub.groupby(['techs', 'locs', 'carriers']).agg({
-                    "spores": "first",
-                    #"carriers": "first",
-                    "unit": "first",
-                    "flow_out_sum": "sum"
-                }).reset_index()
-                gen_df = pd.concat([gen_df, df_sub])
-                pass
-
-
-
+            if self.subregions is False:
+                for scenario in scenarios:
+                    df_sub = df.loc[df['spores'] == scenario]   # Create a new df with the data from 1 scenario
+                    df_sub['locs'] = df['locs'].apply(self.manage_regions)
+                    df_sub = df_sub.groupby(['techs', 'locs', 'carriers']).agg({
+                        "spores": "first",
+                        #"carriers": "first",
+                        "unit": "first",
+                        "flow_out_sum": "sum"
+                    }).reset_index()
+                    gen_df = pd.concat([gen_df, df_sub])
+            else:
+                for scenario in scenarios:
+                    df_sub = df.loc[df['spores'] == scenario]   # Create a new df with the data from 1 scenario
+                    #df_sub['locs'] = df['locs'].apply(self.manage_regions)
+                    df_sub = df_sub.groupby(['techs', 'locs', 'carriers']).agg({
+                        "spores": "first",
+                        #"carriers": "first",
+                        "unit": "first",
+                        "flow_out_sum": "sum"
+                    }).reset_index()
+                    gen_df = pd.concat([gen_df, df_sub])
 
         return gen_df
 
 
-    def filter_techs(self, df):
+    def filter_techs(self,df):
         """
         This function filters the Calliope data with the technologies defined in the basefile
         If the name is not defined in the "Processor column, it will be removed
         *Update: the function also filters if the technology with region included is not defined
         """
+        # TODO: Improve
+        df_names=df.copy()
+        basefile = pd.read_excel(self.mother_file, sheet_name='Processors')
+        pass
+
+        # Filter Processors
+        df_names['alias_carrier']=df_names['techs'] + '_' +df_names['carriers']
+        basefile['alias_carrier']=basefile['Processor']+ '_' + basefile['@SimulationCarrier']
+        carriers=basefile['alias_carrier'].unique().tolist()
+        df_names=df_names[df_names['alias_carrier'].isin(carriers)]
+        # Get the technologies that are not in the valid list
+        excluded_techs = df_names[~df_names['techs'].isin(basefile['Processor'])]['techs'].unique().tolist()
+
+        # Get the technologies that are not in the valid list of regions
+        techs_regions = basefile['Processor'].unique().tolist()
+        mark = df_names['techs'].isin(techs_regions)
+
+        # Catch some information
+        techs_not_in_list = df_names['techs'][~mark].unique().tolist()
 
         pass
-        df_names=df.copy()
-        df_names['tecregion']=df_names['techs'] + df_names['locs']
-
-        df_techs = pd.read_excel(self.mother_file, sheet_name='Processors')
-        df_techs['tecregion']= df_techs['Processor']+df_techs['Region']
-
-        techs = df_techs['Processor'].tolist()
-
-        techs_regions=(df_techs['tecregion'].unique().tolist())
-
-        mark_tec = df_names['techs'].isin(techs)
-        mark=df_names['tecregion'].isin(techs_regions)
-
-        df_filtered = df_names[mark]
-        # Catch some information
-        techs_not_in_list = df_names['techs'][~mark_tec].unique().tolist()
-
-        self.techs_region_not_included=df_names['tecregion'][~mark].unique().tolist()
-        if len(techs_not_in_list)>0:
+        self.techs_region_not_included=excluded_techs
+        if len(excluded_techs)>0:
             message=f'''\nThe following technologies, are present in the energy data but not in the Basefile: 
-            \n{techs_not_in_list}
+            \n{excluded_techs}
             \n Please,check the following items in order to avoid missing information'''
             warnings.warn(message,Warning)
 
+        return df_names
 
-        return df_filtered
 
+    def manage_regions(self,*arg)->str:
 
-    def manage_regions(self,arg):
-
-        pass
         # Special issue for the Portugal Analysis
         if arg == 'ESP-sink':
             region = 'ESP'
 
-        #if self.subregions is True:
-            # If the used is not interested in having subregions, the location will be the same
-         #   region=str(arg)
 
         else:
-
             region=arg.split('-')[0]
             region=region.split('_')[0]
-
-
         return region
 
 
@@ -185,12 +185,11 @@ class Cleaner():
         Run different functions of the class under one call
         @return: final_df: calliope data cleaned. Check definitions of the class for more information
         """
-
         dat = self.changer()
-        pass
         final_df = self.filter_techs(dat)
         pass
         self.clean=final_df
+
         return final_df
 
 
@@ -317,6 +316,11 @@ class Cleaner():
                     pass
         pass
         return df
+
+    @staticmethod
+    def _handle_subregions(self):
+        pass
+
 
 
 

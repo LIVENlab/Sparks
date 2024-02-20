@@ -7,7 +7,7 @@ from collections import defaultdict
 import pandas as pd
 from bw2data.errors import UnknownObject
 from typing import Optional,Dict,Union,List
-from ProspectBackground.const.const import bw_project,bw_db
+from Sparks.const.const import bw_project,bw_db
 import warnings
 
 bd.projects.set_current(bw_project)            # Select your project

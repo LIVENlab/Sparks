@@ -7,21 +7,20 @@ import pandas as pd
 import bw2data as bd
 from enbios2.base.experiment import Experiment
 import os
-from ProspectBackground.util.preprocess.cleaner import Cleaner
-from ProspectBackground.util.preprocess.SoftLink import SoftLinkCalEnb
+from Sparks.util.preprocess.cleaner import Cleaner
+from Sparks.util.preprocess.SoftLink import SoftLinkCalEnb
 import bw2io as bi
-from ProspectBackground.const import const
-from dataclasses import dataclass
-from ProspectBackground.util.preprocess.template_market_4_electricity import Market_for_electricity
-from ProspectBackground.util.updater.background_updater import Updater
+from Sparks.const import const
+
+from Sparks.util.preprocess.template_market_4_electricity import Market_for_electricity
+from Sparks.util.updater.background_updater import Updater
 import time
-pass
-@dataclass
-class Prospect():
+
+
+class SoftLink():
 
     def __init__(self, caliope : Union[str, pd.DataFrame], mother_file: [str], project : [str], database):
         """
-
         @param caliope: path to the caliope data (flow_out_sum.csv)
         @type caliope: either str path or pd.Dataframe
         @param mother_file: path to the mother file
@@ -82,7 +81,11 @@ class Prospect():
         if self.database not in list(bd.databases):
             print(list(bd.databases))
             raise Warning(f"database {self.database} not in bw databases")
+
+        #TODO Fix finally
+        self._save_const(self.project, self.database)
         print('Project and Database existing...')
+
 
     @staticmethod
     def create_BW_project(project,database,spolds):
@@ -113,20 +116,10 @@ class Prospect():
 
         # Create an instance of the Cleaner class
         cleaner=Cleaner(self.calliope,self.mother,subregions)
-
-        pass
         self.preprocessed_starter=cleaner.preprocess_data()
-        pass
         self.preprocessed_units=cleaner.adapt_units()
-        pass
         self.exluded_techs_and_regions=cleaner.techs_region_not_included
-        pass
 
-
-       # preprocessed_units=unit_adapter(self.preprocessed_starter, self.mother)
-        #self.preprocessed = preprocessed_units
-        #self.techs = preprocessed_units['techs'].unique().tolist() #give some info
-        #self.scenarios = preprocessed_units['scenarios'].unique().tolist()
 
 
 
@@ -135,9 +128,8 @@ class Prospect():
         Transform the data into enbios like dictionary
         """
         # Create an instance of the SoftLInkCalEnb
-        pass
+
         self.SoftLink=SoftLinkCalEnb(self.preprocessed_units,self.mother,smaller_vers)
-        pass
         self.SoftLink.run(path_save)
         self.enbios2_data = self.SoftLink.enbios2_data
         self.save_json_data(self.enbios2_data, path_save)
@@ -194,8 +186,6 @@ class Prospect():
 
 
     def updater_run(self):
-
-
         # check if template created
 
         if self.template_code is None:
@@ -253,11 +243,17 @@ class Prospect():
             os.makedirs(folder_path,exist_ok=True)
             file_path=os.path.join(folder_path,'data_enbios.json')
             print(file_path)
-
             with open(file_path, 'w') as file:
                 json.dump(data, file,indent=4)
             print(f'Data for enbios saved in {file_path}')
             self.path_saved=file_path
+
+    @staticmethod
+    def _save_const(project:str,db:str):
+        """ get the project and db name and store in a const file"""
+
+        setattr(const, 'bw_project', project)
+        setattr(const, 'bw_db', db)
 
 
 
