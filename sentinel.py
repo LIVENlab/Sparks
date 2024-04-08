@@ -1,12 +1,24 @@
-import pandas as pd
-from Sparks.util.update_experiment import SoftLink
+from enbios2.base.experiment import Experiment
 
-enbios_mod = SoftLink(r'/home/lex/Documents/data_sentinel/flow_out_sum.csv',
-                       r'/home/lex/Downloads/basefile_sentinel.xlsx',
-                       'TFM_Lex', 'ecoinvent')
+import json
+try:
+    exp = Experiment(r'C:\Users\Administrator\PycharmProjects\SEEDS\Data_enbios_paper\final_run_v1.json')
+    exp.run()
+except:
+    # Generally the exception is the unspecificEcoinvent error from ENBIOS
+    from enbios2.base.unit_registry import ecoinvent_units_file_path
 
-enbios_mod.preprocess(subregions=True)
-enbios_mod.data_for_ENBIOS(smaller_vers=1)
+    text_to_write = 'unspecificEcoinventUnit = []'
+
+    with open(ecoinvent_units_file_path, 'w') as file:
+        file.write(text_to_write)
 
 
-#df=pd.read_csv(r'C:\Users\altz7\PycharmProjects\enbios__git\projects\data_sentinel\flow_out_sum.csv',delimiter=',')
+    exp = Experiment(r'C:\Users\Administrator\PycharmProjects\SEEDS\Data_enbios_paper\final_run_v1.json')
+
+    exp.run()
+
+res=exp.result_to_dict()
+
+with open('results.json', 'w') as file:
+    json.dump(res, file, indent=4)

@@ -107,6 +107,7 @@ class Cleaner():
             if self.subregions is False:
                 for scenario in scenarios:
                     df_sub = df.loc[df['spores'] == scenario]   # Create a new df with the data from 1 scenario
+                    pass
                     df_sub['locs'] = df['locs'].apply(self.manage_regions)
                     df_sub = df_sub.groupby(['techs', 'locs', 'carriers']).agg({
                         "spores": "first",
@@ -166,17 +167,17 @@ class Cleaner():
 
         return df_names
 
-
-    def manage_regions(self,*arg)->str:
-
+    def manage_regions(self, arg):
+        if isinstance(arg, tuple):
+            arg = arg[0]
+            region = arg.split('-')[0]
+            region = region.split('_')[0]
         # Special issue for the Portugal Analysis
         if arg == 'ESP-sink':
             region = 'ESP'
-
-
         else:
-            region=arg.split('-')[0]
-            region=region.split('_')[0]
+            region = arg.split('-')[0]
+            region = region.split('_')[0]
         return region
 
 
