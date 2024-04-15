@@ -21,10 +21,14 @@ class PlottingEnbios:
         self._starter_path=starter
         self._units_path=units
         self._raw_data=None
+        self.results_csv= None
+
+
+
         # Basic actions
         self.data=self._get_general_results(self._path)
         self.normal_data=self._normalize_values()
-
+        self.starter=self._get_amounts_starter()
 
     def _get_general_results(self, *args):
 
@@ -37,57 +41,98 @@ class PlottingEnbios:
             data = pd.DataFrame.from_dict(out_results).T
         return data
 
-    def _normalize_values(self) -> pd.DataFrame:
+    def _normalize_values(self,data=None) -> pd.DataFrame:
         """ Normalize values between 0 and 1"""
-        res = self.data
-        info_norm = {}
+        pass
+        if data is None:
+            res = self.data
+        else:
+            res=data
+
         for col in res.columns:
             name = str(col)
             min_ = np.min(res[col])
             max_ = np.max(res[col])
             res[name] = (res[col] - min_) / (max_ - min_)
-            info_norm[col] = {
-                "max": max_,
-                "min": min_,
-                "scenario_max": res[col].idxmax().item(),
-                "scenario_min": res[col].idxmin().item()
-            }
+
         return res
 
     def _join_impacts(self):
         """
         Join in the same df the energy inputs + results
         """
-        df_energy = pd.read_csv(self._starter_path, delimiter=',')
+        #TODO: CHECK IF UNITS
+        #df_energy = pd.read_csv(self._starter_path, delimiter=',')
+        df_energy= pd.read_csv(self._units_path)
+        pass
         #df_energy = df_energy.drop(df_energy.columns[0], axis=1)
-        df_energy = df_energy.groupby(['scenarios', 'techs'])['flow_out_sum'].sum().reset_index()
-        df_energy = df_energy.pivot(index='scenarios', columns='techs', values='flow_out_sum')
+        df_energy = df_energy.groupby(['spores', 'techs'])['flow_out_sum'].sum().reset_index()
+        self.energy_straight=df_energy
+        df_energy = df_energy.pivot(index='spores', columns='techs', values='flow_out_sum')
+
 
         return pd.concat([self._normalize_values(), df_energy], axis=1)
 
 
 
+    def _load_csv(self, results_path:str):
+        return pd.read_csv(results_path)
 
-    def load_hierarchy(self):
+
+
+    def _handle_nan_columns(self, col_name: pd.Series ='scenario'):
+        val_prev=np.nan
         pass
+        filled_colum=[]
+        for value in col_name:
+            if pd.isnull(value):
+                filled_colum.append(val_prev)
+            else:
+                filled_colum.append(int(value))
+                val_prev=int(value)
+        return pd.Series(filled_colum)
+
+    def _get_amounts_starter(self):
+        data=pd.read_csv(self._units_path)
+        data['names_official']=data['techs']+'__'+data['carriers']+'___'+data['locs']
+
+        return data
+
+    def _handle_columns(self, df, level:int):
+        #filter columns according to the desired level
+        df=df.iloc[: , [0] + list(range(level+1, len(df.columns)))]
+        df=df.drop(['unit'], axis=1)
+        df=df.dropna(subset=['lvl_'+str(level)])
+        df=df[df['scenario']==0]
+        # load the unit data
+        amounts=self.starter
+
+        values=[]
+        for scen,tech in zip(df['scenario'],df['lvl_' + str(level)]):
+            amounts_temp=amounts[amounts['spores']==scen]
+            for i, v in amounts_temp.iterrows():
+                if tech==v['names_official']:
+                    values.append(v['flow_out_sum'])
+
+        df['flow_out']=values
+
+        ind_amounts=df.columns.get_loc('amount')
+        columns_to_divide=df.columns[ind_amounts : -1]
+        #divide the impact
+
+        df[columns_to_divide]=df[columns_to_divide].div(df['flow_out'], axis=0)
+
+        # final modifications
+
+        cols_to_filter=['lvl_'+str(level)] + list(columns_to_divide)
+        df=df[cols_to_filter]
+        df = df.drop(columns=['amount'])
+        df=df.rename(columns={'lvl_'+str(level) : 'technologies'})
+        df['technologies']=[x.split('___')[0] for x in df['technologies']]
+        df.set_index('technologies', inplace=True)
 
 
-    def hierarchy_to_df(self,hierarchy):
-        """
-        assumed: the hierarchy has **4** levels
-        """
-        df = pd.DataFrame.from_dict({
-                                        'Level_1': i,
-                                        'Level_2': j,
-                                        'Level_3': k,
-                                        'Activity': l
-                                    } for i in hierarchy.keys() for j in hierarchy[i].keys() for k in
-                                    hierarchy[i][j].keys() for l in hierarchy[i][j][k])
-        pass
         return df
-
-
-
 
 
 
@@ -195,8 +240,10 @@ class PlottingEnbios:
         return df_transpuesto
 
 
+
     def correlations_calliope(self, path_save):
         df=self._edit_units()
+
         correlation_matrix = df.corr()
 
         fig = plt.figure(figsize=(25, 20))
@@ -223,77 +270,135 @@ class PlottingEnbios:
         plt.show()
 
 
+    def _clean_csv(self, path_csv, level):
+        #applies different changes
+        data = self._load_csv(path_csv)
+        data['scenario'] = self._handle_nan_columns(data['scenario'])
+        data=self._handle_columns(data, level)
+
+        datum=data.copy()
+        self._impact_tech=datum
+        data=self._normalize_values(data=data)
+        self._impact_tech_normalized=data
+
+        return data
+
+
+
+    def intensive_plot(self,path_csv, level, path_save):
+        data=self._clean_csv(path_csv, level)
+
+
+        plt.figure(figsize=(10, 8))  # Ajusta el tamaño de la figura según tus necesidades
+        #sns.heatmap(data, cmap='Greens',annot=self._impact_tech,
+           #         linewidths=.0)  # Ajusta la paleta de colores y otras propiedades
+
+        sns.heatmap(data, cmap='Greens', linewidths=.1)  # Ajusta la paleta de colores y otras propiedades
+        # Personaliza el heatmap
+        plt.title('Normalized impact values')  # Agrega un título al heatmap
+        plt.xticks(rotation=45, horizontalalignment='right')
+        plt.tight_layout()
+        # Guarda la figura si es necesario
+        plt.savefig(path_save, dpi=800)  # Ajusta la resolución y los márgenes según tus necesidades
+
+        # Muestra el heatmap
+        plt.show()
+
+    def intensive_plot_absolute(self, path_csv, level, path_save):
+        df = self._clean_csv(path_csv, level)
+        fig, axs = plt.subplots(nrows=1, ncols=5,
+                                figsize=(15, 4))  # Ajusta el tamaño de la figura según tus necesidades
+        for i, columna in enumerate(df.columns):
+            sns.heatmap(self._impact_tech_normalized[[columna]], cmap='Greens', annot=self._impact_tech[[columna]], fmt='.2f', cbar=False,
+                        ax=axs[i])  # Utiliza la misma paleta de colores para todas las columnas
+            axs[i].set_title(columna)  # Agrega un título a cada heatmap
+            axs[i].set_ylabel('')  # Elimina la etiqueta del eje y para ahorrar espacio
+
+        # Agrega una única leyenda adimensional para todos los heatmaps
+        cbar_ax = fig.add_axes([0.95, 0.1, 0.03, 0.8])  # Ajusta la posición de la leyenda según tus necesidades
+        sns.heatmap(df.iloc[0:1], cmap='Greens', cbar=True, cbar_ax=cbar_ax)
+        cbar_ax.set_ylabel('Adimensional')  # Agrega una etiqueta a la leyenda
+        plt.savefig(path_save, dpi=800)
+        plt.show()
+
+
+
+    def _gini(self,series):
+        n = len(series)
+        sorted_values = series.sort_values()  # Ordena los valores de la serie
+        cumulative_demand = sorted_values.cumsum()  # Calcula la demanda acumulada
+        total_demand = cumulative_demand.iloc[-1]  # Total de la demanda
+        lorenz_curve = cumulative_demand / total_demand  # Curva de Lorenz
+        area_lorenz_curve = lorenz_curve.sum() / n  # Área bajo la curva de Lorenz
+        area_perfect_equality = 0.5  # Área debajo de la línea de igualdad
+        gini_index = (area_perfect_equality - area_lorenz_curve) / area_perfect_equality  # Índice de Gini
+        return gini_index
+
+
+    def _compute_shanon(self):
+        data=self._join_impacts()
+        techs=data.iloc[:,5:]
+        proportions=techs.div(techs.sum(axis=1),axis=0)
+        shannon_indices = -(proportions * np.log2(proportions)).sum(axis=1)
+        data['shanon']=shannon_indices
+        return data
+
+
+
+
+    def violin_and_shanon(self):
+        data= self._compute_shanon()
+        pass
+        shanon = data.iloc[:, -1]
+        impacts = data.iloc[:, 0:5]
+
+        # Calcular la correlación entre cada una de las cinco primeras columnas y la última columna
+
+        correlations = impacts.corrwith(shanon)
+        print(correlations)
+        pass
+
+
+
+
+
 
 
 if __name__ =='__main__':
 
-    plot=PlottingEnbios(r'C:\Users\Administrator\PycharmProjects\SEEDS\results\results_260.json',
-                        flow_out_sum=r'C:\Users\Administrator\PycharmProjects\SEEDS\data_sentinel\flow_out_sum.csv',
-                        starter=r'C:\Users\Administrator\PycharmProjects\SEEDS\Data_enbios_paper\units_260.csv',
-                        units=r'C:\Users\Administrator\PycharmProjects\SEEDS\Data_enbios_paper\starter_260.csv')
+    plot=PlottingEnbios(r'C:\Users\Administrator\PycharmProjects\SEEDS\runs\run_density_water\data\results_260.json',
+                        flow_out_sum=r'C:\Users\Administrator\Downloads\flow_out_sum (1).csv',
+                        starter=r'C:\Users\Administrator\PycharmProjects\SEEDS\runs\run_density_water\data\units_260.csv',
+                        units=r'C:\Users\Administrator\PycharmProjects\SEEDS\runs\run_density_water\data\starter_260.csv')
 
     #plot.violin_plot(spore=0, path_save='violin_260')
-    #plot.correlation_matrix("plots/correlation.png")
-    #plot.spearman_correlation("plots/spearman.png")
-    #plot.correlations_calliope(r"plots/correlation_matrix_calliope.png")
+    #plot.correlation_matrix("plots/correlation_260.png")
+    #plot.spearman_correlation("plots/spearman_260.png")
+    #plot.correlations_calliope(r"plots/correlation_matrix_calliope_260.png")
+    #plot.intensive_plot(r'C:\Users\Administrator\PycharmProjects\SEEDS\runs\run_density_water\data\results_260.csv', level=4, path_save='plots/intensive.png')
+   # plot.intensive_plot_absolute(r'C:\Users\Administrator\PycharmProjects\SEEDS\runs\run_density_water\data\results_260.csv',
+      #                  level=4, path_save='plots/intensive_absolute_260.png')
+    plot.violin_and_shanon()
+    ###### 270
+
+    plot2 = PlottingEnbios(r'C:\Users\Administrator\PycharmProjects\SEEDS\runs\run_density_water\data\results_270.json',
+                          flow_out_sum=r'C:\Users\Administrator\Downloads\flow_out_sum.csv',
+                          starter=r'C:\Users\Administrator\PycharmProjects\SEEDS\runs\run_density_water\data\units_270.csv',
+                          units=r'C:\Users\Administrator\PycharmProjects\SEEDS\runs\run_density_water\data\starter_270.csv')
+
+    #plot2.violin_plot(spore=0, path_save='violin_270.png')
+    #plot2.correlation_matrix("plots/correlation_270.png")
+    #plot2.spearman_correlation("plots/spearman_270.png")
+    #plot2.correlations_calliope(r"plots/correlation_matrix_calliope_270.png")
+    #plot2.intensive_plot(r'C:\Users\Administrator\PycharmProjects\SEEDS\runs\run_density_water\data\results_270.csv',
+     #                   level=4, path_save='plots/intensive_270.png')
+    #plot2.intensive_plot_absolute(
+     #   r'C:\Users\Administrator\PycharmProjects\SEEDS\runs\run_density_water\data\results_270.csv',
+      #  level=4, path_save='plots/intensive_absolute_270.png')
+    plot2.violin_and_shanon()
 
 
-    hierarchy={
-        "Energysystem": {
-            "Generation": {
-                "Electricity_generation": [
-                    "wind_onshore__electricity___PRT",
-                    "wind_offshore__electricity___PRT",
-                    "hydro_run_of_river__electricity___PRT",
-                    "hydro_reservoir__electricity___PRT",
-                    "ccgt__electricity___PRT",
-                    "chp_biofuel_extraction__electricity___PRT",
-                    "open_field_pv__electricity___PRT",
-                    "chp_hydrogen__electricity___PRT",
-                    "existing_wind__electricity___PRT",
-                    "existing_pv__electricity___PRT",
-                    "roof_mounted_pv__electricity___PRT",
-                    "chp_wte_back_pressure__electricity___PRT",
-                    "chp_methane_extraction__electricity___PRT",
-                    "waste_supply__waste___PRT"
-                ],
-                "Thermal_generation": [
-                    "chp_biofuel_extraction__heat___PRT",
-                    "chp_hydrogen__heat___PRT",
-                    "chp_wte_back_pressure__heat___PRT",
-                    "chp_methane_extraction__heat___PRT",
-                    "biofuel_boiler__heat___PRT",
-                    "methane_boiler__heat___PRT"
-                ]
-            },
-            "Storage": {
-                "Electricity_storage": [
-                    "battery__electricity___PRT",
-                    "pumped_hydro__electricity___PRT"
-                ],
-                "Thermal_storage": [
-                    "heat_storage_big__heat___PRT",
-                    "heat_storage_small__heat___PRT",
-                    "methane_storage__methane___PRT"
-                ]
-            },
-            "Conversions": {
-                "Conversions": [
-                    "biofuel_to_diesel__diesel___PRT",
-                    "biofuel_to_liquids__diesel___PRT",
-                    "biofuel_to_methane__methane___PRT",
-                    "biofuel_to_methanol__methanol___PRT",
-                    "electrolysis__hydrogen___PRT"
-                ]
-            },
-            "Imports": {
-                "Imports": [
-                    "el_import__electricity___ESP"
-                ]
-            }
-        }}
 
-    plot.hierarchy_to_df(hierarchy=hierarchy)
 
 
 
