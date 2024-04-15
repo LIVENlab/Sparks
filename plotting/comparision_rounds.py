@@ -4,7 +4,7 @@ import json
 import matplotlib.pyplot as plt
 from typing_extensions import OrderedDict
 import seaborn as sns
-
+from scipy.stats import mannwhitneyu
 
 class CompRounds:
 
@@ -127,26 +127,7 @@ class CompRounds:
         # Save the figure as an image
         plt.savefig(save_path, dpi=800, bbox_inches='tight')
 
-    def subplots(self, filter_data=False):
-        if filter_data:
-            self._270_normalized = self.filter_data()
 
-        combined_data = pd.concat([self._260_normalized, self._270_normalized], axis=0)
-        combined_data.columns = [x.split("(")[0] for x in combined_data.columns]
-        melted_data = pd.melt(combined_data, id_vars=['Round'], var_name='Variable', value_name='Value')
-
-        fig, ax = plt.subplots(nrows=3, ncols=2, figsize=(12, 18))
-        sns.boxenplot(data=melted_data[melted_data['Variable'] == combined_data.columns[0]], x='Value', y='Variable',
-                      hue='Round', palette=['skyblue', 'lightgreen'], ax=ax[0, 0])
-        #ax[0, 0].set_xlabel('Normalized Value', fontsize=12)  # x-axis label
-        ax[0, 0].set_title(combined_data.columns[0], fontsize=14)  # Title for the subplot
-        plt.axvline(x=0, color='black', linestyle='--', linewidth=0.5, ax=ax[0,0])
-        plt.axvline(x=1, color='black', linestyle='--', linewidth=0.5, ax= ax[0,0])
-
-        # Save the figure as an image
-        plt.savefig(save_path, dpi=800, bbox_inches='tight')
-
-        plt.show()
 
     def plot_stats(self, save_path):
 
@@ -173,6 +154,21 @@ class CompRounds:
 
 
 
+    def mann_whitney_test(self):
+        """ The Mann-Whitney U test is a nonparametric test of the null hypothesis
+    that the distribution underlying sample `x` is the same as the
+    distribution underlying sample `y`. It is often used as a test of
+    difference in location between distributions"""
+        df1=self._260_normalized.drop(columns=['Round'])
+        df2=self._270_normalized.drop(columns=['Round'])
+        pass
+
+        for col in df1.columns:
+            statistic, p_value = mannwhitneyu(df1[col], df2[col], alternative='two-sided')
+            print(f'Comparación para la categoría {col}:')
+            print(f'Estadística de prueba: {statistic}')
+            print(f'Valor p: {p_value}')
+            print('')
 
 
 
@@ -183,7 +179,8 @@ class CompRounds:
 res = CompRounds(r'C:\Users\Administrator\PycharmProjects\SEEDS\runs\run_density_water\data\results_260.json', r'C:\Users\Administrator\PycharmProjects\SEEDS\runs\run_density_water\data\results_270.json')
 res.compare_boxplots(filter_data=True, save_path='plots/boxplots.png')
 #res.subplots()
-res.plot_stats(save_path='plots/stats.png')
+#res.plot_stats(save_path='plots/stats.png')
+res.mann_whitney_test()
 
 
 
