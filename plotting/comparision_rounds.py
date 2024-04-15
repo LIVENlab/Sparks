@@ -96,7 +96,7 @@ class CompRounds:
         data=self._270_normalized
         return data[data['surplus ore potential (SOP)']<1.4]
 
-    def compare_boxplots(self, filter_data=False):
+    def compare_boxplots(self, save_path : str,  filter_data=False):
 
         if filter_data:
             self._270_normalized=self.filter_data()
@@ -125,7 +125,7 @@ class CompRounds:
         plt.legend(title='Round', title_fontsize='11', fontsize='11', loc='upper right')
 
         # Save the figure as an image
-        plt.savefig('plot_1.png', dpi=800, bbox_inches='tight')
+        plt.savefig(save_path, dpi=800, bbox_inches='tight')
 
     def subplots(self, filter_data=False):
         if filter_data:
@@ -144,11 +144,32 @@ class CompRounds:
         plt.axvline(x=1, color='black', linestyle='--', linewidth=0.5, ax= ax[0,0])
 
         # Save the figure as an image
-        plt.savefig('fig_1_cut.png', dpi=800, bbox_inches='tight')
+        plt.savefig(save_path, dpi=800, bbox_inches='tight')
 
         plt.show()
 
-        plt.show()
+    def plot_stats(self, save_path):
+
+        sns.set(style='whitegrid')
+
+        # Convertir los datos a formato 'long' utilizando la función melt de pandas
+        melted_stats = self.stats.reset_index().melt(id_vars='index', var_name='Métrica', value_name='Diferencia')
+
+        plt.figure(figsize=(12, 8))  # Figure size
+        ax = sns.barplot(data=melted_stats, x='Diferencia', y='Métrica', hue='index', orient='h', palette='Set3')
+
+        # Añadir línea vertical en x=1
+        plt.axvline(x=1, color='black', linestyle='--')
+
+        # Añadir título y etiquetas
+        plt.title('Statistical Differences', fontsize=16)
+        plt.xlabel('Difference', fontsize=14)
+        #plt.ylabel('Métrica', fontsize=14)
+
+        # Cambiar el título de la leyenda
+        handles, labels = ax.get_legend_handles_labels()
+        ax.legend(handles, labels, title='Statistics')
+        plt.savefig(save_path, dpi=800, bbox_inches='tight')
 
 
 
@@ -156,10 +177,13 @@ class CompRounds:
 
 
 
-res = CompRounds(r'C:\Users\Administrator\PycharmProjects\SEEDS\results\results_260.json', r'C:\Users\Administrator\PycharmProjects\SEEDS\results\results_270.json')
-res.compare_boxplots(filter_data=True)
+
+
+
+res = CompRounds(r'C:\Users\Administrator\PycharmProjects\SEEDS\runs\run_density_water\data\results_260.json', r'C:\Users\Administrator\PycharmProjects\SEEDS\runs\run_density_water\data\results_270.json')
+res.compare_boxplots(filter_data=True, save_path='plots/boxplots.png')
 #res.subplots()
-#res.plot_stats()
+res.plot_stats(save_path='plots/stats.png')
 
 
 
