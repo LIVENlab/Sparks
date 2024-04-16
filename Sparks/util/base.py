@@ -30,20 +30,16 @@ class SoftLink():
         @param database: db name in bw
         @type database: str
         """
-        self.default_market = None #
         self.project=project
         self.calliope=caliope
         self.mother=mother_file
-        self.techs=[]
-        self.scenarios=[]
         self.preprocessed=None
         self.preprocessed_starter=None
-        self.template_electricity_market = None
         self.SoftLink=None
         self.input=None
         self.database=database
-        self.template_code=None
-        self.exp=None
+
+
 
         #Check project and db
         self._bw_project_and_DB()
@@ -65,8 +61,6 @@ class SoftLink():
         It also allows for the creation of a new one
         """
         projects=list(bd.projects)
-        pass
-
         if self.project not in str(projects):
             ans=input(f'Project {self.project} not in projects. Want to create a new project? (y/n)')
             if ans =='y':
@@ -83,8 +77,6 @@ class SoftLink():
             print(list(bd.databases))
             raise Warning(f"database {self.database} not in bw databases")
 
-        #TODO Fix finally
-        pass
         self._save_const(self.project, self.database)
         print('Project and Database existing...')
 
@@ -100,8 +92,7 @@ class SoftLink():
 
 
     @timer
-    def preprocess(self,
-                   subregions : [bool,Optional] = False):
+    def preprocess(self,subregions : [bool,Optional] = False):
         """
         cal_file: str path to flow_out_sum data
 
@@ -131,12 +122,10 @@ class SoftLink():
         self.SoftLink=SoftLinkCalEnb(self.preprocessed_units,self.mother,smaller_vers)
         self.SoftLink.run(path_save)
         self.enbios2_data = self.SoftLink.enbios2_data
-        self.save_json_data(self.enbios2_data, path_save)
+        self._save_json_data(self.enbios2_data, path_save)
 
 
-
-
-    def save_json_data(self,data, path: str):
+    def _save_json_data(self,data, path: str):
         if path is not None:
             try:
                 with open(path, 'w') as file:
