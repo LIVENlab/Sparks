@@ -1,3 +1,4 @@
-# SparkBox
-Explore EuroCalliope Data with ENBIOS through Prospective Analysis
-Work in progress. Checkout the dev branch
+# Sparks
+Sparks facilitates the creation of inputs for [enbios](https://github.com/LIVENlab/enbios) through an Excel file.
+
+Please note that this repository is currently undergoing several updates.
