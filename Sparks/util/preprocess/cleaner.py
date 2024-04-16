@@ -33,17 +33,12 @@ class Cleaner():
             Default value set as false:
             - It will group the different subregions per country
         """
-        pass
-        self.subregions=subregions
-        self._raw_data=caliope # flow_out_sum
-        self.mother_file=motherfile # basefile
-        self.final_df=None # Final output of the Cleaning functions
-
-        # Unit changer
-        self.activity_conversion_dictionary : Dict[str,Dict[str,Union[str,int]]]=dict() #Dictionary containing the activity-conversion factor information
-        self.clean_modified=None # Final output of the Unit functions
-        self.techs_region_not_included=[] #List of the Processors and regions (together) not included in the basefile
-
+        self.subregions = subregions
+        self._raw_data = caliope
+        self.mother_file = motherfile
+        self.final_df = None
+        self.activity_conversion_dictionary = {}
+        self.techs_region_not_included = []
 
     @staticmethod
     def create_df() -> pd.DataFrame:
@@ -79,86 +74,63 @@ class Cleaner():
         if "spore" in cols:
             data.rename(columns={'spore': 'spores'}, inplace=True)
             cols = set(data.columns)
-        if expected_cols == cols:
-            print('Input checked. Columns look ok')
-        else:
+        if expected_cols != cols:
             raise KeyError(f"Columns {cols} do not match the expected columns: {expected_cols}")
 
 
-    def _load_data(self,df) -> pd.DataFrame:
+    def _load_data(self) -> pd.DataFrame:
         """ Assuming comma separated input"""
-        return pd.read_csv(self._raw_data, delimiter=',')
+        return pd.read_csv(self._raw_data, delimiter=',').dropna()
 
 
-    def _group_df(self, df):
+    def _group_df(self, df: pd.DataFrame)-> pd.DataFrame:
+        """
+        group input data by specified criteria
+        """
         gen_df = self.create_df()
-        scenarios = list(df.spores.unique())
+        scenarios = df['spores'].unique()
 
-        if self.subregions is False:
-            for scenario in scenarios:
-                df_sub = df.loc[df['spores'] == scenario]  # Create a new df with the data from 1 scenario
+        for scenario in scenarios:
+            df_sub = df[df['spores'] == scenario]
+            if not self.subregions:
                 df_sub['locs'] = df['locs'].apply(self._manage_regions)
-                df_sub = df_sub.groupby(['techs', 'locs', 'carriers']).agg({
-                    "spores": "first",
-                    # "carriers": "first",
-                    "unit": "first",
-                    "flow_out_sum": "sum"
-                }).reset_index()
-                gen_df = pd.concat([gen_df, df_sub])
-        else:
-            for scenario in scenarios:
-                df_sub = df.loc[df['spores'] == scenario]  # Create a new df with the data from 1 scenario
-                # df_sub['locs'] = df['locs'].apply(self.manage_regions)
-                df_sub = df_sub.groupby(['techs', 'locs', 'carriers']).agg({
-                    "spores": "first",
-                    # "carriers": "first",
-                    "unit": "first",
-                    "flow_out_sum": "sum"
-                }).reset_index()
-                gen_df = pd.concat([gen_df, df_sub])
+            df_sub = df_sub.groupby(['techs', 'locs', 'carriers']).agg({
+                "spores": "first",
+                "unit": "first",
+                "flow_out_sum": "sum"
+            }).reset_index()
+            gen_df = pd.concat([gen_df, df_sub])
 
         return gen_df
 
 
-    def _adapt_data(self):
+    def _adapt_data(self)->pd.DataFrame:
 
         print('Adapting input data...')
         try:
-            df=self._load_data(self._raw_data)
-
+            df=self._load_data()
+            self.input_checker()
         except FileNotFoundError:
-
             raise FileNotFoundError(f'File {self._raw_data} does not exist. Please check it')
         else:
             self.input_checker(df) # Input loaded. Check if ok
-            df = df.dropna()
-            df= self._group_df(df)
-        return df
+
+        return self._group_df(df)
 
 
-    def filter_techs(self,df):
+    def filter_techs(self,df: pd.DataFrame)-> pd.DataFrame:
         """
-        This function filters the Calliope data with the technologies defined in the basefile
-        If the name is not defined in the "Processor column, it will be removed
-        *Update: the function also filters if the technology with region included is not defined
+        Filter the input data based on technologies defined in the basefile
         """
 
         df_names=df.copy()
-        basefile = pd.read_excel(self.mother_file, sheet_name='Processors')
-        pass
+        self.basefile=pd.read_excel(self.mother_file, sheet_name='Processors')
+
 
         # Filter Processors
         df_names['alias_carrier']=df_names['techs'] + '_' +df_names['carriers']
-
-        basefile['alias_carrier']=basefile['Processor']+ '_' + basefile['@SimulationCarrier']
-        carriers=basefile['alias_carrier'].unique().tolist()
-        carriers=set(basefile['alias_carrier'])
-
-        # Obtener las tecnologías excluidas
-        excluded_techs = set(df_names['techs']) - set(basefile['Processor'])
-
-
-
+        self.basefile['alias_carrier']=self.basefile['Processor']+ '_' + self.basefile['@SimulationCarrier']
+        excluded_techs = set(df_names['techs']) - set(self.basefile['Processor'])
         self.techs_region_not_included=excluded_techs
         if len(excluded_techs)>0:
             message=f'''\nThe following technologies, are present in the energy data but not in the Basefile: 
@@ -168,7 +140,18 @@ class Cleaner():
 
         return df_names
 
-    def _manage_regions(self, *arg):
+    def preprocess_data(self)->pd.DataFrame:
+        """
+        Run data preprocessing steps
+
+        """
+        self.final_df = self.filter_techs(self._adapt_data())
+        return self.final_df
+
+    def _manage_regions(self, *arg)->str:
+        """
+        Manage region names
+        """
         if isinstance(arg, tuple):
             arg = arg[0]
             region = arg.split('-')[0]
@@ -176,28 +159,15 @@ class Cleaner():
         # Special issue for the Portugal Analysis
         if arg == 'ESP-sink':
             region = 'ESP'
-        else:
-            region = arg.split('-')[0]
-            region = region.split('_')[0]
         return region
 
 
-    def preprocess_data(self):
-        """
-        Run different functions of the class under one call
-        @return: final_df: calliope data cleaned. Check definitions of the class for more information
-        """
-        dat = self._adapt_data()
-        self.final_df = self.filter_techs(dat)
-        pass
-        return self.final_df
 
 
     ##############################################################################
     # This second part focuses on the modification of the units
 
-
-    def data_merge(self):
+    def _data_merge(self):
         """
         This function reads the Excel "mother file" and generates a dictionary following the structure:
 
@@ -205,7 +175,7 @@ class Cleaner():
             { bw_code : [str],
             conversion factor: [int]}}
         """
-        df = pd.read_excel(self.mother_file)
+        df= self.basefile
         general_dict = {}
         for index, row in df.iterrows():
             name = row['Processor'] + '_' + row['@SimulationCarrier']
@@ -215,13 +185,14 @@ class Cleaner():
                 'factor': factor,
                 'code': code
             }
+
         self.activity_conversion_dictionary=general_dict
 
         return general_dict
 
 
 
-    def modify_data(self):
+    def _modify_data(self):
         """
         This function reads the dictionary generated by data_merge, and the flow_out_sum file.
         Applies some transformations:
@@ -233,9 +204,9 @@ class Cleaner():
 
             Returns a list of techs to apply the following function "check elements"
         """
-        pass
-        df=self.final_df
 
+        df=self.final_df
+        pass
         # Create a modified column name to match  the names
         print('Preparing to change and adapt the units...')
 
@@ -256,10 +227,10 @@ class Cleaner():
 
 
     def adapt_units(self):
+
+        self._data_merge()
         pass
-        self.data_merge()
-        pass
-        modified_units_df=self.modify_data()
+        modified_units_df=self._modify_data()
         return modified_units_df
 
 
@@ -315,7 +286,7 @@ class Cleaner():
                     df.at[index, 'names_db'] = act_name
                 else:
                     pass
-        pass
+
         return df
 
     @staticmethod
