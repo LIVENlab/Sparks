@@ -11,15 +11,15 @@ from Sparks.util.preprocess.cleaner import Cleaner
 from Sparks.util.preprocess.SoftLink import SoftLinkCalEnb
 import bw2io as bi
 from Sparks.const import const
-
-from Sparks.util.preprocess.template_market_4_electricity import Market_for_electricity
-from Sparks.util.updater.background_updater import Updater
 import time
 
 
 class SoftLink():
 
-    def __init__(self, caliope : Union[str, pd.DataFrame], mother_file: [str], project : [str], database):
+    def __init__(self,
+                 caliope : Union[str, pd.DataFrame],
+                 mother_file: [str],
+                 project : [str], database):
         """
         @param caliope: path to the caliope data (flow_out_sum.csv)
         @type caliope: either str path or pd.Dataframe
@@ -46,7 +46,7 @@ class SoftLink():
         self.exp=None
 
         #Check project and db
-        self.BW_project_and_DB()
+        self._bw_project_and_DB()
 
     @staticmethod
     def timer(func):
@@ -59,19 +59,20 @@ class SoftLink():
         return wrapper
 
 
-    def BW_project_and_DB(self):
+    def _bw_project_and_DB(self):
         """
         Check the BW project and database.
         It also allows for the creation of a new one
         """
         projects=list(bd.projects)
+        pass
 
         if self.project not in str(projects):
             ans=input(f'Project {self.project} not in projects. Want to create a new project? (y/n)')
             if ans =='y':
                 database=input('Enter the DB name that you want to create:')
                 spolds=input('Enter path to the spold files ("str"):')
-                self.create_BW_project(self.project, database,spolds)
+                self._create_BW_project(self.project, database,spolds)
                 const.bw_project=self.project
                 const.bw_db=database
             else:
@@ -83,24 +84,24 @@ class SoftLink():
             raise Warning(f"database {self.database} not in bw databases")
 
         #TODO Fix finally
+        pass
         self._save_const(self.project, self.database)
         print('Project and Database existing...')
 
 
     @staticmethod
-    def create_BW_project(project,database,spolds):
-        """
-        Create a new project and database
-        """
+    def _create_BW_project(project,database,spolds):
+        """Create a new project and database"""
         bd.projects.set_current(project)
         bi.bw2setup()
         ei=bi.SingleOutputEcospold2Importer(spolds,database,use_mp=False)
         ei.apply_strategies()
         ei.write_database()
-        pass
+
 
     @timer
-    def preprocess(self,subregions : [bool,Optional] = False):
+    def preprocess(self,
+                   subregions : [bool,Optional] = False):
         """
         cal_file: str path to flow_out_sum data
 
@@ -121,8 +122,6 @@ class SoftLink():
         self.exluded_techs_and_regions=cleaner.techs_region_not_included
 
 
-
-
     def data_for_ENBIOS(self, path_save=None,smaller_vers=None):
         """
         Transform the data into enbios like dictionary
@@ -136,97 +135,8 @@ class SoftLink():
 
 
 
-    def template_electricity(self, final_key,Location='Undefined',Reference_product=None,
-        Activity_name='Future_market_for_electricity', Activity_code='FM4E'
-        ,Units=None):
-        """
-        This function creates the template activity for the market for electricity using the data of enbios.
-        It gets all the activities with _electicity_ in the alias
 
-        @param final_key: Key of the enbios dictionary opening the electricity activities
-        @type final_key:  str
-        @param Location:
-        @param Activity_name: Save the market under this name in SQL database
-        @param Activity_code: "
-        @param Reference_product:
-        @type Reference_product:
-        @param Units: units of the activity
-        """
-        market_class=Market_for_electricity(self.enbios2_data)
-        self.electricity_activities = market_class.get_list(final_key)
-        self.default_market = market_class.template_market_4_electricity(Location,
-                                                   Activity_name,
-                                                   Activity_code,
-                                                   Reference_product,
-                                                   Units)
-        self.template_code=Activity_code
-
-
-    def classic_run(self):
-        general_path=self.path_saved
-
-        try:
-            exp = Experiment(general_path)
-            exp.run()
-        except Exception as e:
-            # Generally the exception is the unspecificEcoinvent error from ENBIOS
-            from enbios2.base.unit_registry import ecoinvent_units_file_path
-            text_to_write = 'unspecificEcoinventUnit = []'
-
-            with open(ecoinvent_units_file_path, 'w') as file:
-                file.write(text_to_write)
-            print(f'error {e} covered and solved')
-            exp=Experiment(general_path)
-            pass
-
-        result=exp.result_to_dict()
-        return result
-
-
-
-
-    def updater_run(self):
-        # check if template created
-
-        if self.template_code is None:
-            raise TypeError(
-                f'An error occurred. The template for electricity is {self.template_code}. Please, consider running {self.template_electricity.__name__} before')
-
-        general = self.enbios2_data
-        general_path = self.path_saved
-        scenarios = list(general['scenarios'].keys())
-        try:
-            exp = Experiment(general_path)
-            exp.run()
-        except Exception as e:
-            # Generally the exception is the unspecificEcoinvent error from ENBIOS
-            from enbios2.base.unit_registry import ecoinvent_units_file_path
-            text_to_write = 'unspecificEcoinventUnit = []'
-            # Abre el archivo en modo escritura ('w')
-            with open(ecoinvent_units_file_path, 'w') as file:
-                file.write(text_to_write)
-            print(f'error {e} covered and solved')
-            exp=Experiment(general_path)
-            pass
-
-
-
-        updater=Updater(general,self.default_market)
-
-        for scenario in scenarios:
-            print(f'parsing scenario {scenario}')
-
-            template=updater.inventoryModify(scenario)
-            self.template_electricity_market=template # update the table
-            updater.exchange_updater(self.template_code)
-
-            exp.run_scenario(scenario)
-
-
-        pass
-
-
-    def save_json_data(self,data, path):
+    def save_json_data(self,data, path: str):
         if path is not None:
             try:
                 with open(path, 'w') as file:
@@ -237,8 +147,6 @@ class SoftLink():
         else:
             current=os.path.dirname(os.path.abspath(__file__))
             folder_path=os.path.join(os.path.dirname(current),'Default')
-
-            print(current)
 
             os.makedirs(folder_path,exist_ok=True)
             file_path=os.path.join(folder_path,'data_enbios.json')
@@ -251,9 +159,10 @@ class SoftLink():
     @staticmethod
     def _save_const(project:str,db:str):
         """ get the project and db name and store in a const file"""
-
-        setattr(const, 'bw_project', project)
-        setattr(const, 'bw_db', db)
+        with open(r'Sparks/const/const.py', 'w') as f:
+            pass
+            f.write(f"bw_project = '{project}'\n")
+            f.write(f"bw_db = '{db}'\n")
 
 
 
