@@ -1,2 +1,2 @@
-bw_project = 'testing'
+bw_project = 'github'
 bw_db = 'ecoinvent'
