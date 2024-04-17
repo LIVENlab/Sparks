@@ -130,6 +130,7 @@ class Cleaner():
         self.techs_region_not_included=excluded_techs
 
         df_names = df_names[~df_names['techs'].isin(excluded_techs)] # exclude the technologies
+
         if len(excluded_techs)>0:
             message=f'''\nThe following technologies, are present in the energy data but not in the Basefile: 
             \n{excluded_techs}
@@ -142,7 +143,6 @@ class Cleaner():
         """
         Run data preprocessing steps
         """
-
         self.final_df = self.filter_techs(self._adapt_data())
         return self.final_df
 
@@ -275,7 +275,11 @@ class Cleaner():
 
         df = df[cols]
         df.rename(columns={'spores': 'scenarios', 'new_vals': 'flow_out_sum'}, inplace=True)
+        df['aliases'] = df['techs'] + '__' + df['carriers'] + '___' + df['locs']  # add alias
         return df
+
+
+
 
 
 

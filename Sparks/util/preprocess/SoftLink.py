@@ -1,7 +1,5 @@
-import pprint
 import json
 import random
-from logging import getLogger
 import bw2data as bd
 from collections import defaultdict
 import pandas as pd
@@ -18,7 +16,6 @@ class SoftLinkCalEnb():
     This class allows to create an ENBIOS-like input
 
     Class that allows to move from Calliope-mother file data to input data for enbios
-
     """
 
     def __init__(self,calliope,motherfile,smaller_vers=None):
@@ -37,34 +34,20 @@ class SoftLinkCalEnb():
     def generate_scenarios(self, smaller_vers=None):
         """
         Iterate through the data from calliope (data.csv, output results...)
-            -Create new columns, such as alias
         The function includes an intermediate step to create the hierarchy
-
-
         :param calliope_data:
         :param smaller_vers: BOOL, if true, a small version of the data for testing gets produced
         :return:scen_dict, acts
                 *scen dict --> dictionary of the different scenarios
                 *acts --> list including all the unique activities
         """
-        if isinstance(self.calliope, pd.DataFrame):
-            cal_dat=self.calliope
-
-        elif isinstance(self.calliope,str):
-
-            cal_dat = pd.read_csv(self.calliope, delimiter=',')
-        else:
-            raise Exception(f'Input data error in {self.generate_scenarios.__name__}')
-
-        cal_dat['aliases'] = cal_dat['techs'] + '__' + cal_dat['carriers'] + '___' + cal_dat['locs']  # Use ___ to split the loc for the recognision of the activities
+        cal_dat=self.calliope
         cal_dat['scenarios']=cal_dat['scenarios'].astype(str)
-
         try:
             scenarios = cal_dat['scenarios'].unique().tolist()
         except KeyError as e:
             cols=cal_dat.columns
             raise KeyError(f'Input data error. Columns are {cols}.', f' and expecting {e}.')
-
         if smaller_vers is not None:  # get a small version of the data ( only 3 scenarios )
             try:
                 scenarios = scenarios[:smaller_vers]
@@ -81,13 +64,10 @@ class SoftLinkCalEnb():
             scen_dict[scenario]['activities'] = info
 
         # GENERATE KEYS FOR THE SCENARIOS
-        pass
         scens = random.choice(list(scen_dict.keys()))  # select a random scenario from the list
-
         acts = list(scen_dict[scens]['activities'].keys())
-
-
         activities=set(acts)
+
         # Create intermediate information for the hierarchy
         dict_gen=SoftLinkCalEnb.get_regionalized_processors(*activities)
         self.dict_gen=dict(dict_gen) # avoid missing key errors
@@ -125,7 +105,7 @@ class SoftLinkCalEnb():
         for index,row in df.iterrows():
             alias = row['aliases']
             flow_out_sum = (row['flow_out_sum'])
-            unit = row['units']
+            unit = row['units_new']
             scenario[alias].extend([unit,flow_out_sum])
         return dict(scenario)
 
@@ -367,16 +347,9 @@ class SoftLinkCalEnb():
                 json.dump(self.enbios2_data, gen_diction, indent=4)
             gen_diction.close()
 
-
         print('Input data for ENBIOS created')
 
 
 
 
 
-
-if __name__=='__main__':
-    # TODO: Calliope path will be the atribute of a preprocess class.
-    # Keep the path link for testing
-    a=SoftLinkCalEnb(r'C:\Users\Alex\PycharmProjects\pythonProject\enbios_2\projects\seed\Data\flow_out_sum_modified_unit_checked_full_subregions.csv',r'C:\Users\Alex\PycharmProjects\pythonProject\enbios_2\projects\seed\Data\base_file_simplified.xlsx')
-    a.run()

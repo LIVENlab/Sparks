@@ -108,8 +108,11 @@ class SoftLink():
 
         # Create an instance of the Cleaner class
         cleaner=Cleaner(self.calliope,self.mother,subregions)
-        self.preprocessed_starter=cleaner.preprocess_data()
+        cleaner.preprocess_data()
         self.preprocessed_units=cleaner.adapt_units()
+        self.preprocessed_starter = cleaner.clean_total
+
+
         self.exluded_techs_and_regions=cleaner.techs_region_not_included
 
 
