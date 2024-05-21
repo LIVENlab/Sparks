@@ -2,43 +2,71 @@
 @author: Alexander de Tomás (ICTA-UAB)
         -LexPascal
 """
-import bw2data.errors
+import bw2data
 import pandas as pd
-pd.options.mode.chained_assignment = None
-import bw2data as bd
+from typing import Dict, Union, Optional, Any, List
 import warnings
-from Sparks.const.const import bw_project,bw_db
-from typing import Dict,Union,Optional
-bd.projects.set_current(bw_project)            # Select your project
-database = bd.Database(bw_db)        # Select your db
-pass
+import bw2data as bd
+from bw2data.errors import UnknownObject
+from Sparks.const.const import bw_project, bw_db
+from bw2data.backends import Activity, ActivityDataset
+from dataclasses import dataclass
 
-class Cleaner():
+
+bd.projects.set_current(bw_project)
+database = bd.Database(bw_db)
+
+
+@dataclass
+class BaseFileActivity:
+    """ Base class for motherfile data"""
+    name: str
+    region: str
+    carrier: str
+    parent: str
+    code:str
+    #activity: Optional['Activity'] = None
+    factor: Union[int, float]
+    alias: Optional[str] = None
+    unit: Optional[str] = None
+
+    def __post_init__(self):
+        pass
+        self.alias = f"{self.name}_{self.carrier}"
+        self.activity = self._load_activity(key=self.code)
+
+        if isinstance(self.activity, Activity):
+            self.unit = self.activity['unit']
+        else:
+            self.unit = None
+
+    def _load_activity(self, key) -> Optional['Activity']:
+        try:
+            return database.get_node(key)
+        except (bw2data.errors.UnknownObject, KeyError):
+            message = (f"\n{key} from activity not found in the database. Please check your database."
+                       f"\nThis activity won't be included.")
+            warnings.warn(message, Warning)
+            return None
+
+
+
+class Cleaner:
     """
-
-        *Clean the input data
-        *Modify the units of the input data
+    Clean the input data and modify the units
     """
     def __init__(self,
-                 caliope,
-                 motherfile,
+                 caliope: str,
+                 motherfile: str,
                  subregions : [Optional,bool]= False):
 
-        """
-        @param caliope: Calliope data, str path
-        @param motherfile: Basefile, str path
-        @param subregions: BOOL:
-            -If true, the cleaning and preprocess of the data, will consider the different subregions
-            *ESP_1,ESP_2..
-            Default value set as false:
-            - It will group the different subregions per country
-        """
         self.subregions = subregions
         self._raw_data = caliope
         self.mother_file = motherfile
         self.final_df = None
         self.activity_conversion_dictionary = {}
         self.techs_region_not_included = []
+
 
     @staticmethod
     def create_df() -> pd.DataFrame:
@@ -53,29 +81,7 @@ class Cleaner():
             "unit",
             "flow_out_sum"
         ]
-        df = pd.DataFrame(columns=columns)
-        return df
-
-
-    @staticmethod
-    def input_checker(data):
-        """
-        Check whether the input from Calliope follows the expected structure
-        data: pd.Dataframe
-        """
-        expected_cols = set(['spores',
-                             'techs',
-                             'locs',
-                             'carriers',
-                             'unit',
-                             'flow_out_sum'])
-        cols = set(data.columns)
-        # Search for possible differences. Older versions of calliope produce "spore"
-        if "spore" in cols:
-            data.rename(columns={'spore': 'spores'}, inplace=True)
-            cols = set(data.columns)
-        if expected_cols != cols:
-            raise KeyError(f"Columns {cols} do not match the expected columns: {expected_cols}")
+        return pd.DataFrame(columns=columns)
 
 
     def _load_data(self) -> pd.DataFrame:
@@ -83,24 +89,52 @@ class Cleaner():
         return pd.read_csv(self._raw_data, delimiter=',').dropna()
 
 
-    def _group_df(self, df: pd.DataFrame)-> pd.DataFrame:
+    def _input_checker(self):
+        data=self._load_data()
         """
-        group input data by specified criteria
+        Check whether the input from Calliope follows the expected structure
+        data: pd.Dataframe
         """
+        expected_cols = {'spores',
+                         'techs',
+                         'locs',
+                         'carriers',
+                         'unit',
+                         'flow_out_sum'}
+        cols = set(data.columns) # Search for possible differences. Older versions of calliope produce "spore"
+        if "spore" in cols:
+            data.rename(columns={'spore': 'spores'}, inplace=True)
+            cols = set(data.columns)
+        if expected_cols != cols:
+            raise KeyError(f"Columns {cols} do not match the expected columns: {expected_cols}")
+
+    def _manage_regions(self, loc)->str:
+
+        if isinstance(loc, tuple):
+            arg = loc[0]
+            region = arg.split('-')[0].split('_')[0]
+        # Special issue for the Portugal Analysis
+        if loc == 'ESP-sink':
+            return 'ESP'
+        else:
+            return loc.split('-')[0].split('_')[0]
+    def _group_df(self,
+                  df: pd.DataFrame)-> pd.DataFrame:
+        """ group input data by specified criteria"""
+
         gen_df = self.create_df()
         scenarios = df['spores'].unique()
 
+        if not self.subregions:
+            df['locs'] = df['locs'].apply(self._manage_regions)
         for scenario in scenarios:
             df_sub = df[df['spores'] == scenario]
-            if not self.subregions:
-                df_sub['locs'] = df['locs'].apply(self._manage_regions)
             df_sub = df_sub.groupby(['techs', 'locs', 'carriers']).agg({
                 "spores": "first",
                 "unit": "first",
                 "flow_out_sum": "sum"
             }).reset_index()
             gen_df = pd.concat([gen_df, df_sub])
-
         return gen_df
 
 
@@ -109,14 +143,16 @@ class Cleaner():
         print('Adapting input data...')
         try:
             df=self._load_data()
-            self.input_checker(data=df)
+            self._input_checker()
         except FileNotFoundError:
             raise FileNotFoundError(f'File {self._raw_data} does not exist. Please check it')
 
         return self._group_df(df)
 
 
-    def filter_techs(self,df: pd.DataFrame)-> pd.DataFrame:
+
+    def filter_techs(self,
+                     df: pd.DataFrame)-> pd.DataFrame:
         """
         Filter the input data based on technologies defined in the basefile
         """
@@ -146,137 +182,64 @@ class Cleaner():
         self.final_df = self.filter_techs(self._adapt_data())
         return self.final_df
 
-    def _manage_regions(self, *arg)->str:
-        """
-        Manage region names
-        """
+
+
+
+
+    def _extract_data(self)->List['BaseFileActivity']:
+        base_activities=[]
+        for i,r in self.basefile.iterrows():
+            base_activities.append(
+                BaseFileActivity(
+                    name=r['Processor'],
+                    carrier=r['@SimulationCarrier'],
+                    parent=r['ParentProcessor'],
+                    region=r['Region'],
+                    code=r['Ecoinvent_key_code'],
+                    factor=r['@SimulationToEcoinventFactor']
+                )
+            )
+
+        self.base_activities=base_activities
         pass
-        if isinstance(arg, tuple):
-            arg = arg[0]
-            region = arg.split('-')[0]
-            region = region.split('_')[0]
-        # Special issue for the Portugal Analysis
-        if arg == 'ESP-sink':
-            region = 'ESP'
-        else:
-            region = arg.split('-')[0]
-            region = region.split('_')[0]
-
-        return region
+        self.base_activities = [x for x in self.base_activities if x.unit is not None]
 
 
-    ##############################################################################
-    # This second part focuses on the modification of the units
 
-    def _data_merge(self):
+    def _adapt_units(self):
         """
-        This function reads the Excel "mother file" and generates a dictionary following the structure:
-
-        {technology name :
-            { bw_code : [str],
-            conversion factor: [int]}}
+        adapt the units (flow_out_sum * conversion factor)
         """
-        df= self.basefile
+        self._extract_data()
         pass
-        general_dict = {}
-        for index, row in df.iterrows():
-            name = row['Processor'] + '_' + row['@SimulationCarrier']
-            code = row['Ecoinvent_key_code']
-            factor = row['@SimulationToEcoinventFactor']
-            general_dict[name] = {
-                'factor': factor,
-                'code': code
-            }
-
-        self.activity_conversion_dictionary=general_dict
-        return general_dict
-
-
-
-    def _modify_data(self)->pd.DataFrame:
-        """
-        This function reads the dictionary generated by data_merge, and the flow_out_sum file.
-        Applies some transformations:
-            *Multiply the flow_ou_sum by the characterization factor
-            *Change the unit according to the conversion
-        """
-        df=self.final_df
+        alias_to_factor = {x.alias: x.factor for x in self.base_activities}
+        unit_to_factor = {x.alias: x.unit for x in self.base_activities }
         pass
-        # Create a modified column name to match  the names
-        print('Chaning and adapting units')
-        df=self._ecoinvent_units_factors(df)
-        # Prepare an enbios-like file    cols = ['spores', 'locs', 'techs', 'carriers', 'units', 'new_vals']
-        df=self._clean_final_df(df)
-        self.clean_modified = df
-        print('Units adapted')
-        return df
+        self.final_df['new_vals'] = self.final_df['alias_carrier'].map(alias_to_factor) * self.final_df['flow_out_sum']
+        self.final_df['new_units'] =self.final_df['alias_carrier'].map(unit_to_factor)
+        return self.edit_final_df(self.final_df)
 
 
-    def adapt_units(self):
-        self._data_merge()
-        modified_units_df=self._modify_data()
-        return modified_units_df
-
-
-    def _ecoinvent_units_factors(self,df):
-        """
-        Read the calliope data and extend the information based on self.actvity_conversion dictionary
-        *add new columns and apply the conversion factor to the value
-        """
-        # Create new columns
-        df['new_vals'] = None
-        df['units_new'] = None
-        df['codes'] = None
-        df['names_db'] = None
-
-        # df['flow_out_sum']=[x.replace(',','.') for x in df['flow_out_sum']]
-        for key in self.activity_conversion_dictionary.keys():
-            code = self.activity_conversion_dictionary[key]['code']
-            pass
-            try:
-                activity = database.get_node(code=code)
-                unit = activity['unit']
-                act_name = activity['name']
-            except (bw2data.errors.UnknownObject, KeyError) as e:
-                pass
-                message=f" \n{code} from activity, {key} not found in the database. Please check your database"
-                warnings.warn(message,Warning)
-                continue  # If activity doesn't exist, don't do anything
-
-            df=df.reset_index(drop=True)
-            for index, row in df.iterrows():
-                pass
-                if str(key) == str(row['alias_carrier']):
-                    factor = (self.activity_conversion_dictionary[key]['factor'])
-                    value = float(row['flow_out_sum'])
-                    new_val = value * factor
-                    df.at[index, 'codes'] = code
-                    df.at[index, 'units_new'] = unit
-                    df.at[index, 'new_vals'] = new_val
-                    df.at[index, 'names_db'] = act_name
-                    pass
-                else:
-                    pass
-
-        return df
-
-
-    def _clean_final_df(self,df)-> pd.DataFrame:
-        """ """
-        df.dropna(axis=0, inplace=True)
-        self.clean_total=df
-        pass
+    @staticmethod
+    def edit_final_df(df):
         cols = ['spores',
                 'locs',
                 'techs',
                 'carriers',
                 'units_new',
                 'new_vals']
-
+        df.dropna(axis=0, inplace=True)
         df = df[cols]
         df.rename(columns={'spores': 'scenarios', 'new_vals': 'flow_out_sum'}, inplace=True)
-        df['aliases'] = df['techs'] + '__' + df['carriers'] + '___' + df['locs']  # add alias
+        df['aliases'] = df['techs'] + '__' + df['carriers'] + '___' + df['locs']
         return df
+
+
+    def adapt_units(self):
+        return self._adapt_units()
+
+
+
 
 
 
