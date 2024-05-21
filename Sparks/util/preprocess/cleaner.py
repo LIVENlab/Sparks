@@ -226,7 +226,7 @@ class Cleaner:
                 'locs',
                 'techs',
                 'carriers',
-                'units_new',
+                'new_units',
                 'new_vals']
         df.dropna(axis=0, inplace=True)
         df = df[cols]
