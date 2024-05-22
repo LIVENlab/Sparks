@@ -6,4 +6,4 @@ enbios_mod = SoftLink(r'C:\Users\Administrator\Downloads\flow_out_sum (1).csv',
                        'github', 'ecoinvent')
 pass
 enbios_mod.preprocess(subregions=False)
-enbios_mod.data_for_ENBIOS(path_save=r'data_enbios_paper/test.json')
+enbios_mod.data_for_ENBIOS(path_save=r'data/test.json')

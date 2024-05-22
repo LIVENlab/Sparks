@@ -49,7 +49,6 @@ class BaseFileActivity:
 
 
 
-
 class Cleaner:
     """Clean the input data and modify the units"""
 
@@ -140,7 +139,7 @@ class Cleaner:
 
 
 
-    def filter_techs(self,df: pd.DataFrame)-> pd.DataFrame:
+    def _filter_techs(self,df: pd.DataFrame)-> pd.DataFrame:
         """
         Filter the input data based on technologies defined in the basefile
         """
@@ -164,7 +163,7 @@ class Cleaner:
 
     def preprocess_data(self)->pd.DataFrame:
         """Run data preprocessing steps"""
-        self.final_df = self.filter_techs(self._adapt_data())
+        self.final_df = self._filter_techs(self._adapt_data())
         return self.final_df
 
 
@@ -216,6 +215,9 @@ class Cleaner:
     def adapt_units(self):
         """Public method to adapt the units"""
         return self._adapt_units()
+
+
+
 
 
 
