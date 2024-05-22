@@ -7,18 +7,86 @@ from bw2data.errors import UnknownObject
 from typing import Optional,Dict,Union,List
 from Sparks.const.const import bw_project,bw_db
 import warnings
+from dataclasses import dataclass, field
+from Sparks.util.preprocess.cleaner import BaseFileActivity
 
 bd.projects.set_current(bw_project)            # Select your project
 database = bd.Database(bw_db)        # Select your db
 
+
+
+@dataclass
+class Activity_scenario:
+    """ Class for each activity in a specific scenario"""
+    alias: str
+    amount: int
+    unit: str #TODO: adapt
+
+
+@dataclass
+class Scenario:
+    """ Basic Scenario"""
+    name: str # scenario name
+    activities: List['Activity_scenario'] = field(default_factory=list)
+
+    def __post_init__(self):
+        self.activities_dict = {x.alias: [
+            x.unit,x.amount
+        ] for x in self.activities}
+
+    def to_dict(self):
+        return {'name': self.name, 'nodes':self.activities_dict}
+
+@dataclass
+class Last_Branch:
+    """ Last Branch before leaf. Leaf is a BaseFileActivity"""
+    name: str
+    level: str
+    parent: str
+    adapter='bw'
+    origin: List['BaseFileActivity'] = field(default_factory=list)
+    leafs: List = field(init=False)
+
+    def __post_init__(self):
+        self.leafs = [{'name': x.alias, 'adapter': 'bw', 'config': {'code': x.code}} for x in self.origin]
+        pass
+
+
+@dataclass
+class Branch:
+    name: str
+    level: str
+    parent :Optional[str] = None
+    origin: List[Union['Branch', 'Last_Branch']]=field(default_factory=list)
+    leafs: List = field(init=False)
+    def __post_init__(self):
+        self.leafs=[
+            {
+                'name': x.name, 'aggregator': 'sum', 'children': x.leafs
+            }
+            for x in self.origin]
+
+@dataclass
+class Method:
+    method: tuple
+
+    def to_dict(self):
+        return {self.method[2].split('(')[1].split(')')[0]: [
+            self.method[0], self.method[1], self.method[2]
+        ]}
+
+
+
 class SoftLinkCalEnb():
     """
     This class allows to create an ENBIOS-like input
-
-    Class that allows to move from Calliope-mother file data to input data for enbios
     """
 
-    def __init__(self,calliope,motherfile,smaller_vers=None):
+    def __init__(self,calliope,
+                 mother_data: list,
+                 motherfile,
+                 smaller_vers=None):
+
 
         self.calliope=calliope
         self.motherfile=motherfile
@@ -28,19 +96,12 @@ class SoftLinkCalEnb():
         self.final_acts={}
         self.hierarchy_tree=None
         self.smaller_vers=smaller_vers
+        self.mother_data=mother_data
 
 
 
-    def generate_scenarios(self, smaller_vers=None):
-        """
-        Iterate through the data from calliope (data.csv, output results...)
-        The function includes an intermediate step to create the hierarchy
-        :param calliope_data:
-        :param smaller_vers: BOOL, if true, a small version of the data for testing gets produced
-        :return:scen_dict, acts
-                *scen dict --> dictionary of the different scenarios
-                *acts --> list including all the unique activities
-        """
+    def _generate_scenarios(self):
+
         cal_dat=self.calliope
         cal_dat['scenarios']=cal_dat['scenarios'].astype(str)
         try:
@@ -48,306 +109,125 @@ class SoftLinkCalEnb():
         except KeyError as e:
             cols=cal_dat.columns
             raise KeyError(f'Input data error. Columns are {cols}.', f' and expecting {e}.')
-        if smaller_vers is not None:  # get a small version of the data ( only 3 scenarios )
+        if self.smaller_vers is not None:  # get a small version of the data ( only 3 scenarios )
             try:
-                scenarios = scenarios[:smaller_vers]
+                scenarios = scenarios[:self.smaller_vers]
             except:
                 raise ValueError('Scenarios out of bonds')
 
-
-        scenarios=[str(x) for x in scenarios ] # Convert to string, just in case the scenario is a number
-        scen_dict = {}
-        for scenario in scenarios:
-            df = cal_dat[cal_dat['scenarios'] == scenario]
-            info = SoftLinkCalEnb.get_scenario(df)
-            scen_dict[scenario] = {}
-            scen_dict[scenario]['activities'] = info
-
-        # GENERATE KEYS FOR THE SCENARIOS
-        scens = random.choice(list(scen_dict.keys()))  # select a random scenario from the list
-        acts = list(scen_dict[scens]['activities'].keys())
-        activities=set(acts)
-
-        # Create intermediate information for the hierarchy
-        dict_gen=SoftLinkCalEnb.get_regionalized_processors(*activities)
-        self.dict_gen=dict(dict_gen) # avoid missing key errors
-        self.acts=activities
-        self.scens=scen_dict
-
-    @staticmethod
-    def get_regionalized_processors(*args)-> Dict[str,list [str]]:
-        """
-        This function returns the following informaiton
-        Each processor has multiple aliases, depending on the regions
-        For example: 'wind_onshore__electricity': ['wind_onshore__electricity___ESP', 'wind_onshore__electricity___DEU']
-        Return a dictionary with this information
-        """
-        general=defaultdict(list)
-        for act in args:
-            act_key=act.split('___')[0]
-            general[act_key].append(act)
-        return general
-
-    @staticmethod
-
-    def get_scenario(df) -> Dict[str , List[Union[str,int]]]:
-        """
-        Iters through 1 scenario of the calliope_flow_out_sum.csv (scenarios data), storing basic data in a dictionary
-        Get {
-        activities : {
-            alias : [
-            unit,
-            amount]}}
-        :param df:
-        :return:
-        """
-        scenario=defaultdict(list)
-        for index,row in df.iterrows():
-            alias = row['aliases']
-            flow_out_sum = (row['flow_out_sum'])
-            unit = row['units_new']
-            scenario[alias].extend([unit,flow_out_sum])
-        return dict(scenario)
+        return self._get_scenarios()
 
 
 
+    def _get_scenarios(self): # Implementing: work fine
 
-    def generate_activities(self,*args) -> dict:
-        """
-        This function reads the Excel "mother file" and creates a dictionary.
-        It reads the BWs' codes and extracts information from each activity and stores them in a dictionary
+        cal_dat = self.calliope
+        cal_dat['scenarios'] = cal_dat['scenarios'].astype(str)
+        scenarios = [str(x) for x in cal_dat['scenarios'].unique()]  # Convert to string, just in case the scenario is a number
 
-        :param args:
-        :return:
-        """
-
-        processors = pd.read_excel(self.motherfile, sheet_name='Processors')
-
-        activities_cool = {}
-        for index, row in processors.iterrows():
-            code = str(row['BW_DB_FILENAME'])
-            try:
-                act = database.get_node(code)
-
-            except UnknownObject:
-                mess=f'''\n{row['Processor']},has an unknown object in the db \n
-                It will not be included in the input data'''
-
-                warnings.warn(mess,Warning)
-                continue
+        scenarios=[
+            Scenario(name=str(scenario),
+                     activities=[
+                         Activity_scenario(
+                             alias=row['aliases'],
+                             amount = row['flow_out_sum'],
+                             unit=row['new_units']
+                         )
+                         for _,row in group.iterrows()
+                     ]).to_dict()
+            for scenario,group in cal_dat.groupby('scenarios')
+        ]
+        return scenarios
 
 
-            name = act['name']
-            unit = act['unit']
-            alias = str(row['Processor']) + '__' + str(row['@SimulationCarrier'])
+    def _get_methods(self):
+        processors = pd.read_excel(self.motherfile, sheet_name='Methods')
+        methods=[Method(meth).to_dict() for meth in processors['Formula'].apply(eval)]
 
-
-            activities_cool[alias] = {
-                'name': name,
-                'code': code,
-            }
-
-
-        activities = {}
-        for element in args:
-            new_element = element.split('___')[0]  # This should match the name
-            for key in activities_cool.keys():
-                if new_element == key:
-                    new_code = activities_cool[key]['code']
-                    activities[element] = {
-                        "id": {
-                            'code': new_code
-                        }
-                    }
-
-        self.final_acts = activities
-        print('Activities stored as a dict')
-
-
-
-
-    def hierarchy(self, *args) -> dict:
-        """
-        This function creates the hierarchy tree.
-        It uses two complementary functions (generate_dict and tree_last_level).
-
-        It reads the information contained in the mother file starting by the bottom (n-lowest) level
-        :param data:
-        :param args:
-        :return:
-        """
-        print('Creating tree following the structure defined in the basefile')
-        df = pd.read_excel(self.motherfile, sheet_name='Dendrogram_top')
-        df2 = pd.read_excel(self.motherfile, sheet_name='Processors')
-
-        # Do some changes to match the regions and aliases
-
-        df2['Processor'] = df2['Processor'] + '__' + df2['@SimulationCarrier']  # Mark, '__' for carrier split
-        # Start by the last level of parents
-        levels = df['Level'].unique().tolist()
-        last_level_parent = int(levels[-1].split('-')[-1])
-        last_level_processors = 'n-' + str(last_level_parent + 1)
-        df2['Level'] = last_level_processors
-        df = pd.concat([df, df2[['Processor', 'ParentProcessor', 'Level']]], ignore_index=True, axis=0)
-
-        levels = df['Level'].unique().tolist()
-
-        list_total = []
-        for level in reversed(levels):
-            df_level = df[df['Level'] == level]
-            if level == levels[0]:
-                break
-
-            elif level == levels[-1]:
-                last = self.tree_last_level(df_level, *args)
-                global last_list
-                last_list = last
-
-            else:
-                df_level = df[df['Level'] == level]
-                list_2 = self.generate_dict(df_level, last_list)
-                last_list = list_2
-                list_total.append(list_2)
-
-        dict_tree = list_total[-1]
-        self.hierarchy_tree=dict_tree[-1]
-
-    @staticmethod
-    def tree_last_level(df, *args):
-        """
-        This function supports the creation of the tree.
-        It's specific for the lowest level of the dendrogram
-        Return the act
-        :param df:
-        :param names: comes from generate scenarios. List of unique aliases
-        :return:
-        """
-        new_rows = []
-        for index, row in df.iterrows():
-            processor = row['Processor']
-            for element in args:
-                cop = element.split('___')[0]
-                if cop == processor:
-                    new_row = row.copy()
-                    new_row['Processor'] = element
-                    new_rows.append(new_row)
-
-        df = pd.concat([df] + new_rows, ignore_index=True)
-        last_level_list = []
-        # Return a list of dictionaries
-        parents = list(df['ParentProcessor'].unique())
-        for parent in parents:
-            last_level = {}
-            df3 = df[df['ParentProcessor'] == parent]
-            childs = df3['Processor'].unique().tolist()
-            last_level[parent] = childs
-            last_level_list.append(last_level)
-
-        return last_level_list
-
-    @staticmethod
-    def generate_dict(df, list_pre):
-        """
-        Pass a list of the lower level and the dataframe of the present
-        Returns a list of the dictionary corresponding that branch
-
-        :param df:
-        :param list:
-        :return:
-        """
-        parents = df['ParentProcessor'].unique().tolist()
-        list_branches = []
-        for parent in parents:
-            branch = {}
-            df_parent = df[df['ParentProcessor'] == parent]
-            branch[parent] = {}
-
-            for _, row in df_parent.iterrows():
-                child_df = row['Processor']
-                for element in list_pre:
-                    if child_df in element:
-                        branch[parent][child_df] = element[child_df]
-            list_branches.append(branch)
-
-        return list_branches
-
-
-
-
-    def hierarchy_refinement(self,hierarchy_dict):
-        """
-        Include different regions in the tree
-
-        Read the hierarchy dictionary and do some modifications:
-            * Replace the names of the activities by the ones defined in the mapping dictionary
-            Ex: hydro_run_of_river__electricity : [hydro_run_of_river__electricity___PRT_1, hydro_run_of_river__electricity___PRT_2]
-
-        :param hierarchy_dict:
-        :return: same dictionary modified
-        """
-        # 1 look for the lists. List contain the last levels of the dendrogram, where the names need to be modified
-
-
-        map_names=self.dict_gen
-
-        for value in hierarchy_dict.values():
-
-            if isinstance(value, list):
-
-                # Copy the list
-                values_copy = value[:]
-                value.clear()
-                for element in values_copy:
-                    for key, val in map_names.items():
-                        if element == key:
-                            list_names = map_names[key]
-                            # 3. Include the new names
-                            for name in list_names:
-
-                                value.append(name)
-            elif isinstance(value, dict):
-
-                self.hierarchy_refinement(value)
-
-        self.hierarchy_tree = hierarchy_dict
-
-    def get_methods(self):
-        methods = {}
-        processors = pd.read_excel(
-            self.motherfile,
-            sheet_name='Methods')
-        processors['Formula'] = processors['Formula'].apply(eval)
-
-        for method in processors['Formula']:
-            methods.update({str(method[-1]): method})
-
-        return methods
-
+        return  {key: value for key, value in [list(item.items())[0] for item in methods]}
 
 
 
     def run(self, path= None):
+        """public function """
 
-        self.generate_scenarios(self.smaller_vers)
-        self.generate_activities(*self.acts)
-        self.hierarchy(*self.final_acts)
-        self.hierarchy_refinement(hierarchy_dict=self.hierarchy_tree)
-
-        enbios2_methods= self.get_methods()
+        self.hierarchy=Hierarchy(base_path=self.motherfile, motherdata=self.mother_data).generate_hierarchy()
+        enbios2_methods= self._get_methods()
 
         self.enbios2_data = {
             "bw_project": bw_project,
-            "activities": self.final_acts,
-            "hierarchy": self.hierarchy_tree,
+            "hierarchy": self.hierarchy,
             "methods": enbios2_methods,
-            "scenarios": self.scens
+            "scenarios": self._generate_scenarios()
         }
+        pass
         if path is not None:
             with open(path, 'w') as gen_diction:
                 json.dump(self.enbios2_data, gen_diction, indent=4)
             gen_diction.close()
 
         print('Input data for ENBIOS created')
+
+
+
+class Hierarchy:
+    def __init__(self, base_path: str, motherdata):
+        self.parents = pd.read_excel(base_path, sheet_name='Dendrogram_top')
+        self.motherdata=motherdata
+        self.data=self._transform_motherdata()
+
+
+    def _transform_motherdata(self):
+        """ Transform mother data into a config dictionary
+        This should be equal to the last level of the hierarchy"""
+        return [
+            {'name': x.alias, 'adapter': 'bw', 'config': {'code': x.code}} for x in self.motherdata
+        ]
+
+
+    def generate_hierarchy(self):
+        last_level=None
+        last_level_branches=[]
+        last_level_hierachy=[] # official list
+
+        for level in reversed(self.parents['Level'].unique().tolist()):
+            data=self.parents.loc[self.parents['Level']==level]
+            if last_level is None:
+                last_level_branches = [
+                    Last_Branch(
+                        name=row['Processor'],
+                        level=level,
+                        parent=row['ParentProcessor'],
+                        origin=[x for x in self.motherdata if x.parent == row['Processor']],
+                    )
+                    for _, row in data.iterrows()
+                ]
+                last_level_hierachy=[x.leafs for x in last_level_branches]
+                last_level=level
+                continue
+
+            if last_level is not None and level!=self.parents['Level'].unique().tolist()[0]:
+                last_level_branches = [
+                    Branch(
+                        name = row['Processor'],
+                        level=level,
+                        parent= row['ParentProcessor'],
+                        origin=[x for x in last_level_branches if x.parent == row['Processor']]
+                    )
+                    for _, row in data.iterrows()]
+
+                last_level_hierachy=[x.leafs for x in last_level_branches]
+
+            else:
+                last_level_branches = [
+                    Branch(
+                        name=row['Processor'],
+                        level=level,
+                        parent=row['ParentProcessor'],
+                        origin=[x for x in last_level_branches if x.parent == row['Processor']]
+                    )
+                    for _, row in data.iterrows()]
+                return {'name': last_level_branches[0].name, 'aggregator': 'sum', 'children': last_level_branches[0].leafs}
 
 
 
