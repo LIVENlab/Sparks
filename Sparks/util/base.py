@@ -19,7 +19,9 @@ class SoftLink():
     def __init__(self,
                  caliope : Union[str, pd.DataFrame],
                  mother_file: [str],
-                 project : [str], database):
+                 project : [str],
+                 database: str
+                 ):
         """
         @param caliope: path to the caliope data (flow_out_sum.csv)
         @type caliope: either str path or pd.Dataframe
@@ -38,11 +40,11 @@ class SoftLink():
         self.SoftLink=None
         self.input=None
         self.database=database
-
-
-
         #Check project and db
         self._bw_project_and_DB()
+
+        self.cleaner=Cleaner(caliope, mother_file) # Instance cleaner
+
 
     @staticmethod
     def timer(func):
@@ -51,7 +53,6 @@ class SoftLink():
             func(*args,**kwargs)
             end = time.time()
             print(f'function {func.__name__} executed in {end - start} seconds')
-
         return wrapper
 
 
@@ -62,7 +63,8 @@ class SoftLink():
         """
         projects=list(bd.projects)
         if self.project not in str(projects):
-            ans=input(f'Project {self.project} not in projects. Want to create a new project? (y/n)')
+            ans=input(f'Project {self.project} not in projects.'
+                      f' Want to create a new project? (y/n)')
             if ans =='y':
                 database=input('Enter the DB name that you want to create:')
                 spolds=input('Enter path to the spold files ("str"):')
@@ -107,13 +109,11 @@ class SoftLink():
         """
 
         # Create an instance of the Cleaner class
-        cleaner=Cleaner(self.calliope,self.mother,subregions)
-        cleaner.preprocess_data()
-        self.preprocessed_units=cleaner.adapt_units()
-        self.preprocessed_starter = cleaner.clean_total
-
-
-        self.exluded_techs_and_regions=cleaner.techs_region_not_included
+        self.cleaner.subregions = subregions
+        self.cleaner.preprocess_data()
+        self.preprocessed_units= self.cleaner.adapt_units()
+        self.exluded_techs_and_regions = self.cleaner.techs_region_not_included
+        pass
 
 
     def data_for_ENBIOS(self, path_save=None,smaller_vers=None):
@@ -121,6 +121,7 @@ class SoftLink():
         Transform the data into enbios like dictionary
         """
         # Create an instance of the SoftLInkCalEnb
+
 
         self.SoftLink=SoftLinkCalEnb(self.preprocessed_units,self.mother,smaller_vers)
         self.SoftLink.run(path_save)
