@@ -118,7 +118,6 @@ class SoftLinkCalEnb():
         return self._get_scenarios()
 
 
-
     def _get_scenarios(self): # Implementing: work fine
 
         cal_dat = self.calliope
@@ -147,7 +146,6 @@ class SoftLinkCalEnb():
         return  {key: value for key, value in [list(item.items())[0] for item in methods]}
 
 
-
     def run(self, path= None):
         """public function """
 
@@ -155,17 +153,20 @@ class SoftLinkCalEnb():
         enbios2_methods= self._get_methods()
 
         self.enbios2_data = {
-            "bw_project": bw_project,
+            "adapters": [
+                {
+                    "adapter_name": "brightway-adapter",
+                    "config": {"bw_project": bw_project},
+                    "methods": enbios2_methods
+                }],
             "hierarchy": self.hierarchy,
-            "methods": enbios2_methods,
             "scenarios": self._generate_scenarios()
         }
-        pass
+
         if path is not None:
             with open(path, 'w') as gen_diction:
                 json.dump(self.enbios2_data, gen_diction, indent=4)
             gen_diction.close()
-
         print('Input data for ENBIOS created')
 
 
