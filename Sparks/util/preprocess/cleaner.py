@@ -11,47 +11,14 @@ from bw2data.errors import UnknownObject
 from Sparks.const.const import bw_project, bw_db
 from bw2data.backends import Activity, ActivityDataset
 from dataclasses import dataclass
-
+from Sparks.generic.generic import *
 
 bd.projects.set_current(bw_project)
 database = bd.Database(bw_db)
 
 
-@dataclass
-class BaseFileActivity:
-    """ Base class for motherfile data"""
-    name: str
-    region: str
-    carrier: str
-    parent: str
-    code:str
-    factor: Union[int, float]
-    alias: Optional[str] = None
-    unit: Optional[str] = None
-
-    def __post_init__(self):
-        self.alias = f"{self.name}_{self.carrier}"
-        self.activity = self._load_activity(key=self.code)
-
-        if isinstance(self.activity, Activity):
-            self.unit = self.activity['unit']
-        else:
-            self.unit = None
-
-    def _load_activity(self, key) -> Optional['Activity']:
-        try:
-            return database.get_node(key)
-        except (bw2data.errors.UnknownObject, KeyError):
-            message = (f"\n{key} from activity not found in the database. Please check your database."
-                       f"\nThis activity won't be included.")
-            warnings.warn(message, Warning)
-            return None
-
-
-
 class Cleaner:
     """Clean the input data and modify the units"""
-
 
     def __init__(self,
                  caliope: str,
