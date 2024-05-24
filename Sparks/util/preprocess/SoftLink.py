@@ -35,19 +35,23 @@ class SoftLinkCalEnb():
         except KeyError as e:
             cols=cal_dat.columns
             raise KeyError(f'Input data error. Columns are {cols}.', f' and expecting {e}.')
-        if self.smaller_vers is not None:  # get a small version of the data ( only 3 scenarios )
-            try:
-                scenarios = scenarios[:self.smaller_vers]
-            except:
-                raise ValueError('Scenarios out of bonds')
+
 
         return self._get_scenarios()
 
 
-    def _get_scenarios(self): # Implementing: work fine
-
+    def _get_scenarios(self):
         cal_dat = self.calliope
         cal_dat['scenarios'] = cal_dat['scenarios'].astype(str)
+
+        if self.smaller_vers:  # get a small version of the data (only the first)
+            try:
+                scenario = cal_dat['scenarios'].unique().tolist()[0]
+                cal_dat['scenarios'] = cal_dat['scenarios'].astype(str)
+                cal_dat=cal_dat[cal_dat['scenarios']==str(scenario)]
+            except:
+                raise ValueError('Scenarios out of bonds')
+
         scenarios_check = [str(x) for x in cal_dat['scenarios'].unique()]  # Convert to string, just in case the scenario is a number
 
         scenarios=[
@@ -150,7 +154,7 @@ class Hierarchy:
 
 
     def generate_hierarchy(self):
-        pass
+
         last_level=None
         last_level_branches=[]
         last_level_hierachy=[] # official list

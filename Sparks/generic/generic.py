@@ -24,6 +24,7 @@ class BaseFileActivity:
     unit: Optional[str] = None
     init_post: InitVar[bool]=True # Allow to create an instance without calling alias modifications
 
+
     def __post_init__(self,init_post):
         if not init_post:
             return
@@ -48,7 +49,6 @@ class BaseFileActivity:
             return None
 
 
-
 @dataclass
 class Activity_scenario:
     """ Class for each activity in a specific scenario"""
@@ -69,6 +69,7 @@ class Scenario:
             x.unit,x.amount
         ] for x in self.activities}
 
+
     def to_dict(self):
         return {'name': self.name, 'nodes':self.activities_dict}
 
@@ -83,9 +84,10 @@ class Last_Branch:
     origin: List['BaseFileActivity'] = field(default_factory=list)
     leafs: List = field(init=False)
 
+
     def __post_init__(self):
         self.leafs = [{'name': x.alias_carrier_region, 'adapter': 'bw', 'config': {'code': x.code}} for x in self.origin]
-        pass
+
 
 
 @dataclass
@@ -95,6 +97,8 @@ class Branch:
     parent :Optional[str] = None
     origin: List[Union['Branch', 'Last_Branch']]=field(default_factory=list)
     leafs: List = field(init=False)
+
+
     def __post_init__(self):
         self.leafs=[
             {
@@ -106,6 +110,7 @@ class Branch:
 @dataclass
 class Method:
     method: tuple
+
 
     def to_dict(self):
         return {self.method[2].split('(')[1].split(')')[0]: [
