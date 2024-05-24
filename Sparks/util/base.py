@@ -2,16 +2,17 @@
 @LexPascal
 """
 import json
-from typing import Union,Optional
+import os
+import time
+from typing import Union, Optional
+
 import pandas as pd
 import bw2data as bd
-from enbios2.base.experiment import Experiment
-import os
+import bw2io as bi
+
 from Sparks.util.preprocess.cleaner import Cleaner
 from Sparks.util.preprocess.SoftLink import SoftLinkCalEnb
-import bw2io as bi
 from Sparks.const import const
-import time
 
 
 class SoftLink():
@@ -105,15 +106,13 @@ class SoftLink():
                 -Unit adaptation
                 -Scaling according to the conversion factor
                 -Filtered activities contained in the mother file
-        ___________________________
-        """
 
+        """
         # Create an instance of the Cleaner class
         self.cleaner.subregions = subregions
         self.cleaner.preprocess_data()
         self.preprocessed_units= self.cleaner.adapt_units()
         self.exluded_techs_and_regions = self.cleaner.techs_region_not_included
-        pass
 
 
     def data_for_ENBIOS(self, path_save=None,smaller_vers=None):
@@ -123,7 +122,11 @@ class SoftLink():
         # Create an instance of the SoftLInkCalEnb
 
 
-        self.SoftLink=SoftLinkCalEnb(self.preprocessed_units,self.mother,smaller_vers)
+        self.SoftLink=SoftLinkCalEnb(calliope=self.preprocessed_units,
+                                     motherfile=self.mother,
+                                     mother_data=self.cleaner.base_activities,
+                                     sublocations=self.cleaner._techs_sublocations,
+                                     smaller_vers=smaller_vers)
         self.SoftLink.run(path_save)
         self.enbios2_data = self.SoftLink.enbios2_data
         self._save_json_data(self.enbios2_data, path_save)
@@ -150,10 +153,9 @@ class SoftLink():
             self.path_saved=file_path
 
     @staticmethod
-    def _save_const(project:str,db:str):
+    def _save_const(project: str, db: str):
         """ get the project and db name and store in a const file"""
         with open(r'Sparks/const/const.py', 'w') as f:
-            pass
             f.write(f"bw_project = '{project}'\n")
             f.write(f"bw_db = '{db}'\n")
 

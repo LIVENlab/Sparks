@@ -115,7 +115,9 @@ class Cleaner:
         self.basefile=pd.read_excel(self.mother_file, sheet_name='Processors')
         # Filter Processors
         df_names['alias_carrier']=df_names['techs'] + '_' +df_names['carriers']
+        df_names['alias_region']=df_names['alias_carrier'] + '_' +df_names['locs']
         self.basefile['alias_carrier']=self.basefile['Processor']+ '_' + self.basefile['@SimulationCarrier']
+        self.basefile['alias_region']=self.basefile['alias_carrier']+'_'+self.basefile['Region']
         excluded_techs = set(df_names['techs']) - set(self.basefile['Processor'])
         self.techs_region_not_included=excluded_techs
         df_names = df_names[~df_names['techs'].isin(excluded_techs)] # exclude the technologies
@@ -155,8 +157,8 @@ class Cleaner:
         """adapt the units (flow_out_sum * conversion factor)"""
         self.base_activities=self._extract_data()
 
-        alias_to_factor = {x.alias: x.factor for x in self.base_activities}
-        unit_to_factor = {x.alias: x.unit for x in self.base_activities}
+        alias_to_factor = {x.alias_carrier: x.factor for x in self.base_activities}
+        unit_to_factor = {x.alias_carrier: x.unit for x in self.base_activities}
 
         self.final_df['new_vals'] = self.final_df['alias_carrier'].map(alias_to_factor) * self.final_df['flow_out_sum']
         self.final_df['new_units'] =self.final_df['alias_carrier'].map(unit_to_factor)
@@ -164,8 +166,8 @@ class Cleaner:
         return self._final_dataframe(self.final_df)
 
 
-    @staticmethod
-    def _final_dataframe(df):
+
+    def _final_dataframe(self,df):
         cols = ['spores',
                 'locs',
                 'techs',
@@ -176,6 +178,7 @@ class Cleaner:
         df = df[cols]
         df.rename(columns={'spores': 'scenarios', 'new_vals': 'flow_out_sum'}, inplace=True)
         df['aliases'] = df['techs'] + '__' + df['carriers'] + '___' + df['locs']
+        self._techs_sublocations=df['aliases'].unique().tolist() # save sublocation aliases for hierarchy
         return df
 
 
