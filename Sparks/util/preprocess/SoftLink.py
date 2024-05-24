@@ -28,7 +28,6 @@ class SoftLinkCalEnb():
 
 
     def _generate_scenarios(self):
-        pass
         cal_dat=self.calliope
         cal_dat['scenarios']=cal_dat['scenarios'].astype(str)
         try:
@@ -107,11 +106,7 @@ class Hierarchy:
         self.motherdata=motherdata
         self.subloc = sublocations
         self.motherdata = self.manage_subregions()
-        pass
         self.data=self._transform_motherdata()
-
-
-
 
 
     def _create_copies(self,

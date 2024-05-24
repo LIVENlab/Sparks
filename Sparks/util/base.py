@@ -41,9 +41,9 @@ class SoftLink():
         self.SoftLink=None
         self.input=None
         self.database=database
+
         #Check project and db
         self._bw_project_and_DB()
-
         self.cleaner=Cleaner(caliope, mother_file) # Instance cleaner
 
 

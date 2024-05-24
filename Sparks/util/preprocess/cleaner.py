@@ -2,15 +2,8 @@
 @author: Alexander de Tomás (ICTA-UAB)
         -LexPascal
 """
-import bw2data
-import pandas as pd
-from typing import Dict, Union, Optional, Any, List
-import warnings
 import bw2data as bd
-from bw2data.errors import UnknownObject
-from Sparks.const.const import bw_project, bw_db
-from bw2data.backends import Activity, ActivityDataset
-from dataclasses import dataclass
+import pandas as pd
 from Sparks.generic.generic import *
 
 bd.projects.set_current(bw_project)
@@ -103,7 +96,6 @@ class Cleaner:
         except FileNotFoundError:
             raise FileNotFoundError(f'File {self._raw_data} does not exist. Please check it')
         return self._group_data(df)
-
 
 
     def _filter_techs(self,df: pd.DataFrame)-> pd.DataFrame:
