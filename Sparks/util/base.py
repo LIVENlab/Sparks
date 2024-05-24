@@ -115,7 +115,7 @@ class SoftLink():
         self.exluded_techs_and_regions = self.cleaner.techs_region_not_included
 
 
-    def data_for_ENBIOS(self, path_save=None,smaller_vers=None):
+    def data_for_ENBIOS(self, path_save=None,smaller_vers=False):
         """
         Transform the data into enbios like dictionary
         """
