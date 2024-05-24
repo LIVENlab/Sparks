@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, InitVar
 import bw2data
 from typing import Union, Optional, List
 import warnings
@@ -19,17 +19,24 @@ class BaseFileActivity:
     parent: str
     code:str
     factor: Union[int, float]
-    alias: Optional[str] = None
+    alias_carrier: Optional[str] = None
+    alias_carrier_region: Optional[str] = None
     unit: Optional[str] = None
+    init_post: InitVar[bool]=True # Allow to create an instance without calling alias modifications
 
-    def __post_init__(self):
-        self.alias = f"{self.name}_{self.carrier}"
+    def __post_init__(self,init_post):
+        if not init_post:
+            return
+
+        self.alias_carrier = f"{self.name}_{self.carrier}"
+        self.alias_carrier_region=f"{self.name}__{self.carrier}___{self.region}"
         self.activity = self._load_activity(key=self.code)
 
         if isinstance(self.activity, Activity):
             self.unit = self.activity['unit']
         else:
             self.unit = None
+
 
     def _load_activity(self, key) -> Optional['Activity']:
         try:
@@ -39,6 +46,7 @@ class BaseFileActivity:
                        f"\nThis activity won't be included.")
             warnings.warn(message, Warning)
             return None
+
 
 
 @dataclass
@@ -54,6 +62,7 @@ class Scenario:
     """ Basic Scenario"""
     name: str # scenario name
     activities: List['Activity_scenario'] = field(default_factory=list)
+
 
     def __post_init__(self):
         self.activities_dict = {x.alias: [
@@ -75,7 +84,7 @@ class Last_Branch:
     leafs: List = field(init=False)
 
     def __post_init__(self):
-        self.leafs = [{'name': x.alias, 'adapter': 'bw', 'config': {'code': x.code}} for x in self.origin]
+        self.leafs = [{'name': x.alias_carrier_region, 'adapter': 'bw', 'config': {'code': x.code}} for x in self.origin]
         pass
 
 
