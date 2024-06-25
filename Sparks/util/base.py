@@ -5,11 +5,10 @@ import json
 import os
 import time
 from typing import Union, Optional
-
 import pandas as pd
 import bw2data as bd
 import bw2io as bi
-
+import warnings
 from Sparks.util.preprocess.cleaner import Cleaner
 from Sparks.util.preprocess.SoftLink import SoftLinkCalEnb
 from Sparks.const import const
@@ -36,11 +35,12 @@ class SoftLink():
         self.project=project
         self.calliope=caliope
         self.mother=mother_file
+        self.database = database
         self.preprocessed=None
         self.preprocessed_starter=None
         self.SoftLink=None
         self.input=None
-        self.database=database
+
 
         #Check project and db
         self._bw_project_and_DB()
@@ -67,9 +67,9 @@ class SoftLink():
             ans=input(f'Project {self.project} not in projects.'
                       f' Want to create a new project? (y/n)')
             if ans =='y':
-                database=input('Enter the DB name that you want to create:')
-                spolds=input('Enter path to the spold files ("str"):')
-                self._create_BW_project(self.project, database,spolds)
+
+                spolds=input('Enter path to the spold files ("str") in order to fill the database:')
+                self._create_BW_project(self.project, self.database,spolds)
                 const.bw_project=self.project
                 const.bw_db=database
             else:
@@ -78,7 +78,12 @@ class SoftLink():
         bd.projects.set_current(self.project)
         if self.database not in list(bd.databases):
             print(list(bd.databases))
-            raise Warning(f"database {self.database} not in bw databases")
+            warnings.warn(f"database {self.database} not in bw databases")
+            ans=input("Do you want to import an ecoinvent database? y/n")
+            if ans == 'y':
+                spolds=str(input('Enter path to the spold files in order to fill the database:'))
+                pass
+                self._create_BW_project(self.project, self.database, spolds)
 
         self._save_const(self.project, self.database)
         print('Project and Database existing...')
@@ -87,6 +92,7 @@ class SoftLink():
     @staticmethod
     def _create_BW_project(project,database,spolds):
         """Create a new project and database"""
+        pass
         bd.projects.set_current(project)
         bi.bw2setup()
         ei=bi.SingleOutputEcospold2Importer(spolds,database,use_mp=False)
