@@ -9,6 +9,7 @@ import pandas as pd
 import bw2data as bd
 import bw2io as bi
 import warnings
+from Sparks.generic.loggin import *
 from Sparks.util.preprocess.cleaner import Cleaner
 from Sparks.util.preprocess.SoftLink import SoftLinkCalEnb
 from Sparks.const import const
@@ -36,15 +37,12 @@ class SoftLink():
         self.calliope=caliope
         self.mother=mother_file
         self.database = database
-        self.preprocessed=None
-        self.preprocessed_starter=None
         self.SoftLink=None
-        self.input=None
 
 
         #Check project and db
         self._bw_project_and_DB()
-        self.cleaner=Cleaner(caliope, mother_file) # Instance cleaner
+        self._cleaner=Cleaner(caliope, mother_file) # Instance cleaner
 
 
     @staticmethod
@@ -71,7 +69,7 @@ class SoftLink():
                 spolds=input('Enter path to the spold files ("str") in order to fill the database:')
                 self._create_BW_project(self.project, self.database,spolds)
                 const.bw_project=self.project
-                const.bw_db=database
+                const.bw_db=self.database
             else:
                 raise Warning('Please, create a project before continue')
 
@@ -115,10 +113,10 @@ class SoftLink():
 
         """
         # Create an instance of the Cleaner class
-        self.cleaner.subregions = subregions
-        self.cleaner.preprocess_data()
-        self.preprocessed_units= self.cleaner.adapt_units()
-        self.exluded_techs_and_regions = self.cleaner.techs_region_not_included
+        self._cleaner.subregions = subregions
+        self._cleaner.preprocess_data()
+        self.preprocessed_units= self._cleaner.adapt_units()
+        self.exluded_techs_and_regions = self._cleaner.techs_region_not_included
 
 
     def data_for_ENBIOS(self, path_save=None,smaller_vers=False):
@@ -130,8 +128,8 @@ class SoftLink():
 
         self.SoftLink=SoftLinkCalEnb(calliope=self.preprocessed_units,
                                      motherfile=self.mother,
-                                     mother_data=self.cleaner.base_activities,
-                                     sublocations=self.cleaner._techs_sublocations,
+                                     mother_data=self._cleaner.base_activities,
+                                     sublocations=self._cleaner._techs_sublocations,
                                      smaller_vers=smaller_vers)
         self.SoftLink.run(path_save)
         self.enbios2_data = self.SoftLink.enbios2_data
@@ -161,9 +159,20 @@ class SoftLink():
     @staticmethod
     def _save_const(project: str, db: str):
         """ get the project and db name and store in a const file"""
-        with open(r'Sparks/const/const.py', 'w') as f:
-            f.write(f"bw_project = '{project}'\n")
-            f.write(f"bw_db = '{db}'\n")
+        try:
+            with open(r'Sparks/const/const.py', 'w') as f:
+                f.write(f"bw_project = '{project}'\n")
+                f.write(f"bw_db = '{db}'\n")
+        except:
+            base_path=os.path.abspath(os.path.join('..', '..', 'Sparks', 'const'))
+            os.makedirs(base_path, exist_ok=True)
+
+            file_path=file_path = os.path.join(base_path, 'const.py')
+            with open(file_path, 'w') as f:
+                f.write(f"bw_project = '{project}'\n")
+                f.write(f"bw_db = '{db}'\n")
+
+
 
 
 
