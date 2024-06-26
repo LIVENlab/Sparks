@@ -1,6 +1,6 @@
 import json
 import pandas as pd
-from Sparks.generic.generic import *
+from Sparks.generic.generic_dataclass import *
 
 bd.projects.set_current(bw_project)            # Select your project
 database = bd.Database(bw_db)        # Select your db

@@ -43,7 +43,7 @@ class BaseFileActivity:
         try:
             return database.get_node(key)
         except (bw2data.errors.UnknownObject, KeyError):
-            message = (f"\n{key} from activity not found in the database. Please check your database."
+            message = (f"\n{key} not found in the database. Please check your database / basefile."
                        f"\nThis activity won't be included.")
             warnings.warn(message, Warning)
             return None
