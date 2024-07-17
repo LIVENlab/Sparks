@@ -4,6 +4,12 @@ It has been specifically design to match [Calliope](https://github.com/calliope-
 
 ![Example](example.png)
 
+## Install requirements
+```console
+pip install -r /path/to/requirements.txt
+```
+## Create inputs for enbios
+
 ```python
 from Sparks.util.base import SoftLink
 enbios_mod = SoftLink(r'C:\Users\Administrator\Downloads\flow_out_sum (1).csv',
