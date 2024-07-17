@@ -28,6 +28,7 @@ class SoftLinkCalEnb():
 
 
     def _generate_scenarios(self):
+        pass
         cal_dat=self.calliope
         cal_dat['scenarios']=cal_dat['scenarios'].astype(str)
         try:
@@ -41,6 +42,7 @@ class SoftLinkCalEnb():
 
 
     def _get_scenarios(self):
+        pass
         cal_dat = self.calliope
         cal_dat['scenarios'] = cal_dat['scenarios'].astype(str)
 
@@ -53,18 +55,22 @@ class SoftLinkCalEnb():
                 raise ValueError('Scenarios out of bonds')
 
         scenarios_check = [str(x) for x in cal_dat['scenarios'].unique()]  # Convert to string, just in case the scenario is a number
-
+        pass
+        #todo: check
+        scenario=cal_dat['scenarios'][0]
+        pass
         scenarios=[
             Scenario(name=str(scenario),
                      activities=[
                          Activity_scenario(
                              alias=row['aliases'],
-                             amount = row['flow_out_sum'],
+                             amount = row['flow_out_sum_'],
                              unit=row['new_units']
                          )
-                         for _,row in group.iterrows()
+                         for _,row in cal_dat.iterrows()
+
                      ]).to_dict()
-            for scenario,group in cal_dat.groupby('scenarios')
+
         ]
         assert (len(scenarios) == len(scenarios_check) )
         return scenarios
@@ -97,6 +103,7 @@ class SoftLinkCalEnb():
         }
 
         if path is not None:
+            pass
             with open(path, 'w') as gen_diction:
                 json.dump(self.enbios2_data, gen_diction, indent=4)
             gen_diction.close()
@@ -122,7 +129,6 @@ class Hierarchy:
             for new_name in new_names:
                 new_act=BaseFileActivity(
                     name=new_name,
-                    region=existing_act.region,
                     carrier=existing_act.carrier,
                     parent=existing_act.parent,
                     code=existing_act.code,

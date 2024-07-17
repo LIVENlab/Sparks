@@ -114,6 +114,7 @@ class SoftLink():
         """
         # Create an instance of the Cleaner class
         self._cleaner.subregions = subregions
+        pass
         self._cleaner.preprocess_data()
         self.preprocessed_units= self._cleaner.adapt_units()
         self.exluded_techs_and_regions = self._cleaner.techs_region_not_included

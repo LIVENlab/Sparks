@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field, InitVar
 import bw2data
-from typing import Union, Optional, List
+from typing import Union, Optional, List,Tuple
 import warnings
 import bw2data as bd
 from bw2data.errors import UnknownObject
@@ -14,10 +14,10 @@ database = bd.Database(bw_db)
 class BaseFileActivity:
     """ Base class for motherfile data"""
     name: str
-    region: str
+    #region: str
     carrier: str
     parent: str
-    code:str
+    code: Tuple
     factor: Union[int, float]
     alias_carrier: Optional[str] = None
     alias_carrier_region: Optional[str] = None
@@ -28,9 +28,10 @@ class BaseFileActivity:
     def __post_init__(self,init_post):
         if not init_post:
             return
-
+        pass
+        self.code=eval(self.code)[1]
         self.alias_carrier = f"{self.name}_{self.carrier}"
-        self.alias_carrier_region=f"{self.name}__{self.carrier}___{self.region}"
+        self.alias_carrier_region=f"{self.name}__{self.carrier}"
         self.activity = self._load_activity(key=self.code)
 
         if isinstance(self.activity, Activity):
@@ -52,10 +53,11 @@ class BaseFileActivity:
 @dataclass
 class Activity_scenario:
     """ Class for each activity in a specific scenario"""
+
     alias: str
     amount: int
     unit: str #TODO: adapt
-
+    pass
 
 @dataclass
 class Scenario:
@@ -68,7 +70,8 @@ class Scenario:
         self.activities_dict = {x.alias: [
             x.unit,x.amount
         ] for x in self.activities}
-
+        for x in self.activities:
+            print(type(x.unit), type(x.amount))
 
     def to_dict(self):
         return {'name': self.name, 'nodes':self.activities_dict}
