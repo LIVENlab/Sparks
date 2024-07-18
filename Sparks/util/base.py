@@ -9,7 +9,6 @@ import pandas as pd
 import bw2data as bd
 import bw2io as bi
 import warnings
-from Sparks.generic.loggin import *
 from Sparks.util.preprocess.cleaner import Cleaner
 from Sparks.util.preprocess.SoftLink import SoftLinkCalEnb
 from Sparks.const import const
