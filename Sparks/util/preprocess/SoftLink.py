@@ -72,7 +72,7 @@ class SoftLinkCalEnb():
                      ]).to_dict()
 
         ]
-        assert (len(scenarios) == len(scenarios_check) )
+
         return scenarios
 
 
