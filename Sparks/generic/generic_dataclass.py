@@ -14,10 +14,10 @@ database = bd.Database(bw_db)
 class BaseFileActivity:
     """ Base class for motherfile data"""
     name: str
-    #region: str
+    region: str
     carrier: str
     parent: str
-    code: Tuple
+    code:str
     factor: Union[int, float]
     alias_carrier: Optional[str] = None
     alias_carrier_region: Optional[str] = None
@@ -28,21 +28,29 @@ class BaseFileActivity:
     def __post_init__(self,init_post):
         if not init_post:
             return
-        pass
-        self.code=eval(self.code)[1]
+
         self.alias_carrier = f"{self.name}_{self.carrier}"
-        self.alias_carrier_region=f"{self.name}__{self.carrier}"
+        self.alias_carrier_region=f"{self.name}__{self.carrier}___{self.region}"
+        pass
         self.activity = self._load_activity(key=self.code)
+        pass
 
         if isinstance(self.activity, Activity):
             self.unit = self.activity['unit']
         else:
             self.unit = None
 
-
     def _load_activity(self, key) -> Optional['Activity']:
+        pass
         try:
-            return database.get_node(key)
+            activity=list(ActivityDataset.select().where(ActivityDataset.code == key))
+
+            if len(activity)>1:
+                warnings.warn(f"More than one activity found with code {key}",Warning)
+            if len(activity)<1:
+                raise UnknownObject(f'No activity with code {key}')
+            return Activity(activity[0])
+
         except (bw2data.errors.UnknownObject, KeyError):
             message = (f"\n{key} not found in the database. Please check your database / basefile."
                        f"\nThis activity won't be included.")

@@ -59,12 +59,12 @@ class SoftLink():
         Check the BW project and database.
         It also allows for the creation of a new one
         """
+        pass
         projects=list(bd.projects)
         if self.project not in str(projects):
             ans=input(f'Project {self.project} not in projects.'
                       f' Want to create a new project? (y/n)')
             if ans =='y':
-
                 spolds=input('Enter path to the spold files ("str") in order to fill the database:')
                 self._create_BW_project(self.project, self.database,spolds)
                 const.bw_project=self.project
@@ -73,6 +73,7 @@ class SoftLink():
                 raise Warning('Please, create a project before continue')
 
         bd.projects.set_current(self.project)
+        #TODO: remove when finished
         if self.database not in list(bd.databases):
             print(list(bd.databases))
             warnings.warn(f"database {self.database} not in bw databases")
@@ -116,6 +117,7 @@ class SoftLink():
         pass
         self._cleaner.preprocess_data()
         self.preprocessed_units= self._cleaner.adapt_units()
+        pass
         self.exluded_techs_and_regions = self._cleaner.techs_region_not_included
 
 
