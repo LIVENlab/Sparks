@@ -1,9 +1,4 @@
-# ENBIOS application for the TIMES-Sinergia Model (TIMES Spain)
-This repository contains the code to run ENBIOS for energy scenarios generated with the TIMES-Sinergia model for Spain. 
-
-The TIMES-Sinergia model is the Spanish TIMES version. 
-CARLOS PORFA UPDATE THIS
-
+# Introduction
 ENBIOS is an analytical framework for the estimation of environmental impacts of energy system configurations as calculated by energy system optimization models. More information about ENBIOS can be found [here](https://pypi.org/project/enbios/)
 
 ## Generating JSON input file
