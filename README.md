@@ -1,6 +1,18 @@
-# Sparks
-Sparks facilitates the creation of inputs for [enbios](https://github.com/LIVENlab/enbios) through an Excel file.
-It has been specifically design to match [Calliope](https://github.com/calliope-project/calliope) outputs with Enbios.
+# ENBIOS application for the TIMES-Sinergia Model (TIMES Spain)
+This repository contains the code to run ENBIOS for energy scenarios generated with the TIMES-Sinergia model for Spain. 
+
+The TIMES-Sinergia model is the Spanish TIMES version. 
+CARLOS PORFA UPDATE THIS
+
+ENBIOS is an analytical framework for the estimation of environmental impacts of energy system configurations as calculated by energy system optimization models. More information about ENBIOS can be found [here](https://pypi.org/project/enbios/)
+
+## Generating JSON input file
+The first step to run ENBIOS is to generate the input files. You can do this by running the sparks module. Sparks will transform your excel inputs into the ENBIOS dendrogram.  For an example of the ENBIOS excel basefile you can go to the ENBIOS github site [here](https://github.com/LIVENlab/Sparks/blob/main/testing/data_test/basefile.xlsx) 
+
+You can generate the JSON input file by running the demo_test.py script. If you are a Brightway2 user SPARKs will crete a BW2 project for you on the run in the 
+
+
+
 
 ![Example](example.png)
 

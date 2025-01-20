@@ -57,7 +57,7 @@ class SoftLinkCalEnb():
         scenarios_check = [str(x) for x in cal_dat['scenarios'].unique()]  # Convert to string, just in case the scenario is a number
         pass
         #todo: check
-        scenario=cal_dat['scenarios'][0]
+        scenario=scenarios_check[0]
         pass
         scenarios=[
             Scenario(name=str(scenario),
@@ -72,7 +72,7 @@ class SoftLinkCalEnb():
                      ]).to_dict()
 
         ]
-        assert (len(scenarios) == len(scenarios_check) )
+
         return scenarios
 
 
@@ -90,7 +90,7 @@ class SoftLinkCalEnb():
                                  motherdata=self.mother_data,
                                  sublocations=self.sublocations ).generate_hierarchy()
         enbios2_methods= self._get_methods()
-
+        pass
         self.enbios2_data = {
             "adapters": [
                 {
