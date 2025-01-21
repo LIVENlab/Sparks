@@ -31,13 +31,12 @@ class BaseFileActivity:
 
         self.alias_carrier = f"{self.name}_{self.carrier}"
         self.alias_carrier_region=f"{self.name}__{self.carrier}___{self.region}"
-        pass
         self.activity = self._load_activity(key=self.code)
-        pass
 
-        if isinstance(self.activity, Activity):
-            self.unit = self.activity['unit']
-        else:
+        try:
+            if isinstance(self.activity, Activity):
+                self.unit = self.activity['unit']
+        except:
             self.unit = None
 
     def _load_activity(self, key) -> Optional['Activity']:
@@ -48,6 +47,7 @@ class BaseFileActivity:
             if len(activity)>1:
                 warnings.warn(f"More than one activity found with code {key}",Warning)
             if len(activity)<1:
+
                 raise UnknownObject(f'No activity with code {key}')
             return Activity(activity[0])
 
@@ -78,8 +78,7 @@ class Scenario:
         self.activities_dict = {x.alias: [
             x.unit,x.amount
         ] for x in self.activities}
-        for x in self.activities:
-            print(type(x.unit), type(x.amount))
+
 
     def to_dict(self):
         return {'name': self.name, 'nodes':self.activities_dict}
@@ -121,7 +120,6 @@ class Branch:
 @dataclass
 class Method:
     method: tuple
-
 
     def to_dict(self):
         return {self.method[2].split('(')[1].split(')')[0]: [
