@@ -3,7 +3,7 @@ import pandas as pd
 from Sparks.generic.generic_dataclass import *
 
 bd.projects.set_current(bw_project)            # Select your project
-database = bd.Database(bw_db)        # Select your db
+     # Select your db
 
 
 
@@ -17,7 +17,6 @@ class SoftLinkCalEnb():
                  sublocations: list,
                  motherfile,
                  smaller_vers=None):
-        pass
 
         self.calliope=calliope
         self.motherfile=motherfile
@@ -77,12 +76,11 @@ class SoftLinkCalEnb():
 
     def run(self, path= None):
         """public function """
-        pass
+
         self.hierarchy=Hierarchy(base_path=self.motherfile,
                                  motherdata=self.mother_data,
                                  sublocations=self.sublocations ).generate_hierarchy()
         enbios2_methods= self._get_methods()
-        pass
         self.enbios2_data = {
             "adapters": [
                 {
@@ -95,7 +93,6 @@ class SoftLinkCalEnb():
         }
 
         if path is not None:
-            pass
             with open(path, 'w') as gen_diction:
                 json.dump(self.enbios2_data, gen_diction, indent=4)
             gen_diction.close()

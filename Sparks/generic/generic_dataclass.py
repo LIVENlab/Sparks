@@ -5,9 +5,9 @@ import warnings
 import bw2data as bd
 from bw2data.errors import UnknownObject
 from bw2data.backends import Activity, ActivityDataset
-from Sparks.const.const import bw_project,bw_db
+from Sparks.const.const import bw_project
 bd.projects.set_current(bw_project)            # Select your project
-database = bd.Database(bw_db)
+
 
 
 @dataclass
@@ -40,7 +40,7 @@ class BaseFileActivity:
             self.unit = None
 
     def _load_activity(self, key) -> Optional['Activity']:
-        pass
+
         try:
             activity=list(ActivityDataset.select().where(ActivityDataset.code == key))
 
@@ -61,11 +61,10 @@ class BaseFileActivity:
 @dataclass
 class Activity_scenario:
     """ Class for each activity in a specific scenario"""
-
     alias: str
     amount: int
-    unit: str #TODO: adapt
-    pass
+    unit: str
+
 
 @dataclass
 class Scenario:

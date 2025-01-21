@@ -7,21 +7,19 @@ pd.options.mode.chained_assignment = None  # default='warn'
 from Sparks.generic.generic_dataclass import *
 
 bd.projects.set_current(bw_project)
-database = bd.Database(bw_db)
+
 
 
 class Cleaner:
     """Clean the input data and modify the units"""
 
     def __init__(self,
-                 caliope: str,
                  motherfile: str,
                  file_handler: dict,
-                 subregions : [Optional,bool]= False,
+                 subregions: Optional[bool]= False,
                  ):
 
         self.subregions = subregions
-        self._raw_data = caliope
         self.mother_file = motherfile
         self.final_df = None
         self.techs_region_not_included = []
@@ -44,8 +42,8 @@ class Cleaner:
         """ Assuming comma separated input, load the data from a specific file"""
         try:
             return pd.read_csv(self.file_handler[source], delimiter=',').dropna()
-        except:
-            FileNotFoundError(f"File {source} does not exist")
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"File {source} does not exist") from e
 
 
     def _input_checker(self, data: pd.DataFrame, filename: str):
@@ -94,7 +92,6 @@ class Cleaner:
         excluded_techs = set(df_names['alias_carrier']) - set(basefile['alias_carrier'])
         self.techs_region_not_included=excluded_techs
         df_names = df_names[~df_names['alias_carrier'].isin(excluded_techs)] # exclude the technologies
-        pass
 
         if excluded_techs:
             message=f'''\nThe following technologies, are present in the energy data but not in the Basefile: 
@@ -130,16 +127,15 @@ class Cleaner:
                 all_data = pd.concat([all_data, filtered_data], ignore_index=True)
             except Exception as e:
                 warnings.warn(f"Error processing {data_source}: {e}", Warning)
-        pass
+
         self.final_df = self._group_data(all_data)
-        pass
         return self.final_df
 
 
 
     def _extract_data(self) -> List['BaseFileActivity']:
         base_activities = []
-        pass
+
         for _, r in self.basefile.iterrows():
             try:
                 base_activities.append(
@@ -147,7 +143,7 @@ class Cleaner:
                         name=r['Processor'],
                         carrier=r['@SimulationCarrier'],
                         parent=r['ParentProcessor'],
-                        region = r['Region'],
+                        region= r['Region'],
                         code=r['Ecoinvent_key_code'],
                         factor=r['@SimulationToEcoinventFactor']
                     )
@@ -159,9 +155,8 @@ class Cleaner:
 
     def _adapt_units(self):
         """adapt the units (flow_out_sum * conversion factor)"""
-        pass
+
         self.base_activities = self._extract_data()
-        pass
         alias_to_factor = {x.alias_carrier: x.factor for x in self.base_activities}
         unit_to_factor = {x.alias_carrier: x.unit for x in self.base_activities}
 
@@ -177,7 +172,7 @@ class Cleaner:
                 'carriers',
                 'new_units',
                 'new_vals']
-        pass
+
         df.dropna(axis=0, inplace=True)
         df = df[cols]
         df.rename(columns={'spores': 'scenarios', 'new_vals': 'energy_value'}, inplace=True)
