@@ -5,9 +5,9 @@ import warnings
 import bw2data as bd
 from bw2data.errors import UnknownObject
 from bw2data.backends import Activity, ActivityDataset
-from Sparks.const.const import bw_project,bw_db
+from Sparks.const.const import bw_project
 bd.projects.set_current(bw_project)            # Select your project
-database = bd.Database(bw_db)
+
 
 
 @dataclass
@@ -31,23 +31,23 @@ class BaseFileActivity:
 
         self.alias_carrier = f"{self.name}_{self.carrier}"
         self.alias_carrier_region=f"{self.name}__{self.carrier}___{self.region}"
-        pass
         self.activity = self._load_activity(key=self.code)
-        pass
 
-        if isinstance(self.activity, Activity):
-            self.unit = self.activity['unit']
-        else:
+        try:
+            if isinstance(self.activity, Activity):
+                self.unit = self.activity['unit']
+        except:
             self.unit = None
 
     def _load_activity(self, key) -> Optional['Activity']:
-        pass
+
         try:
             activity=list(ActivityDataset.select().where(ActivityDataset.code == key))
 
             if len(activity)>1:
                 warnings.warn(f"More than one activity found with code {key}",Warning)
             if len(activity)<1:
+
                 raise UnknownObject(f'No activity with code {key}')
             return Activity(activity[0])
 
@@ -61,11 +61,10 @@ class BaseFileActivity:
 @dataclass
 class Activity_scenario:
     """ Class for each activity in a specific scenario"""
-
     alias: str
     amount: int
-    unit: str #TODO: adapt
-    pass
+    unit: str
+
 
 @dataclass
 class Scenario:
@@ -78,8 +77,7 @@ class Scenario:
         self.activities_dict = {x.alias: [
             x.unit,x.amount
         ] for x in self.activities}
-        for x in self.activities:
-            print(type(x.unit), type(x.amount))
+
 
     def to_dict(self):
         return {'name': self.name, 'nodes':self.activities_dict}
@@ -121,7 +119,6 @@ class Branch:
 @dataclass
 class Method:
     method: tuple
-
 
     def to_dict(self):
         return {self.method[2].split('(')[1].split(')')[0]: [

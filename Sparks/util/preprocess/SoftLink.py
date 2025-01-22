@@ -3,7 +3,7 @@ import pandas as pd
 from Sparks.generic.generic_dataclass import *
 
 bd.projects.set_current(bw_project)            # Select your project
-database = bd.Database(bw_db)        # Select your db
+     # Select your db
 
 
 
@@ -18,7 +18,6 @@ class SoftLinkCalEnb():
                  motherfile,
                  smaller_vers=None):
 
-
         self.calliope=calliope
         self.motherfile=motherfile
         self.sublocations=sublocations # Use for hierarchy
@@ -26,9 +25,8 @@ class SoftLinkCalEnb():
         self.mother_data=mother_data
 
 
-
     def _generate_scenarios(self):
-        pass
+
         cal_dat=self.calliope
         cal_dat['scenarios']=cal_dat['scenarios'].astype(str)
         try:
@@ -37,12 +35,9 @@ class SoftLinkCalEnb():
             cols=cal_dat.columns
             raise KeyError(f'Input data error. Columns are {cols}.', f' and expecting {e}.')
 
-
         return self._get_scenarios()
 
-
     def _get_scenarios(self):
-        pass
         cal_dat = self.calliope
         cal_dat['scenarios'] = cal_dat['scenarios'].astype(str)
 
@@ -50,31 +45,27 @@ class SoftLinkCalEnb():
             try:
                 scenario = cal_dat['scenarios'].unique().tolist()[0]
                 cal_dat['scenarios'] = cal_dat['scenarios'].astype(str)
-                cal_dat=cal_dat[cal_dat['scenarios']==str(scenario)]
+                cal_dat = cal_dat[cal_dat['scenarios'] == str(scenario)]
             except:
                 raise ValueError('Scenarios out of bonds')
 
-        scenarios_check = [str(x) for x in cal_dat['scenarios'].unique()]  # Convert to string, just in case the scenario is a number
-        pass
-        #todo: check
-        scenario=scenarios_check[0]
-        pass
-        scenarios=[
+        scenarios_check = [str(x) for x in
+                           cal_dat['scenarios'].unique()]  # Convert to string, just in case the scenario is a number
+
+        scenarios = [
             Scenario(name=str(scenario),
                      activities=[
                          Activity_scenario(
                              alias=row['aliases'],
-                             amount = row['flow_out_sum_'],
+                             amount=row['energy_value'],
                              unit=row['new_units']
                          )
-                         for _,row in cal_dat.iterrows()
-
+                         for _, row in group.iterrows()
                      ]).to_dict()
-
+            for scenario, group in cal_dat.groupby('scenarios')
         ]
-
+        assert (len(scenarios) == len(scenarios_check))
         return scenarios
-
 
     def _get_methods(self):
         processors = pd.read_excel(self.motherfile, sheet_name='Methods')
@@ -90,7 +81,6 @@ class SoftLinkCalEnb():
                                  motherdata=self.mother_data,
                                  sublocations=self.sublocations ).generate_hierarchy()
         enbios2_methods= self._get_methods()
-        pass
         self.enbios2_data = {
             "adapters": [
                 {
@@ -103,12 +93,10 @@ class SoftLinkCalEnb():
         }
 
         if path is not None:
-            pass
             with open(path, 'w') as gen_diction:
                 json.dump(self.enbios2_data, gen_diction, indent=4)
             gen_diction.close()
         print('Input data for ENBIOS created')
-
 
 
 class Hierarchy:
@@ -129,6 +117,7 @@ class Hierarchy:
             for new_name in new_names:
                 new_act=BaseFileActivity(
                     name=new_name,
+                    region=existing_act.region,
                     carrier=existing_act.carrier,
                     parent=existing_act.parent,
                     code=existing_act.code,
@@ -203,8 +192,3 @@ class Hierarchy:
                     )
                     for _, row in data.iterrows()]
                 return {'name': last_level_branches[0].name, 'aggregator': 'sum', 'children': last_level_branches[0].leafs}
-
-
-
-
-
