@@ -19,27 +19,25 @@ class SoftLink():
     def __init__(self,
                  file_path: [str],
                  project : [str],
-                 spores: bool = False
                  ):
         """
-        @param caliope: path to the caliope data (flow_out_sum.csv)
-        @type caliope: either str path or pd.Dataframe
-        @param mother_file: path to the mother file
-        @type mother_file: str
-        @param project: project name in bw
-        @type project: str
-        @param database: db name in bw
-        @type database: str
+        @file_path: str
+        Path to the folder with the files to be used
+        @project: str
+        Name of the bw project
+        @multiple_codes: bool
+        Boolean: when True, it allows the possibility of using two bw codes for one single activity
+        This is necessary in cases where you want to consider operation and construction separately
         """
-        self.project=project
-        self.file_path=file_path
-        self.SoftLink=None
-        self.spores = spores
+        self.project = project
+        self.file_path = file_path
+        self.SoftLink = None
         self._arrange_paths()
-
-        #Check project and db
         self._bw_project_and_DB()
-        self._cleaner=Cleaner(self.paths_dict['basefile.xlsx'], self.paths_dict) # Instance cleaner
+
+        self._cleaner = None
+
+
 
 
     @staticmethod
@@ -57,7 +55,6 @@ class SoftLink():
         Check the BW project and database.
         It also allows for the creation of a new one
         """
-
         projects=list(bd.projects)
         if self.project not in str(projects):
             raise AssertionError(f'Project {self.project} not in BW projects. Please, create it before continuing')
@@ -68,7 +65,7 @@ class SoftLink():
 
 
     @staticmethod
-    def _create_BW_project(project,database,spolds):
+    def _create_BW_project(project, database, spolds):
         """Create a new project and database"""
         bd.projects.set_current(project)
         bi.bw2setup()
@@ -98,13 +95,11 @@ class SoftLink():
         }
 
 
-
     @timer
-    def preprocess(self,subregions : [bool,Optional] = False):
+    def preprocess(self, national: bool = False) -> pd.DataFrame:
         """
-        cal_file: str path to flow_out_sum data
-
-        moth_file: path file to excel data (check examples)
+        @subregions: bool = False
+        If activated, it aggregates the data at country level
 
         returns:
             -pd.DataFrame: modified Calliope file with the following changes:
@@ -114,7 +109,15 @@ class SoftLink():
 
         """
         # Create an instance of the Cleaner class
-        self._cleaner.subregions = subregions
+
+
+        self._cleaner = Cleaner(
+                motherfile=self.paths_dict['basefile.xlsx'],
+                file_handler=self.paths_dict,
+                national=national
+            )
+
+            # Preprocess the data
         self._cleaner.preprocess_data()
         self.preprocessed_units= self._cleaner.adapt_units()
 

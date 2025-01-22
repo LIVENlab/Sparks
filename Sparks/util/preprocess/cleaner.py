@@ -16,17 +16,16 @@ class Cleaner:
     def __init__(self,
                  motherfile: str,
                  file_handler: dict,
-                 subregions: Optional[bool]= False,
+                 national: Optional[bool]= False,
                  ):
 
-        self.subregions = subregions
+        self.national = national
         self.mother_file = motherfile
         self.final_df = None
         self.techs_region_not_included = []
         self.file_handler = file_handler
 
         self._edited = False
-
 
 
     @staticmethod
@@ -51,6 +50,7 @@ class Cleaner:
         Check whether the input follows the expected strucutre.
         Assume that last column corresponds to filename (flow_out_sum etc)
         """
+
         filename=filename.split('.')[0]
         expected_cols = {'spores',
                          'techs',
@@ -61,11 +61,11 @@ class Cleaner:
         # Add 'spores' column if it does not exist
         if 'spores' not in data.columns:
             data['spores'] = 0
-        try:
-            data[list(expected_cols)]
-            data['country'] = data['locs'].str.split('_').str[0]
 
+        try:
+            tr = data[list(expected_cols)]
             return data.rename(columns={filename: 'energy_value'})
+
         except KeyError:
             raise KeyError(f"Columns {data.columns} do not match the expected columns: {expected_cols}")
 
@@ -76,17 +76,16 @@ class Cleaner:
         """
         df_names=df.copy()
         # Filter Processors
-        df_names['alias_carrier']=df_names['techs'] + '_' +df_names['carriers']
-        df_names['alias_region']=df_names['alias_carrier'] + '_' +df_names['locs']
-
+        df_names['alias_carrier']=df_names['techs'] + '_' + df_names['carriers']
+        df_names['alias_region']=df_names['alias_carrier'] + '_' + df_names['locs']
 
         if self._edited is False:
             self.basefile = pd.read_excel(self.mother_file, sheet_name='Processors').dropna(subset=['Ecoinvent_key_code'])
-            self.basefile['alias_carrier']=self.basefile['Processor'] + '_' + self.basefile['@SimulationCarrier']
-            self.basefile['alias_region']=self.basefile['alias_carrier']+'_'+self.basefile['Region']
-            self._edited=True
+            self.basefile['alias_carrier'] = self.basefile['Processor'] + '_' + self.basefile['@SimulationCarrier']
+            self.basefile['alias_region'] = self.basefile['alias_carrier']+'_'+self.basefile['Region']
+            self._edited = True
 
-        basefile=self.basefile.loc[self.basefile['File_source']==filter]
+        basefile = self.basefile.loc[self.basefile['File_source'] == filter]
 
 
         excluded_techs = set(df_names['alias_carrier']) - set(basefile['alias_carrier'])
@@ -102,9 +101,26 @@ class Cleaner:
 
 
     def _group_data(self,df: pd.DataFrame)-> pd.DataFrame:
-        grouped_df = df.groupby(['spores', 'techs', 'carriers', 'unit', 'locs', 'alias_carrier'], as_index=False).agg({
-            'energy_value': 'sum'
-        })
+        """
+        Group the input data based on technologies defined in the basefile
+        If national= True, it aggregates by country
+        """
+
+        if self.national:
+
+            df['locs'] = df['locs'].str.split('_').str[0].str.split('-').str[0]
+            grouped_df = df.groupby(['alias_carrier', "locs", 'unit'], as_index=False).agg({
+                'energy_value': 'sum',
+                'spores': 'first',
+                'techs': 'first',
+                'carriers': 'first',
+                'unit': 'first',
+            })
+
+        else:
+            grouped_df = df.groupby(['spores', 'techs', 'carriers', 'unit', 'locs', 'alias_carrier'], as_index=False).agg({
+                'energy_value': 'sum'
+            })
         return grouped_df
 
 
@@ -112,8 +128,8 @@ class Cleaner:
         """Run data preprocessing steps"""
 
         self.basefile = pd.read_excel(self.mother_file, sheet_name='Processors')
-        all_data=self.create_template_df()
-        grouped= self.basefile.groupby('File_source')
+        all_data = self.create_template_df()
+        grouped = self.basefile.groupby('File_source')
 
         for data_source, group in grouped:
             if pd.isna(data_source):
@@ -122,15 +138,15 @@ class Cleaner:
             try:
                 # Load data once for the data source
                 raw_data = self._load_data(data_source)
-                checked_data = self._input_checker(data=raw_data, filename=data_source)
-                filtered_data = self._filter_techs(checked_data,data_source)
+                checked_data = self._input_checker(data=raw_data, filename = data_source)
+                filtered_data = self._filter_techs(checked_data, data_source)
                 all_data = pd.concat([all_data, filtered_data], ignore_index=True)
+
             except Exception as e:
                 warnings.warn(f"Error processing {data_source}: {e}", Warning)
 
         self.final_df = self._group_data(all_data)
         return self.final_df
-
 
 
     def _extract_data(self) -> List['BaseFileActivity']:
@@ -153,6 +169,7 @@ class Cleaner:
 
         return [activity for activity in base_activities if activity.unit is not None]
 
+
     def _adapt_units(self):
         """adapt the units (flow_out_sum * conversion factor)"""
 
@@ -166,6 +183,7 @@ class Cleaner:
 
 
     def _final_dataframe(self, df):
+
         cols = ['spores',
                 'locs',
                 'techs',
@@ -184,6 +202,9 @@ class Cleaner:
     def adapt_units(self):
         """Public method to adapt the units"""
         return self._adapt_units()
+
+
+
 
 
 
