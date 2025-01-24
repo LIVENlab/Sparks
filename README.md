@@ -22,7 +22,7 @@ enbios_mod.preprocess()
 enbios_mod.data_for_ENBIOS(smaller_vers=False, path_save=r'test.json')
 ```
 
-The *SoftLink* class requires a path to a folder with different files. First, you need to include the basefile (see an example here). It's an Excel file describing the energy technologies, inventory data, file sources, methods, conversion factors and the dendrogram.
+The *SoftLink* class requires a path to a folder with different files. First, you need to include the basefile (see an example [here](https://github.com/LIVENlab/Sparks/tree/sparks-times/testing/data_test). It's an Excel file describing the energy technologies, inventory data, file sources, methods, conversion factors and the dendrogram.
 
 run the *preprocess* function will transform the data into an enbios like-file, while also adapting the units according to the conversion factors.
 
