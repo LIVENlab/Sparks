@@ -11,6 +11,7 @@ import bw2io as bi
 import warnings
 from Sparks.util.preprocess.cleaner import Cleaner
 from Sparks.util.preprocess.SoftLink import SoftLinkCalEnb
+from Sparks.util.develop_basefile import Support
 from Sparks.const import const
 
 
@@ -178,6 +179,20 @@ class SoftLink():
 
 
 
+    def sup_basefile(self):
+
+        file_path= r'testing\basefile_dev'
+        
+        # Store other paths in a dictionary
+        paths_dict = {
+            file_name: os.path.join(file_path, file_name)
+            for file_name in os.listdir(file_path)
+            if os.path.isfile(os.path.join(file_path, file_name))
+        }
+        pass
+        sup= Support(file= r'tech_mapping.xlsx', project = self.project, calliope = paths_dict)
+
+        
 
 
 
