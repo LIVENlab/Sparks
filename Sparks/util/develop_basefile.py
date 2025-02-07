@@ -31,8 +31,6 @@ class Support():
 
       
 
-
-
     def _read_excel(self, file):  # Added self as the first parameter
     
         self.om = pd.read_excel(file, sheet_name='o&m')  # Changed o&m to om
@@ -48,15 +46,15 @@ class Support():
         # Append technology name and source file in tuples 
         list_om = []
         for index, row in self.om.iterrows():
-            BaseAct(name=row['technology_name_calliope'],
-            ecoinvent_name = ['life_cycle_inventory_name_o&m'],
+            act=BaseAct(name=row['technology_name_calliope'],
+            ecoinvent_name = row['life_cycle_inventory_name_o&m'],
             file_name=row['calliope_om_file'],
             factor= row['prod_scaling_factor'],
             ecoinvent_location = row['prod_location'],
             database = row['prod_database'] ,
             calliope_units = row['calliope_prod_unit'])
            
-            list_om.append(pair)
+            list_om.append(act)
         pass
         self.list_om =list_om
 
@@ -105,8 +103,6 @@ class Support():
     def _append_contry_techs(self):
         
         df= self._create_empty_dataframe
-
-    
         for element in self.list_inf:
             element=element[1] + '.csv'
             if  not hasattr(self, element):
@@ -115,7 +111,6 @@ class Support():
             pass
 
         
-        pass
 
 
 @dataclass
@@ -136,22 +131,34 @@ class BaseAct:
         if not init_post:
             return
        
-        self.activity = self._load_activity(key=self.ecoinvent_name)
+        self.activity = self._load_activity(name=self.ecoinvent_name,
+                                            database=self.database,
+                                            location= self.ecoinvent_location)
 
 
 
-    def _load_activity(self, key) -> Optional['Activity']:
+    def _load_activity(self, name, database, location) -> Optional['Activity']:
 
         try:
-            pass
-            activity=list(ActivityDataset.select().where(ActivityDataset.name == key))
+            activity=list(ActivityDataset.select().where(
+                (ActivityDataset.name == name) & 
+                (ActivityDataset.database == database)))
+            """
             pass
             if len(activity)>1:
                 warnings.warn(f"More than one activity found with name {name}",Warning)
+                pass
             if len(activity)<1:
                 raise UnknownObject(f'No activity with code {name}')
-
-            return Activity(activity[0])
+            """
+            if len(activity) != 0:
+                act=[Activity(act) for act in activity]
+                
+                act=[a for a in act if a['location'] == location][0]
+                if len(act) > 1:
+                    raise('warning, weird stuff going on')
+                return act[0]
+            
 
         except (bw2data.errors.UnknownObject, KeyError):
             message = (f"\n{key} not found in the database. Please check your database / basefile."

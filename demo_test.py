@@ -1,7 +1,7 @@
 from Sparks.util.base import SoftLink
 
 enbios_mod = SoftLink(r'C:\Users\altz7\PycharmProjects\ENBIOS4TIMES_\testing\data_test',
-                    'Seeds_exp4')
+                    'Hydrogen_SEEDS')
 pass
 enbios_mod.sup_basefile()
 enbios_mod.preprocess()
