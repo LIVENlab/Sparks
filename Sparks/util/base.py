@@ -179,18 +179,29 @@ class SoftLink():
 
 
 
-    def sup_basefile(self):
+    def sup_basefile(self,
+                            file_path: str =  r'testing\basefile_dev',
+                            gen_file : str = r'tech_mapping.xlsx' ) -> pd.DataFrame:
+        """
+        transform tech_mapping files into basefiles.
+        See tech_mapping.xlsx for an example 
 
-        file_path= r'testing\basefile_dev'
+        path: str --> path to the folder containing the data files
+        gen_file: str --> path to the excel file with the basic information to be transformed
+        """
         
-        # Store other paths in a dictionary
         paths_dict = {
             file_name: os.path.join(file_path, file_name)
             for file_name in os.listdir(file_path)
             if os.path.isfile(os.path.join(file_path, file_name))
         }
-        pass
-        sup= Support(file= r'tech_mapping.xlsx', project = self.project, calliope = paths_dict)
+        
+        sup = Support(file= gen_file,
+         project = self.project,
+        calliope = paths_dict)
+        sup.run()
+
+        return sup.df
 
         
 
