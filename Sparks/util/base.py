@@ -3,6 +3,7 @@
 """
 import json
 import os
+from pathlib import Path
 import time
 from typing import Union, Optional
 import pandas as pd
@@ -80,9 +81,10 @@ class SoftLink():
          - Checks for the presence of a mandatory file 'basefile.xlsx' and assigns it to `self.basefile_path`.
         - Stores paths to all other files in the directory in a dictionary (`self.paths_dict`).
         """
-        basefile_path = os.path.join(self.file_path, "basefile.xlsx")
+        self.file_path = Path(self.file_path).resolve()  # Asegura que sea absoluta
+        basefile_path = self.file_path / "basefile.xlsx"
 
-        if os.path.exists(basefile_path):
+        if basefile_path.exists():
             self.mother = basefile_path
         else:
             raise FileNotFoundError(
