@@ -96,6 +96,8 @@ class Last_Branch:
 
     def __post_init__(self):
         self.leafs = [{'name': x.alias_carrier_region, 'adapter': 'bw', 'config': {'code': x.code}} for x in self.origin]
+        if not self.leafs:
+            warnings.warn(f"leafs not found for Last Tree Branch {self.name}, at {self.level}. This error can induce critical erros when using this data in enbios. Please, check the dendrogram structure")
 
 
 
@@ -114,6 +116,9 @@ class Branch:
                 'name': x.name, 'aggregator': 'sum', 'children': x.leafs
             }
             for x in self.origin]
+        if not self.leafs:
+            warnings.warn(f"leafs not found for Last Tree Branch {self.name}, at {self.level}. This  can induce critical errors when using this data in enbios. Please, check the dendrogram structure")
+
 
 
 @dataclass
