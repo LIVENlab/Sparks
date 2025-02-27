@@ -39,9 +39,9 @@ The `SoftLink` class requires a `path` pointing to a directory containing the re
 
 A structured example can be found in the [testing/data_test](https://github.com/LIVENlab/Sparks/tree/sparks-times/testing/data_test).
 
-### Output Example
+### Workflow Example
 
-The generated output follows the structure expected by ENBIOS. See [test.json](https://github.com/LIVENlab/Sparks/blob/sparks-times/test.json) for an example.
+See an example of the workflow [here](https://github.com/LIVENlab/Sparks/blob/main/demo.ipynb)
 
 
 ### Contact
