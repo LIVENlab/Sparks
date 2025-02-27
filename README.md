@@ -43,8 +43,9 @@ A structured example can be found in the [testing/data_test](https://github.com/
 
 The generated output follows the structure expected by ENBIOS. See [test.json](https://github.com/LIVENlab/Sparks/blob/sparks-times/test.json) for an example.
 
-## License
 
+### Contact
 
-This work is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/).
+- [Alexander de Tomás](mailto:alexander.detomas@uab.cat)
+
 
