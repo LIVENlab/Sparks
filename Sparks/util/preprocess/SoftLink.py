@@ -106,6 +106,7 @@ class Hierarchy:
         self.subloc = sublocations
         self.motherdata = self.manage_subregions()
         self.data=self._transform_motherdata()
+        
 
 
     def _create_copies(self,
@@ -123,6 +124,7 @@ class Hierarchy:
                     parent=existing_act.parent,
                     code=existing_act.code,
                     factor=existing_act.factor,
+                    full_alias = existing_act.full_alias,
                     init_post=False
                 )
                 new_act.alias_carrier_region=new_name
@@ -134,9 +136,12 @@ class Hierarchy:
     def manage_subregions(self):
         final_list=[]
         for act in self.motherdata:
-            new_names= [x for x in self.subloc if act.alias_carrier_region in str(x)]
-            copies=self._create_copies(act,new_names)
-            final_list.extend(copies)
+            new_names= [x for x in self.subloc if act.full_alias in str(x)]
+            if new_names:
+                copies=self._create_copies(act,new_names)
+                final_list.extend(copies)
+            else:
+                final_list.append(act)
 
         return final_list
 
@@ -180,7 +185,7 @@ class Hierarchy:
                         origin=[x for x in last_level_branches if x.parent == row['Processor']]
                     )
                     for _, row in data.iterrows()]
-
+                
                 last_level_hierachy=[x.leafs for x in last_level_branches]
 
             else:
@@ -192,4 +197,6 @@ class Hierarchy:
                         origin=[x for x in last_level_branches if x.parent == row['Processor']]
                     )
                     for _, row in data.iterrows()]
-                return {'name': last_level_branches[0].name, 'aggregator': 'sum', 'children': last_level_branches[0].leafs}
+        
+        
+        return {'name': last_level_branches[0].name, 'aggregator': 'sum', 'children': last_level_branches[0].leafs}
