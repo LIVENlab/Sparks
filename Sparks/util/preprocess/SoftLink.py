@@ -3,7 +3,7 @@ import pandas as pd
 from Sparks.generic.generic_dataclass import *
 
 bd.projects.set_current(bw_project)            # Select your project
-database = bd.Database(bw_db)        # Select your db
+     # Select your db
 
 
 
@@ -18,7 +18,6 @@ class SoftLinkCalEnb():
                  motherfile,
                  smaller_vers=None):
 
-
         self.calliope=calliope
         self.motherfile=motherfile
         self.sublocations=sublocations # Use for hierarchy
@@ -26,8 +25,8 @@ class SoftLinkCalEnb():
         self.mother_data=mother_data
 
 
-
     def _generate_scenarios(self):
+
         cal_dat=self.calliope
         cal_dat['scenarios']=cal_dat['scenarios'].astype(str)
         try:
@@ -36,9 +35,7 @@ class SoftLinkCalEnb():
             cols=cal_dat.columns
             raise KeyError(f'Input data error. Columns are {cols}.', f' and expecting {e}.')
 
-
         return self._get_scenarios()
-
 
     def _get_scenarios(self):
         cal_dat = self.calliope
@@ -48,27 +45,27 @@ class SoftLinkCalEnb():
             try:
                 scenario = cal_dat['scenarios'].unique().tolist()[0]
                 cal_dat['scenarios'] = cal_dat['scenarios'].astype(str)
-                cal_dat=cal_dat[cal_dat['scenarios']==str(scenario)]
+                cal_dat = cal_dat[cal_dat['scenarios'] == str(scenario)]
             except:
                 raise ValueError('Scenarios out of bonds')
 
-        scenarios_check = [str(x) for x in cal_dat['scenarios'].unique()]  # Convert to string, just in case the scenario is a number
+        scenarios_check = [str(x) for x in
+                           cal_dat['scenarios'].unique()]  # Convert to string, just in case the scenario is a number
 
-        scenarios=[
+        scenarios = [
             Scenario(name=str(scenario),
                      activities=[
                          Activity_scenario(
-                             alias=row['aliases'],
-                             amount = row['flow_out_sum'],
+                             alias=row['full_name'],
+                             amount=row['energy_value'],
                              unit=row['new_units']
                          )
-                         for _,row in group.iterrows()
+                         for _, row in group.iterrows()
                      ]).to_dict()
-            for scenario,group in cal_dat.groupby('scenarios')
+            for scenario, group in cal_dat.groupby('scenarios')
         ]
-        assert (len(scenarios) == len(scenarios_check) )
+        assert (len(scenarios) == len(scenarios_check))
         return scenarios
-
 
     def _get_methods(self):
         processors = pd.read_excel(self.motherfile, sheet_name='Methods')
@@ -84,7 +81,6 @@ class SoftLinkCalEnb():
                                  motherdata=self.mother_data,
                                  sublocations=self.sublocations ).generate_hierarchy()
         enbios2_methods= self._get_methods()
-
         self.enbios2_data = {
             "adapters": [
                 {
@@ -103,7 +99,6 @@ class SoftLinkCalEnb():
         print('Input data for ENBIOS created')
 
 
-
 class Hierarchy:
     def __init__(self, base_path: str, motherdata, sublocations:list):
         self.parents = pd.read_excel(base_path, sheet_name='Dendrogram_top')
@@ -111,12 +106,14 @@ class Hierarchy:
         self.subloc = sublocations
         self.motherdata = self.manage_subregions()
         self.data=self._transform_motherdata()
+        
 
 
     def _create_copies(self,
                        existing_act: BaseFileActivity,
                        new_names: [List[str]])->List[BaseFileActivity]:
-            """ Pass a the name of an existing BasefileAct, a list of new names, and return a list of copies"""
+            """ Pass a the name of an existing BasefileAct,
+             a list of new names, and return a list of copies"""
 
             copies=[]
             for new_name in new_names:
@@ -127,6 +124,7 @@ class Hierarchy:
                     parent=existing_act.parent,
                     code=existing_act.code,
                     factor=existing_act.factor,
+                    full_alias = existing_act.full_alias,
                     init_post=False
                 )
                 new_act.alias_carrier_region=new_name
@@ -138,9 +136,12 @@ class Hierarchy:
     def manage_subregions(self):
         final_list=[]
         for act in self.motherdata:
-            new_names= [x for x in self.subloc if act.alias_carrier_region in str(x)]
-            copies=self._create_copies(act,new_names)
-            final_list.extend(copies)
+            new_names= [x for x in self.subloc if act.full_alias in str(x)]
+            if new_names:
+                copies=self._create_copies(act,new_names)
+                final_list.extend(copies)
+            else:
+                final_list.append(act)
 
         return final_list
 
@@ -184,7 +185,7 @@ class Hierarchy:
                         origin=[x for x in last_level_branches if x.parent == row['Processor']]
                     )
                     for _, row in data.iterrows()]
-
+                
                 last_level_hierachy=[x.leafs for x in last_level_branches]
 
             else:
@@ -196,9 +197,6 @@ class Hierarchy:
                         origin=[x for x in last_level_branches if x.parent == row['Processor']]
                     )
                     for _, row in data.iterrows()]
-                return {'name': last_level_branches[0].name, 'aggregator': 'sum', 'children': last_level_branches[0].leafs}
-
-
-
-
-
+        
+        
+        return {'name': last_level_branches[0].name, 'aggregator': 'sum', 'children': last_level_branches[0].leafs}

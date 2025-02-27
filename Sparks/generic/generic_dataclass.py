@@ -1,13 +1,13 @@
 from dataclasses import dataclass, field, InitVar
 import bw2data
-from typing import Union, Optional, List
+from typing import Union, Optional, List,Tuple
 import warnings
 import bw2data as bd
 from bw2data.errors import UnknownObject
 from bw2data.backends import Activity, ActivityDataset
-from Sparks.const.const import bw_project,bw_db
+from Sparks.const.const import bw_project
 bd.projects.set_current(bw_project)            # Select your project
-database = bd.Database(bw_db)
+
 
 
 @dataclass
@@ -18,9 +18,8 @@ class BaseFileActivity:
     carrier: str
     parent: str
     code:str
+    full_alias: str
     factor: Union[int, float]
-    alias_carrier: Optional[str] = None
-    alias_carrier_region: Optional[str] = None
     unit: Optional[str] = None
     init_post: InitVar[bool]=True # Allow to create an instance without calling alias modifications
 
@@ -31,17 +30,28 @@ class BaseFileActivity:
 
         self.alias_carrier = f"{self.name}_{self.carrier}"
         self.alias_carrier_region=f"{self.name}__{self.carrier}___{self.region}"
+        #self.alias_carrier_parent_loc =f"{self.alias_carrier}_{self.alias_carrier_parent_loc}"
         self.activity = self._load_activity(key=self.code)
 
-        if isinstance(self.activity, Activity):
-            self.unit = self.activity['unit']
-        else:
+        try:
+            if isinstance(self.activity, Activity):
+                self.unit = self.activity['unit']
+        except:
             self.unit = None
 
 
     def _load_activity(self, key) -> Optional['Activity']:
+
         try:
-            return database.get_node(key)
+            activity=list(ActivityDataset.select().where(ActivityDataset.code == key))
+
+            if len(activity)>1:
+                warnings.warn(f"More than one activity found with code {key}",Warning)
+            if len(activity)<1:
+
+                raise UnknownObject(f'No activity with code {key}')
+            return Activity(activity[0])
+
         except (bw2data.errors.UnknownObject, KeyError):
             message = (f"\n{key} not found in the database. Please check your database / basefile."
                        f"\nThis activity won't be included.")
@@ -54,15 +64,14 @@ class Activity_scenario:
     """ Class for each activity in a specific scenario"""
     alias: str
     amount: int
-    unit: str #TODO: adapt
+    unit: str
 
 
 @dataclass
 class Scenario:
     """ Basic Scenario"""
-    name: str # scenario name
+    name: str
     activities: List['Activity_scenario'] = field(default_factory=list)
-
 
     def __post_init__(self):
         self.activities_dict = {x.alias: [
@@ -87,6 +96,8 @@ class Last_Branch:
 
     def __post_init__(self):
         self.leafs = [{'name': x.alias_carrier_region, 'adapter': 'bw', 'config': {'code': x.code}} for x in self.origin]
+        if not self.leafs:
+            warnings.warn(f"leafs not found for Last Tree Branch {self.name}, at {self.level}. This error can induce critical erros when using this data in enbios. Please, check the dendrogram structure")
 
 
 
@@ -105,12 +116,14 @@ class Branch:
                 'name': x.name, 'aggregator': 'sum', 'children': x.leafs
             }
             for x in self.origin]
+        if not self.leafs:
+            warnings.warn(f"leafs not found for Last Tree Branch {self.name}, at {self.level}. This  can induce critical errors when using this data in enbios. Please, check the dendrogram structure")
+
 
 
 @dataclass
 class Method:
     method: tuple
-
 
     def to_dict(self):
         return {self.method[2].split('(')[1].split(')')[0]: [
