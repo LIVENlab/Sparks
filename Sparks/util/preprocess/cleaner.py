@@ -158,7 +158,7 @@ class Cleaner:
         grouped = self.basefile.groupby('File_source')
 
         for data_source, group in grouped:
-            pass #TODO: ADD A COLUMN WITH THE FILE NAME
+            
             if pd.isna(data_source):
                 warnings.warn(f"DataSource is missing for some entries. Skipping these entries.", Warning)
                 continue
@@ -178,7 +178,7 @@ class Cleaner:
             {formatted_items}
 
             Please, check the following items to avoid missing information."""
-            warnings.warn(message, Warning)
+            #warnings.warn(message, Warning)
 
         self.final_df = self._group_data(all_data)
         self.final_df = self._manage_regions(self.final_df)
