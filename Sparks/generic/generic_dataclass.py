@@ -1,18 +1,19 @@
 from dataclasses import dataclass, field, InitVar
 import bw2data
-from typing import Union, Optional, List,Tuple
+from typing import Union, Optional, List,Tuple, Dict
 import warnings
 import bw2data as bd
 from bw2data.errors import UnknownObject
 from bw2data.backends import Activity, ActivityDataset
 from Sparks.const.const import bw_project
 bd.projects.set_current(bw_project)            # Select your project
-
+from collections import defaultdict
 
 
 @dataclass
 class BaseFileActivity:
     """ Base class for motherfile data"""
+
     name: str
     region: str
     carrier: str
@@ -23,8 +24,11 @@ class BaseFileActivity:
     unit: Optional[str] = None
     init_post: InitVar[bool]=True # Allow to create an instance without calling alias modifications
 
+    activity_cache = defaultdict(lambda: None)  # init cache to speedup db search!
+
 
     def __post_init__(self,init_post):
+
         if not init_post:
             return
 
@@ -40,7 +44,13 @@ class BaseFileActivity:
             self.unit = None
 
 
-    def _load_activity(self, key) -> Optional['Activity']:
+    def _load_activity(self, key:str) -> Optional['Activity']:
+        """
+        key: code
+        """
+
+        if key in BaseFileActivity.activity_cache:
+            return BaseFileActivity.activity_cache[key]
 
         try:
             activity=list(ActivityDataset.select().where(ActivityDataset.code == key))
@@ -50,13 +60,20 @@ class BaseFileActivity:
             if len(activity)<1:
 
                 raise UnknownObject(f'No activity with code {key}')
-            return Activity(activity[0])
+
+            result =  Activity(activity[0])
 
         except (bw2data.errors.UnknownObject, KeyError):
             message = (f"\n{key} not found in the database. Please check your database / basefile."
                        f"\nThis activity won't be included.")
             warnings.warn(message, Warning)
-            return None
+            result = None
+
+
+
+        # save activity into the cache
+        BaseFileActivity.activity_cache[key] = result
+        return result
 
 
 @dataclass
