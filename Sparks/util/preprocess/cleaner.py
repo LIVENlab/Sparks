@@ -5,7 +5,8 @@
 import pandas as pd
 pd.options.mode.chained_assignment = None  # default='warn'
 from Sparks.generic.generic_dataclass import *
-
+from tqdm import tqdm
+tqdm.pandas()
 bd.projects.set_current(bw_project)
 
 
@@ -33,7 +34,8 @@ class Cleaner:
         """
         Basic template for clean data
         """
-        columns = ['spores',"techs","carriers","unit","energy_value"]
+        #todo: remove from, here
+        columns = ['spores',"techs","carriers","energy_value"]
         return pd.DataFrame(columns=columns)
 
 
@@ -41,6 +43,7 @@ class Cleaner:
         """ Assuming comma separated input, load the data from a specific file"""
         try:
             return pd.read_csv(self.file_handler[source], delimiter=',').dropna()
+
         except FileNotFoundError as e:
             raise FileNotFoundError(f"File {source} does not exist") from e
 
@@ -51,16 +54,25 @@ class Cleaner:
         Assume that last column corresponds to filename (flow_out_sum etc)
         """
 
+
+
         filename = filename.split('.')[0]
         expected_cols = {'spores',
                          'techs',
                          'locs',
                          'carriers',
-                         'unit',
                          filename}
+
+
         # Add 'spores' column if it does not exist
         if 'spores' not in data.columns:
             data['spores'] = 0
+        if 'Unnamed: 0' in data.columns:
+            data = data.drop('Unnamed: 0', axis=1)
+
+        if 'carriers' not in data.columns:
+            data['carriers'] = 'default_carrier'
+
 
         try:
             tr = data[list(expected_cols)]
@@ -79,7 +91,7 @@ class Cleaner:
         Filter the input data based on technologies defined in the basefile
         """
         df_names=df.copy()
-        # Filter Processors
+        # Filter Processors from calliope data
         df_names['alias_carrier'] = df_names['techs'] + '_' + df_names['carriers']
         df_names['alias_filename'] = df_names['alias_carrier']+ '__' + df_names['filename']
         df_names['full_name'] = df_names['alias_filename'] + '___' + df_names['locs']
@@ -88,6 +100,7 @@ class Cleaner:
 
 
         if self._edited is False:
+            # working with basefile data
             self.basefile = pd.read_excel(self.mother_file, sheet_name='Processors').dropna(subset=['Ecoinvent_key_code'])
             self.basefile['alias_carrier'] = self.basefile['Processor'] + '_' + self.basefile['@SimulationCarrier']
             #self.basefile['alias_region'] = self.basefile['alias_carrier']+'_'+self.basefile['Region']
@@ -116,22 +129,20 @@ class Cleaner:
         if self.national:
             pass
             df['locs'] = df['locs'].str.split('_').str[0].str.split('-').str[0]
-            grouped_df = df.groupby(['alias_filename', "locs", 'unit'], as_index=False).agg({
+            grouped_df = df.groupby(['alias_filename', "locs"], as_index=False).agg({ #todo: remove units form here
                 'energy_value': 'sum',
                 'spores': 'first',
                 'techs': 'first',
                 'carriers': 'first',
-                'unit': 'first',
             })
 
         else:
-            pass
+
             grouped_df = df.groupby(['spores',
                                      'techs',
                                      'carriers',
-                                     'unit',
                                      'locs',
-                                     'alias_carrier',
+                                     'alias_carrier', #remove unit from here
                                      'alias_filename',
                                      'full_name'
                                      ], as_index=False).agg({
@@ -163,9 +174,9 @@ class Cleaner:
                 warnings.warn(f"DataSource is missing for some entries. Skipping these entries.", Warning)
                 continue
             try:
-                # Load data once for the data source
-                raw_data = self._load_data(data_source)
-                checked_data = self._input_checker(data=raw_data, filename = data_source)
+
+                raw_data = self._load_data(data_source) # Calliope data
+                checked_data = self._input_checker(data=raw_data, filename = data_source) # calliope data
                 filtered_data = self._filter_techs(checked_data, data_source)
                 all_data = pd.concat([all_data, filtered_data], ignore_index=True)
 
@@ -185,33 +196,38 @@ class Cleaner:
 
         return self.final_df
 
-
+    # noinspection PyArgumentList
     def _extract_data(self) -> List['BaseFileActivity']:
-        base_activities = []
-
-        for _, r in self.basefile.iterrows():
+        pass
+        def _create_activity(row):
             try:
-                base_activities.append(
-                    BaseFileActivity(
-                        name=r['Processor'],
-                        carrier=r['@SimulationCarrier'],
-                        parent=r['ParentProcessor'],
-                        region=r['Region'],
-                        code=r['Ecoinvent_key_code'],
-                        factor=r['@SimulationToEcoinventFactor'],
-                        full_alias=r['alias_filename_loc']
-                    )
-                )
-            except:
-                continue
 
+                return BaseFileActivity(
+                    name=row['Processor'],
+                    carrier=row['@SimulationCarrier'],
+                    parent=row['ParentProcessor'],
+                    region=row['Region'],
+                    code=row['Ecoinvent_key_code'],
+                    factor=row['@SimulationToEcoinventFactor'],
+                    full_alias=row['alias_filename_loc']
+                )
+
+            except KeyError:
+                return None
+
+        base_activities = self.basefile.progress_apply(_create_activity, axis=1).dropna().tolist()
         return [activity for activity in base_activities if activity.unit is not None]
+        pass
+
+
+
 
 
     def _adapt_units(self):
         """adapt the units (flow_out_sum * conversion factor)"""
 
         self.base_activities = self._extract_data()
+        pass
         alias_to_factor = {x.full_alias: x.factor for x in self.base_activities}
         unit_to_factor = {x.full_alias: x.unit for x in self.base_activities}
 
