@@ -105,9 +105,9 @@ class Cleaner:
             #self.basefile['alias_region'] = self.basefile['alias_carrier']+'_'+self.basefile['Region']
             self.basefile['alias_filename'] = self.basefile['alias_carrier']+'__'+self.basefile['File_source']
             self.basefile['alias_filename'] = self.basefile['alias_filename'].str.split('.').str[0]
-            #TODO: redundant to get it trhough
+
             self.basefile['alias_filename_loc'] = self.basefile['alias_filename'] + '___' + self.basefile['Region']
-            self.basefile['full_alias'] = self.basefile['alias_filename_loc'] + '-' + self.basefile['geo_loc']
+            self.basefile['full_alias'] = self.basefile['alias_filename_loc'] + '-' + self.basefile['geo_loc'] # TODO: make optional
             self._edited = True
 
 
@@ -149,7 +149,7 @@ class Cleaner:
                 'energy_value': 'sum'
             })
         pass
-        return grouped_df # REMEMBER I'M TRYING TO MANAGE THE GEO_LOC COLUMN
+        return grouped_df
 
 
     @staticmethod
@@ -231,35 +231,34 @@ class Cleaner:
 
     def _adapt_units(self):
         """adapt the units (flow_out_sum * conversion factor)"""
-
         self.base_activities = self._extract_data()
 
         df = pd.DataFrame([asdict(activity) for activity in self.base_activities])
-        #mapping = dict(zip(self.final_df['full_name'], self.final_df['energy_value']))
 
         df = pd.merge(
             self.final_df,
             df,
-            left_on="full_name",  # Columna en df1
-            right_on="alias_filename_loc",  # Columna en df2
-            how="right"  # Mantener todos los escenarios de df1
+            left_on="full_name",
+            right_on="alias_filename_loc",
+            how="right"
         )
 
         df['new_vals'] = df['factor'] * df['energy_value']
-        pass
+        df['new_units'] =df['unit']
 
-        return self._final_dataframe(self.final_df)
+        return self._final_dataframe(df)
 
 
     def _final_dataframe(self, df):
 
+
         cols = ['spores',
                 'locs',
                 'techs',
-                'full_name',
+                'full_alias',
                 'carriers',
-                'new_units',
-                'new_vals']
+                'new_vals',
+                'new_units']
 
         df.dropna(axis=0, inplace=True)
 
@@ -267,8 +266,10 @@ class Cleaner:
             df.rename(columns={'alias_filename' : 'full_name'}, inplace=True)
             
         df = df[cols]
-        df.rename(columns={'spores': 'scenarios', 'new_vals': 'energy_value'}, inplace=True)
-        df['aliases'] = df['techs'] + '__' + df['carriers'] + '___' + df['locs']
+
+        df.rename(columns={'full_alias':'full_name', 'spores': 'scenarios', 'new_vals': 'energy_value'}, inplace=True)
+        df['aliases'] = df['techs'] + '__' + df['carriers'] + '___' + df['locs'] # TODO: remove in clean versions
+
         self._techs_sublocations = df['full_name'].unique().tolist()  # save sublocation aliases for hierarchy
 
         return df

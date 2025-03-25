@@ -19,7 +19,8 @@ class BaseFileActivity:
     carrier: str
     parent: str
     code:str
-    full_alias: str
+    alias_filename_loc: str
+    full_alias:str
     factor: Union[int, float]
     unit: Optional[str] = None
     init_post: InitVar[bool]=True # Allow to create an instance without calling alias modifications
