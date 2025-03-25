@@ -8,7 +8,7 @@ from Sparks.generic.generic_dataclass import *
 from tqdm import tqdm
 tqdm.pandas()
 bd.projects.set_current(bw_project)
-
+from dataclasses import asdict
 
 
 class Cleaner:
@@ -53,7 +53,6 @@ class Cleaner:
         Check whether the input follows the expected strucutre.
         Assume that last column corresponds to filename (flow_out_sum etc)
         """
-
 
 
         filename = filename.split('.')[0]
@@ -108,6 +107,7 @@ class Cleaner:
             self.basefile['alias_filename'] = self.basefile['alias_filename'].str.split('.').str[0]
             #TODO: redundant to get it trhough
             self.basefile['alias_filename_loc'] = self.basefile['alias_filename'] + '___' + self.basefile['Region']
+            self.basefile['full_alias'] = self.basefile['alias_filename_loc'] + '-' + self.basefile['geo_loc']
             self._edited = True
 
 
@@ -135,20 +135,21 @@ class Cleaner:
                 'techs': 'first',
                 'carriers': 'first',
             })
-
+        #TODO: CHECK WHY IT GETS CUTED
         else:
 
             grouped_df = df.groupby(['spores',
                                      'techs',
                                      'carriers',
                                      'locs',
-                                     'alias_carrier', #remove unit from here
+                                     'alias_carrier',
                                      'alias_filename',
                                      'full_name'
                                      ], as_index=False).agg({
                 'energy_value': 'sum'
             })
-        return grouped_df
+        pass
+        return grouped_df # REMEMBER I'M TRYING TO MANAGE THE GEO_LOC COLUMN
 
 
     @staticmethod
@@ -177,7 +178,9 @@ class Cleaner:
 
                 raw_data = self._load_data(data_source) # Calliope data
                 checked_data = self._input_checker(data=raw_data, filename = data_source) # calliope data
-                filtered_data = self._filter_techs(checked_data, data_source)
+
+                filtered_data = self._filter_techs(checked_data, data_source) # calliope data
+
                 all_data = pd.concat([all_data, filtered_data], ignore_index=True)
 
             except Exception as e:
@@ -190,18 +193,20 @@ class Cleaner:
 
             Please, check the following items to avoid missing information."""
             #warnings.warn(message, Warning)
-
-        self.final_df = self._group_data(all_data)
+        pass
+        self.final_df = self._group_data(all_data) # calliope data
         self.final_df = self._manage_regions(self.final_df)
 
         return self.final_df
 
     # noinspection PyArgumentList
     def _extract_data(self) -> List['BaseFileActivity']:
+        """
+        extract activities from the basefile and create a list BasFileActivity instances
+        """
         pass
         def _create_activity(row):
             try:
-
                 return BaseFileActivity(
                     name=row['Processor'],
                     carrier=row['@SimulationCarrier'],
@@ -209,7 +214,8 @@ class Cleaner:
                     region=row['Region'],
                     code=row['Ecoinvent_key_code'],
                     factor=row['@SimulationToEcoinventFactor'],
-                    full_alias=row['alias_filename_loc']
+                    full_alias= row['full_alias'],
+                    alias_filename_loc=row['alias_filename_loc']
                 )
 
             except KeyError:
@@ -217,7 +223,7 @@ class Cleaner:
 
         base_activities = self.basefile.progress_apply(_create_activity, axis=1).dropna().tolist()
         return [activity for activity in base_activities if activity.unit is not None]
-        pass
+
 
 
 
@@ -227,12 +233,21 @@ class Cleaner:
         """adapt the units (flow_out_sum * conversion factor)"""
 
         self.base_activities = self._extract_data()
-        pass
-        alias_to_factor = {x.full_alias: x.factor for x in self.base_activities}
-        unit_to_factor = {x.full_alias: x.unit for x in self.base_activities}
 
-        self.final_df['new_vals'] = self.final_df['alias_filename'].map(alias_to_factor) * self.final_df['energy_value']
-        self.final_df['new_units'] = self.final_df['alias_filename'].map(unit_to_factor)
+        df = pd.DataFrame([asdict(activity) for activity in self.base_activities])
+        #mapping = dict(zip(self.final_df['full_name'], self.final_df['energy_value']))
+
+        df = pd.merge(
+            self.final_df,
+            df,
+            left_on="full_name",  # Columna en df1
+            right_on="alias_filename_loc",  # Columna en df2
+            how="right"  # Mantener todos los escenarios de df1
+        )
+
+        df['new_vals'] = df['factor'] * df['energy_value']
+        pass
+
         return self._final_dataframe(self.final_df)
 
 
@@ -247,7 +262,7 @@ class Cleaner:
                 'new_vals']
 
         df.dropna(axis=0, inplace=True)
-        pass
+
         if self.national:
             df.rename(columns={'alias_filename' : 'full_name'}, inplace=True)
             
