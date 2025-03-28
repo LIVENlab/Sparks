@@ -204,7 +204,7 @@ class Support():
                 regional = row['geographical_scope'],
                 carrier= row['carrier'],
                 sheet_name= self.sheet_name)) # Add here geographical scope
-        pass
+
         # 4: store them in the final excel
         self._store_excel(activities)
 

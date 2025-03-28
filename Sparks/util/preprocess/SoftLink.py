@@ -9,7 +9,7 @@ bd.projects.set_current(bw_project)            # Select your project
 
 class SoftLinkCalEnb():
     """
-    This class allows to create an ENBIOS-like input
+    Transform table-like input into a hierarchy (ENBIOS) like format
     """
 
     def __init__(self,calliope,
@@ -125,6 +125,7 @@ class Hierarchy:
                     code=existing_act.code,
                     factor=existing_act.factor,
                     full_alias = existing_act.full_alias,
+                    alias_filename_loc=existing_act.alias_filename_loc,
                     init_post=False
                 )
                 new_act.alias_carrier_region=new_name
