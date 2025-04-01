@@ -1,3 +1,4 @@
+import copy
 import json
 import pandas as pd
 from Sparks.generic.generic_dataclass import *
@@ -111,7 +112,7 @@ class Hierarchy:
 
     def _create_copies(self,
                        existing_act: BaseFileActivity,
-                       new_names: [List[str]])->List[BaseFileActivity]:
+                       new_names: List[str])->List[BaseFileActivity]:
             """ Pass a the name of an existing BasefileAct,
              a list of new names, and return a list of copies"""
 
@@ -128,19 +129,25 @@ class Hierarchy:
                     alias_filename_loc=existing_act.alias_filename_loc,
                     init_post=False
                 )
-                new_act.alias_carrier_region=new_name
+                new_act = copy.deepcopy(existing_act)
+                new_act.name = new_name
+                new_act.alias_carrier_region = new_name
                 copies.append(new_act)
 
             return copies
 
 
     def manage_subregions(self):
-        final_list=[]
+        seen = set()
+        final_list = []
         for act in self.motherdata:
-            new_names= [x for x in self.subloc if act.full_alias in str(x)]
+            new_names = [x for x in self.subloc if act.full_alias in str(x)]
             if new_names:
-                copies=self._create_copies(act,new_names)
-                final_list.extend(copies)
+                copies = self._create_copies(act, new_names)
+                for copy in copies:
+                    if copy.alias_carrier_region not in seen:
+                        final_list.append(copy)
+                        seen.add(copy.alias_carrier_region)
             else:
                 final_list.append(act)
 
@@ -150,9 +157,14 @@ class Hierarchy:
     def _transform_motherdata(self):
         """ Transform mother data into a config dictionary
         This should be equal to the last level of the hierarchy"""
-        return [
-            {'name': x.alias_carrier_region, 'adapter': 'bw', 'config': {'code': x.code}} for x in self.motherdata
-        ]
+
+        unique_dict = {}
+        for x in self.motherdata:
+            if x.alias_carrier_region not in unique_dict:
+                unique_dict[x.alias_carrier_region] = {'name': x.alias_carrier_region, 'adapter': 'bw',
+                                                       'config': {'code': x.code}}
+        unique_items = list(unique_dict.values())
+        return unique_items
 
 
     def generate_hierarchy(self):
@@ -160,7 +172,7 @@ class Hierarchy:
         last_level=None
         last_level_branches=[]
         last_level_hierachy=[] # official list
-
+        pass
         for level in reversed(self.parents['Level'].unique().tolist()):
             data=self.parents.loc[self.parents['Level']==level]
             if last_level is None:
@@ -173,6 +185,7 @@ class Hierarchy:
                     )
                     for _, row in data.iterrows()
                 ]
+                pass
                 last_level_hierachy=[x.leafs for x in last_level_branches]
                 last_level=level
                 continue
