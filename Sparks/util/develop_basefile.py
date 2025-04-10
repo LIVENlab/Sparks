@@ -129,7 +129,7 @@ class BaseAct:
             # logic 1: all the locations will contain the same bd.code
             #TODO: locations get empty here for some reason
             for element in self.locations:
-                element = element + self.activities[0] + (self.regional,self.carrier)
+                element = element + self.activities[0] + (self.regional,self.carrier, self.database)
                 self.basefile_activities.append(element)
                 
         else:
@@ -228,7 +228,9 @@ class Support():
             'File_source' : activity.file_name + '.csv',
             'activity_name_passed' : loc[2],
             'location_passed': loc[3],
-            'geo_loc': loc[5]
+            'geo_loc': loc[5],
+            'database': loc[-1]
+
                 }
             
                 new_rows.append(new_row)
@@ -270,7 +272,8 @@ class Support():
             'Ecoinvent_key_code', 
             'File_source',
             'activity_name_passed',
-            'location_passed'
+            'location_passed',
+            'database' # this should be optional # TODO
         ]
         
         # Create an empty DataFrame with the specified columns
