@@ -18,9 +18,11 @@ class Cleaner:
                  motherfile: str,
                  file_handler: dict,
                  national: Optional[bool]= False,
+                 specify_database: Optional[bool] =False
                  ):
 
         self.national = national
+        self.specify_database = specify_database
         self.mother_file = motherfile
         self.final_df = None
         self.techs_region_not_included = []
@@ -98,8 +100,11 @@ class Cleaner:
         df_names['alias_filename']=df_names['alias_filename']+'___' + df_names['countries']
 
 
-        if self._edited is False:
-            # working with basefile data
+        if self._edited is False:  # working with basefile data
+
+            if self.specify_database: # check that the database column is there and contains no empty values
+                self._validate_databases()
+
             self.basefile = pd.read_excel(self.mother_file, sheet_name='Processors').dropna(subset=['Ecoinvent_key_code'])
             self.basefile['alias_carrier'] = self.basefile['Processor'] + '_' + self.basefile['@SimulationCarrier']
             #self.basefile['alias_region'] = self.basefile['alias_carrier']+'_'+self.basefile['Region']
@@ -118,6 +123,21 @@ class Cleaner:
         df_names = df_names[~df_names['alias_carrier'].isin(excluded_techs)] # exclude the technologies
 
         return df_names
+
+
+    def _validate_databases(self):
+        """
+        if specify database is activated, check that the basefile has non NaN values
+        """
+        if 'database' not in self.basefile.columns:
+            raise KeyError(f"Please, specify the database column in the basefile")
+
+        if self.basefile['database'].isnull().any():
+            raise ValueError(f"The column database from the basefile containse missing values")
+
+
+
+
 
 
     def _group_data(self,df: pd.DataFrame)-> pd.DataFrame:
@@ -199,6 +219,8 @@ class Cleaner:
 
         return self.final_df
 
+
+
     # noinspection PyArgumentList
     def _extract_data(self) -> List['BaseFileActivity']:
         """
@@ -206,17 +228,25 @@ class Cleaner:
         """
         pass
         def _create_activity(row):
+            # move the activities from the basefile into a DataBase dataclass
+
             try:
-                return BaseFileActivity(
-                    name=row['Processor'],
-                    carrier=row['@SimulationCarrier'],
-                    parent=row['ParentProcessor'],
-                    region=row['Region'],
-                    code=row['Ecoinvent_key_code'],
-                    factor=row['@SimulationToEcoinventFactor'],
-                    full_alias= row['full_alias'],
-                    alias_filename_loc=row['alias_filename_loc']
-                )
+                kwargs= {
+                    'name': row['Processor'],
+                    'carrier': row['@SimulationCarrier'],
+                    'parent': row['ParentProcessor'],
+                    'region': row['Region'],
+                    'code': row['Ecoinvent_key_code'],
+                    'factor': row['@SimulationToEcoinventFactor'],
+                    'full_alias': row['full_alias'],
+                    'alias_filename_loc': row['alias_filename_loc']
+                }
+
+                if self.specify_database:
+                    kwargs['database']=row['database']
+
+                return BaseFileActivity(**kwargs)
+
 
             except KeyError:
                 return None
