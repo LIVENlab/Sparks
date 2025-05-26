@@ -63,6 +63,7 @@ class SoftLink():
 
         bd.projects.set_current(self.project)
         self._save_const(self.project)
+
         print('Project and Database existing...')
 
 
@@ -85,6 +86,7 @@ class SoftLink():
         basefile_path = self.file_path / "basefile.xlsx"
 
         if basefile_path.exists():
+
             self.mother = basefile_path
         else:
             raise FileNotFoundError(
@@ -99,10 +101,13 @@ class SoftLink():
 
 
     @timer
-    def preprocess(self, national: bool = False) -> pd.DataFrame:
+    def preprocess(self, national: bool = False, specify_database: bool = False) -> pd.DataFrame:
         """
         @subregions: bool = False
         If activated, it aggregates the data at country level
+
+        @specify_database: bool = False
+        If activated, the resulting dictionary will specify the database to look at
 
         returns:
             -pd.DataFrame: modified Calliope file with the following changes:
@@ -118,7 +123,8 @@ class SoftLink():
         self._cleaner = Cleaner(
                 motherfile=self.paths_dict['basefile.xlsx'],
                 file_handler=self.paths_dict,
-                national=national
+                national=national,
+                specify_database = specify_database
             )
 
             # Preprocess the data
@@ -165,19 +171,27 @@ class SoftLink():
             print(f'Data for enbios saved in {file_path}')
             self.path_saved=file_path
 
+
     @staticmethod
     def _save_const(project: str):
-        """ get the project and db name and store in a const file"""
+        """Get the project name and store it in a const.py file."""
         try:
-            with open(r'Sparks/const/const.py', 'w') as f:
-                f.write(f"bw_project = '{project}'\n")
-        except:
-            base_path=os.path.abspath(os.path.join('..', '..', 'Sparks', 'const'))
-            os.makedirs(base_path, exist_ok=True)
 
-            file_path=file_path = os.path.join(base_path, 'const.py')
+            current_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+
+            file_path = os.path.join(current_dir, "Sparks", "const", "const.py")
+
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+            print("Writing to:", file_path)
+
             with open(file_path, 'w') as f:
                 f.write(f"bw_project = '{project}'\n")
+
+            print(f" Written to: {file_path}")
+
+        except Exception as e:
+            print(f"Failed to write file: {e}")
 
 
 
