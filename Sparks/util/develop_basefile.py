@@ -11,6 +11,7 @@ from bw2data.backends import Activity, ActivityDataset
 
 LOCATION_EQUIVALENCE = {    'ALB': 'AL', 'FRA': 'FR', 'SWE': 'SE', 'DNK': 'DK', 'POL': 'PL', 'IRL': 'IE', 'EST': 'EE', 'HRV': 'HR', 'PRT': 'PT',    'BIH': 'BA', 'LVA': 'LV', 'SVN': 'SI', 'AUT': 'AT', 'GBR': 'GB', 'DEU': 'DE', 'MNE': 'ME', 'NOR': 'NO', 'BGR': 'BG',    'NLD': 'NL', 'HUN': 'HU', 'BEL': 'BE', 'CHE': 'CH', 'CZE': 'CZ', 'ROU': 'RO', 'CYP': 'CY', 'ESP': 'ES', 'GRC': 'GR',    'MKD': 'MK', 'ISL': 'IS', 'ITA': 'IT', 'LTU': 'LT', 'FIN': 'FI', 'SVK': 'SK', 'SRB': 'RS', 'LUX': 'LU'}
 
+
 @dataclass
 class BaseAct:
     """ Base Activity Definition"""
@@ -27,14 +28,12 @@ class BaseAct:
     regional: str
     carrier: str
 
-        
     activities: List[Tuple[str, str, str]] = field(default_factory=list)
     basefile_activities : List[Tuple] = field(default_factory = list)
 
-
     generic_location: [bool] = False
     init_post: InitVar[bool]=True 
-    pass
+
 
     def __post_init__(self, init_post):
 
@@ -68,6 +67,7 @@ class BaseAct:
             self.ecoinvent_name = self.ecoinvent_name + ',' +self.name.split(',')[1]
         self.name= self.name.split(',')[0]
 
+
     def _load_activity(self, name: str, database: str, location: str, unit: str) -> Tuple[str, str, str]:
         """Load a single activity from the database."""
         activity = list(ActivityDataset.select().where(
@@ -100,6 +100,7 @@ class BaseAct:
             message = (f"No activity in database with name {name}")
             warnings.warn(message, Warning)
             return (name, location, 'DB Undefined')
+
 
     def _load_multi_activity(self, name: str, database: str, locations: list, unit: str) -> List[Tuple[str, str, str]]:
         """Load multiple activities based on provided locations."""
@@ -149,7 +150,8 @@ class BaseAct:
                 key = next((k for k, v in LOCATION_EQUIVALENCE.items() if v == item[1]), None)
                 if key in grouped_dict:
                     for match in grouped_dict[key]:                      
-                        summed_tuple = (match + item) + (self.regional,self.carrier)
+                        #summed_tuple = (match + item) + (self.regional,self.carrier)
+                        summed_tuple = (match + item) + (self.regional, self.carrier, self.database)
                         self.basefile_activities.append(summed_tuple)
                         
 
@@ -217,23 +219,26 @@ class Support():
         pass
         for activity in activities:
             for loc in activity.basefile_activities:
+                try:
+                    new_row ={
+                'Processor' : activity.name,
+                'Region': loc[1],
+                '@SimulationCarrier' : loc[6],
+                'ParentProcessor' : 'Unknown',
+                '@SimulationToEcoinventFactor' : activity.factor,
+                'Ecoinvent_key_code' : loc[4],
+                'File_source' : activity.file_name + '.csv',
+                'activity_name_passed' : loc[2],
+                'location_passed': loc[3],
+                'geo_loc': loc[5],
+                'database': loc[7]
 
-                new_row ={
-            'Processor' : activity.name, 
-            'Region': loc[1], 
-            '@SimulationCarrier' : loc[-1],
-            'ParentProcessor' : 'Unknown', 
-            '@SimulationToEcoinventFactor' : activity.factor, 
-            'Ecoinvent_key_code' : loc[4],
-            'File_source' : activity.file_name + '.csv',
-            'activity_name_passed' : loc[2],
-            'location_passed': loc[3],
-            'geo_loc': loc[5],
-            'database': loc[-1]
-
-                }
+                    }
             
-                new_rows.append(new_row)
+                    new_rows.append(new_row)
+                except IndexError:
+                    print(f"IndexError in _store_excel(): loc = {loc}, expected at least 8 elements.")
+
         
         new_df = pd.DataFrame(new_rows)
         self.df = pd.concat([self.df, new_df], ignore_index = True)
