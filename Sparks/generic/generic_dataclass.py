@@ -7,7 +7,10 @@ from bw2data.errors import UnknownObject
 from bw2data.backends import Activity, ActivityDataset
 from Sparks.const.const import bw_project
 bd.projects.set_current(bw_project)            # Select your project
+from dataclasses import dataclass, field
+from typing import List
 from collections import defaultdict
+import warnings
 
 
 @dataclass
@@ -114,10 +117,53 @@ class Last_Branch:
 
 
     def __post_init__(self):
-        pass
-        self.leafs = [{'name': x.alias_carrier_region, 'adapter': 'bw', 'config': {'code': x.code, "database":x.database}} for x in self.origin]
+
+        self._filter_unique_origin_by_full_alias()  # Filter unique values
+
+
+        self.leafs = [
+            {
+                'name': x.full_alias,
+                'adapter': 'bw',
+                'config': (
+                    {'code': x.code, 'database': x.database}
+                    if x.database is not None else
+                    {'code': x.code}
+                )
+            }
+            for x in self.origin]
+
         if not self.leafs:
             warnings.warn(f"leafs not found for Last Tree Branch {self.name}, at {self.level}. This error can induce critical erros when using this data in enbios. Please, check the dendrogram structure")
+
+
+    def _filter_unique_origin_by_full_alias(self):
+        """Filters out duplicate full_alias entries from self.origin and logs duplicates."""
+        alias_map = defaultdict(list)
+        for activity in self.origin:
+            alias_map[activity.full_alias].append(activity)
+
+        unique = []
+        duplicates_reported = False
+
+        for alias, group in alias_map.items():
+            if len(group) == 1:
+                unique.append(group[0])
+            else:
+                duplicates_reported = True
+                warning_msg = (
+                    f"⚠️  Found {len(group)} entries with duplicated full_alias: '{alias}' "
+                    f"in Last_Branch '{self.name}' at level '{self.level}'. Only the first occurrence will be kept.\n"
+                )
+                for i, item in enumerate(group, 1):
+                    warning_msg += f"    [{i}] {item}\n"
+                warnings.warn(warning_msg.strip())
+
+
+                unique.append(group[0])
+
+        self.origin = unique
+
 
 
 
@@ -139,6 +185,9 @@ class Branch:
         if not self.leafs:
             warnings.warn(f"leafs not found for Last Tree Branch {self.name}, at {self.level}. This  can induce critical errors when using this data in enbios. Please, check the dendrogram structure")
 
+
+
+        pass
 
 
 @dataclass
