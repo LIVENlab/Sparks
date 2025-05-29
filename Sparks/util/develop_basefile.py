@@ -94,6 +94,7 @@ class BaseAct:
         ))
         if query:
             all_acts = [Activity(r) for r in query]
+            pass
             matches = [a for a in all_acts if a['location'] == location]
             if not matches:
                 fallback = [a for a in all_acts if a['location'] in ('CH', 'FR', 'DE')]
@@ -256,9 +257,13 @@ class Support:
         # 3) Cache the DataFrame on self under a clean attribute name
         attr = file_key.replace('.csv', '')
         if not hasattr(self, attr):
-            setattr(self, attr, pd.read_csv(csv_path))
+            df = pd.read_csv(csv_path)
+            self._check_columns(df, csv_path)  # Validate required columns
+            setattr(self, attr, df)
+            #setattr(self, attr, pd.read_csv(csv_path))
 
         df = getattr(self, attr)
+
         rows = df.loc[df['techs'] == name, ['techs', 'locs']]
 
         # 4) Build and dedupe Combination objects
@@ -281,5 +286,43 @@ class Support:
             'activity_name_passed', 'location_passed', 'database'
         ]
         return pd.DataFrame(columns=cols)
+
+    @staticmethod
+    def _check_columns(data: pd.DataFrame, passing_file: str):
+        """
+        Validates that the required columns are present in the input DataFrame.
+
+        Parameters:
+        -----------
+        data : pd.DataFrame
+            The input DataFrame to validate.
+        passing_file : str
+            The name or path of the file being validated, used for error messages.
+        """
+        required_column = 'techs'
+        if required_column not in data.columns:
+            raise TypeError(f"Required column '{required_column}' is missing in file: {passing_file}")
+
+        if 'locs' not in data.columns:
+            if 'nodes' in data.columns:
+                data.rename(columns={'nodes': 'locs'}, inplace=True)
+            else:
+                raise TypeError(f"Required column 'locs' is missing in file: {passing_file} "
+                                f"and could not be inferred from a 'nodes' column.")
+
+        """
+        
+        # Add 'spores' column if it does not exist
+        if 'spores' not in data.columns:
+            data['spores'] = 0
+        if 'Unnamed: 0' in data.columns:
+            data = data.drop('Unnamed: 0', axis=1)
+
+        if 'carriers' not in data.columns:
+            data['carriers'] = 'default_carrier'
+        """
+
+
+
 
 
