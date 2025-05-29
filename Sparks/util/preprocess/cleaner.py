@@ -58,6 +58,10 @@ class Cleaner:
         and injects default values where necessary. It assumes that the column corresponding to the `filename`
         parameter contains the main energy value to be analyzed.
 
+        Scenarios / spores are now treated as synonyms
+        Locs / nodes are now consiered synonyms
+
+
         ----------
         data : pd.DataFrame
             The input data to validate.
@@ -79,6 +83,10 @@ class Cleaner:
                 data = data.rename(columns={'scenario': 'spores'})
             else:
                 data['spores'] = 0  # Default spores value
+
+        if 'locs' not in data.columns:
+            if 'nodes' in data.columns:
+                data = data.rename(columns={'nodes': 'locs'})
 
 
         if 'Unnamed: 0' in data.columns:
