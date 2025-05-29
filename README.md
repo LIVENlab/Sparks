@@ -43,6 +43,11 @@ A structured example can be found in the [testing/data_test](https://github.com/
 
 See an example of the workflow [here](https://github.com/LIVENlab/Sparks/blob/main/demo.ipynb)
 
+### Practical Notes for This Version
+
+- When working with Calliope output files, **make sure the main output column has the same name as the file**. For example, if the file is named `flow_out.csv`, the primary data column inside should also be called `flow_out`.
+
+- You can now **add new columns to your scenarios** to create what we call *subscenarios*. Sparks will automatically combine these columns with the existing scenarios to generate subscenario names (e.g., `scenario1_optimization1`, `scenario1_optimization2`). These subscenarios will then be used by Enbios for further analysis.
 
 ### Contact
 
