@@ -18,7 +18,8 @@ class Cleaner:
                  motherfile: str,
                  file_handler: dict,
                  national: Optional[bool]= False,
-                 specify_database: Optional[bool] =False
+                 specify_database: Optional[bool] =False,
+                 additional_columns: Optional [List[str]] = None
                  ):
 
         self.national = national
@@ -27,7 +28,7 @@ class Cleaner:
         self.final_df = None
         self.techs_region_not_included = []
         self.file_handler = file_handler
-
+        self.additional_columns = additional_columns or []
         self._edited = False
 
 
@@ -49,42 +50,68 @@ class Cleaner:
         except FileNotFoundError as e:
             raise FileNotFoundError(f"File {source} does not exist") from e
 
-
-    def _input_checker(self, data: pd.DataFrame, filename: str):
+    def _input_checker(self, data: pd.DataFrame, filename: str) -> pd.DataFrame:
         """
-        Check whether the input follows the expected strucutre.
-        Assume that last column corresponds to filename (flow_out_sum etc)
+        Validate and standardize the input DataFrame structure.
+
+        This function ensures that required columns are present, renames specific columns for consistency,
+        and injects default values where necessary. It assumes that the column corresponding to the `filename`
+        parameter contains the main energy value to be analyzed.
+
+        ----------
+        data : pd.DataFrame
+            The input data to validate.
+        filename : str
+            Name of the file, used to identify the corresponding data column.
+
+        Returns
+        -------
+        pd.DataFrame
+            The validated and reformatted DataFrame.
         """
 
 
-        filename = filename.split('.')[0]
-        expected_cols = {'spores',
-                         'techs',
-                         'locs',
-                         'carriers',
-                         filename}
+        filename_base = filename.split('.')[0]
 
-
-        # Add 'spores' column if it does not exist
+        # Standardize scenario/spores column
         if 'spores' not in data.columns:
-            data['spores'] = 0
+            if 'scenario' in data.columns:
+                data = data.rename(columns={'scenario': 'spores'})
+            else:
+                data['spores'] = 0  # Default spores value
+
+
         if 'Unnamed: 0' in data.columns:
-            data = data.drop('Unnamed: 0', axis=1)
+            data = data.drop(columns='Unnamed: 0')
+
 
         if 'carriers' not in data.columns:
             data['carriers'] = 'default_carrier'
 
 
-        try:
-            tr = data[list(expected_cols)]
-            data.rename(columns={filename: 'energy_value'}, inplace=True)
-            data['filename'] = filename
-
-            return data
+        expected_columns = {'spores', 'techs', 'locs', 'carriers', filename_base}
 
 
-        except KeyError:
-            raise KeyError(f"Columns {data.columns} do not match the expected columns: {expected_cols}")
+        missing_columns = expected_columns - set(data.columns)
+        if missing_columns:
+            raise KeyError(
+                f"Missing required column(s): {missing_columns}. "
+                f"Expected columns include: {expected_columns}. "
+                f"Available columns: {list(data.columns)}"
+            )
+
+
+        data = data.rename(columns={filename_base: 'energy_value'})
+        data['filename'] = filename_base
+
+
+        if data.empty:
+            raise ValueError(
+                f"Error processing '{filename}'. No rows found after processing. "
+                f"Verify that the input file contains valid data."
+            )
+
+        return data
 
 
     def _filter_techs(self,df: pd.DataFrame, filter: str)-> pd.DataFrame:
