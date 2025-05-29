@@ -5,7 +5,7 @@ import json
 import os
 from pathlib import Path
 import time
-from typing import Union, Optional
+from typing import Union, Optional, List
 import pandas as pd
 import bw2data as bd
 import bw2io as bi
@@ -13,6 +13,7 @@ import warnings
 from Sparks.util.preprocess.cleaner import Cleaner
 from Sparks.util.preprocess.SoftLink import SoftLinkCalEnb
 from Sparks.util.develop_basefile import Support
+
 from Sparks.const import const
 
 
@@ -101,13 +102,25 @@ class SoftLink():
 
 
     @timer
-    def preprocess(self, national: bool = False, specify_database: bool = False) -> pd.DataFrame:
-        """
-        @subregions: bool = False
-        If activated, it aggregates the data at country level
+    def preprocess(self,
+                   national: bool = False,
+                   specify_database: bool = False,
+                   additional_columns: Optional[List[str]] = None
+                   ) -> pd.DataFrame:
 
-        @specify_database: bool = False
-        If activated, the resulting dictionary will specify the database to look at
+            """
+            Preprocess the dataset according to the specified flags.
+
+            Parameters
+            ----------
+            national : bool, optional
+                Whether to apply national-level preprocessing (default is False).
+
+            specify_database : bool, optional
+                Whether to include logic for specifying or filtering by database (default is False).
+
+            additional_columns : list of str, optional
+                List of additional column names to include or process (default is None).
 
         returns:
             -pd.DataFrame: modified Calliope file with the following changes:
@@ -117,21 +130,22 @@ class SoftLink():
 
         """
         # Create an instance of the Cleaner class
-        if national:
-            raise NotImplementedError('This function has not been implemented yet')
+            if national:
+                raise NotImplementedError('This function has not been implemented yet')
 
-        self._cleaner = Cleaner(
-                motherfile=self.paths_dict['basefile.xlsx'],
-                file_handler=self.paths_dict,
-                national=national,
-                specify_database = specify_database
-            )
+            self._cleaner = Cleaner(
+                    motherfile=self.paths_dict['basefile.xlsx'],
+                    file_handler=self.paths_dict,
+                    national=national,
+                    specify_database = specify_database,
+                    additional_columns= additional_columns
+                )
 
-            # Preprocess the data
-        self._cleaner.preprocess_data()
-        self.preprocessed_units= self._cleaner.adapt_units()
+                # Preprocess the data
+            self._cleaner.preprocess_data()
+            self.preprocessed_units= self._cleaner.adapt_units()
 
-        self.exluded_techs_and_regions = self._cleaner.techs_region_not_included
+            self.exluded_techs_and_regions = self._cleaner.techs_region_not_included
 
 
     def data_for_ENBIOS(self, path_save=None,smaller_vers=False):

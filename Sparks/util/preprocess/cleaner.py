@@ -172,14 +172,20 @@ class Cleaner:
 
 
 
-
-
-
     def _group_data(self,df: pd.DataFrame)-> pd.DataFrame:
         """
         Group the input data based on technologies defined in the basefile
         If national= True, it aggregates by country
         """
+
+        if self.additional_columns:
+            # Safely combine spores + additional columns into a single string key
+            df['spores'] = df['spores'].astype(str)
+            for col in self.additional_columns:
+                if col in df.columns:
+                    df['spores'] += '_' + df[col].astype(str)
+        else:
+            df['spores'] = df['spores'].astype(str)
 
         if self.national:
             pass
@@ -190,17 +196,18 @@ class Cleaner:
                 'techs': 'first',
                 'carriers': 'first',
             })
-        #TODO: CHECK WHY IT GETS CUTED
+
         else:
 
-            grouped_df = df.groupby(['spores',
-                                     'techs',
-                                     'carriers',
-                                     'locs',
-                                     'alias_carrier',
-                                     'alias_filename',
-                                     'full_name'
-                                     ], as_index=False).agg({
+            group_cols = ['spores',
+                          'techs',
+                          'carriers',
+                          'locs',
+                          'alias_carrier',
+                          'alias_filename',
+                          'full_name']
+
+            grouped_df = df.groupby(group_cols, as_index=False).agg({
                 'energy_value': 'sum'
             })
         pass
