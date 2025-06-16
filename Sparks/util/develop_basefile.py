@@ -257,7 +257,7 @@ class Support:
         # 3) Cache the DataFrame on self under a clean attribute name
         attr = file_key.replace('.csv', '')
         if not hasattr(self, attr):
-            df = pd.read_csv(csv_path)
+            df = pd.read_csv(csv_path, sep=None, engine='python') # Hardfix #8
             self._check_columns(df, csv_path)  # Validate required columns
             setattr(self, attr, df)
             #setattr(self, attr, pd.read_csv(csv_path))
