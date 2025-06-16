@@ -9,6 +9,7 @@ from tqdm import tqdm
 tqdm.pandas()
 bd.projects.set_current(bw_project)
 from dataclasses import asdict
+from pandas.api.types import is_numeric_dtype
 
 
 class Cleaner:
@@ -45,7 +46,8 @@ class Cleaner:
     def _load_data(self, source:str) -> pd.DataFrame:
         """ Assuming comma separated input, load the data from a specific file"""
         try:
-            return pd.read_csv(self.file_handler[source], delimiter=',').dropna()
+            return pd.read_csv(self.file_handler[source], sep = None, engine='python').dropna()
+
 
         except FileNotFoundError as e:
             raise FileNotFoundError(f"File {source} does not exist") from e
@@ -254,7 +256,7 @@ class Cleaner:
             {formatted_items}
 
             Please, check the following items to avoid missing information."""
-            #warnings.warn(message, Warning)
+            warnings.warn(message, Warning)
         pass
         self.final_df = self._group_data(all_data) # calliope data
         self.final_df = self._manage_regions(self.final_df)
@@ -315,11 +317,36 @@ class Cleaner:
             how="right"
         )
 
+        df=df.dropna()
+        df=self._check_str_values(df, 'energy_value')
         df['new_vals'] = df['factor'] * df['energy_value']
         df['new_units'] =df['unit']
 
         return self._final_dataframe(df)
 
+    @staticmethod
+    def _check_str_values(df: pd.DataFrame, column: str, cast_to_int: bool = False):
+        """
+        if ';' passed, issues may rise. This function checks a particular column that could potentially be a string
+        instead of float
+        """
+        if column not in df.columns:
+            raise ValueError(f"Column '{column}' not found in DataFrame.")
+
+        if not is_numeric_dtype(df[column]):
+            df[column] = (
+                df[column]
+                .astype(str)
+                .str.replace(",", ".", regex=False)
+                .str.replace(" ", "", regex=False)
+                .str.strip()
+            )
+            df[column] = pd.to_numeric(df[column], errors="coerce")
+
+        if cast_to_int:
+            df[column] = df[column].astype("Int64")  # Nullable integer type for missing values
+
+        return df
 
     def _final_dataframe(self, df):
 
