@@ -187,16 +187,15 @@ class Branch:
 
 
 
-        pass
-
-
 @dataclass
 class Method:
     method: tuple
 
     def to_dict(self):
-        return {self.method[2].split('(')[1].split(')')[0]: [
+        #return {self.method[2].split('(')[1].split(')')[0]: [
+        #    self.method[0], self.method[1], self.method[2]
+        #]}
+        return {self.method[2]: [
             self.method[0], self.method[1], self.method[2]
         ]}
-
 
