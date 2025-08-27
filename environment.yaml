@@ -1,0 +1,30 @@
+name: sparks_dev
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy>=1.26
+  - scipy>=1.12
+  - pandas>=2.0.3
+  - lxml>=4.9.3
+  - pyyaml>=6.0.1
+  - joblib>=1.4.2
+  - pip
+  - pip:
+      - brightway25==1.0.6
+      - bw-migrations>=0.2
+      - bw-processing>=0.9
+      - bw2analyzer>=0.11.5
+      - bw2calc>=2.0.dev16
+      - bw2data>=4.0.dev33
+      - bw2io>=0.9.dev26
+      - bw2parameters>=1.1.0
+      - stats-arrays>=0.6.5
+      - attrs>=25.1.0
+      - appdirs>=1.4.4
+      - click>=8.1.8
+      - colorama>=0.4.6
+      - tqdm>=4.66.1
+      - threadpoolctl>=3.5.0
+      - requests>=2.31.0
