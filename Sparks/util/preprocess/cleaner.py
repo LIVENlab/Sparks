@@ -43,14 +43,23 @@ class Cleaner:
         return pd.DataFrame(columns=columns)
 
 
+    def verify_csv(self, source:str)-> None:
+        """
+        Verify that the value passed has a csv extension.
+        """
+        if not source.endswith('.csv'):
+            raise ValueError(f"File {source} is not a csv file")
+        
+        
     def _load_data(self, source:str) -> pd.DataFrame:
         """ Assuming comma separated input, load the data from a specific file"""
+        self.verify_csv(source)
         try:
             return pd.read_csv(self.file_handler[source], sep = None, engine='python').dropna()
-
-
+        
         except FileNotFoundError as e:
             raise FileNotFoundError(f"File {source} does not exist") from e
+        
 
     def _input_checker(self, data: pd.DataFrame, filename: str) -> pd.DataFrame:
         """
@@ -247,6 +256,9 @@ class Cleaner:
 
                 all_data = pd.concat([all_data, filtered_data], ignore_index=True)
 
+            except ValueError as e:
+                # Propagate validation errors (e.g., from verify_csv) as real errors
+                raise
             except Exception as e:
                 warnings.warn(f"Error processing {data_source}: {e}", Warning)
 
