@@ -341,8 +341,11 @@ class Cleaner:
             right_on="alias_filename_loc",
             how="right"
         )
-
-        df=df.dropna()
+        
+        if self.specify_database is False: # Fix #16
+            df = df.drop('database', axis=1)
+        
+        df=df.dropna() # This removes all in the case of self.national= True. Looks for database. Related to passing addditional columns
         df=self._check_str_values(df, 'energy_value')
         df['new_vals'] = df['factor'] * df['energy_value']
         df['new_units'] =df['unit']
