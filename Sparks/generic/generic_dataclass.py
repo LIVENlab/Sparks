@@ -6,7 +6,7 @@ import bw2data as bd
 from bw2data.errors import UnknownObject
 from bw2data.backends import Activity, ActivityDataset
 from Sparks.const.const import bw_project
-bd.projects.set_current(bw_project)            # Select your project
+bd.projects.set_current(bw_project)            
 from dataclasses import dataclass, field
 from typing import List
 from collections import defaultdict
@@ -193,9 +193,12 @@ class Method:
      which are the names/identifiers of methods in brightway
     """
     method: tuple
+    _used_keys = set() #Fixes issue #12
     def __post_init__(self):
-        self._methods_exist(self.method)
-
+        if self.method not in bd.methods:
+            raise ValueError(f"Method {self.method} not found in brightway. Please, introduce the full method")
+    
+        
 
 
     def to_dict(self,*args):
@@ -205,12 +208,17 @@ class Method:
           which are the names/identifiers of methods in brightway"
         This function returns a dictionary with a key being the second arbitrary element
         """
-        return {self.method[2]: list(args)}
+        base_key = self.method[2]
+        
+        if base_key in self._used_keys:
+            counter = 1
+            while f"{base_key}_{counter}" in self._used_keys:
+                counter += 1
+            key = f"{base_key}_{counter}"
+        else:
+            key = base_key 
+        
+        self._used_keys.add(key) #Issue #12
+        return {key: list(args)}
 
-
-    def _methods_exist(self, method: tuple):
-        """Check that method exists in brightway db as passed"""
-        if method not in bd.methods:
-            raise ValueError(f"Method {method} not found in brightway. Please, introduce the full method")
-    
     
