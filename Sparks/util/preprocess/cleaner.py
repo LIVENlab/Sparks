@@ -10,6 +10,7 @@ tqdm.pandas()
 bd.projects.set_current(bw_project)
 from dataclasses import asdict
 from pandas.api.types import is_numeric_dtype
+import re
 
 
 class Cleaner:
@@ -39,21 +40,45 @@ class Cleaner:
         Basic template for clean data
         """
         #todo: remove from, here
-        columns = ['spores',"techs","carriers","energy_value"]
+        columns = ['spores',
+                   "techs",
+                   "carriers",
+                   "energy_value"]
         return pd.DataFrame(columns=columns)
 
 
-    def verify_csv(self, source:str)-> None:
+    def _verify_csv(self, source:str)-> None:
         """
         Verify that the value passed has a csv extension.
         """
         if not source.endswith('.csv'):
             raise ValueError(f"File {source} is not a csv file")
         
-        
+    def _verify_national(self)-> None:
+        """ 
+        Check locations in the motherfile and rise a warning if it looks like national
+        """
+        if not self.national:
+            regions_series = self.basefile.get('Region')
+            if regions_series is None:
+                return
+            regions = regions_series.dropna().astype(str).unique().tolist()
+
+            pattern = re.compile(r"[-_].+")
+            subnational_regions = [r for r in regions if pattern.search(r)]
+
+            if len(subnational_regions) < 1:
+                pass
+                warnings.warn(f"""Region names look national (no '-' or '_'). \n
+                              Since national was defined as False, but data looks like national, this could lead to critical errors in the results \n
+                              If you expected subnational detail, review the 'Region' values in the basefile.""")
+
+
+
+
     def _load_data(self, source:str) -> pd.DataFrame:
         """ Assuming comma separated input, load the data from a specific file"""
-        self.verify_csv(source)
+        self._verify_csv(source)
         try:
             return pd.read_csv(self.file_handler[source], sep = None, engine='python').dropna()
         
@@ -72,17 +97,6 @@ class Cleaner:
         Scenarios / spores are now treated as synonyms
         Locs / nodes are now consiered synonyms
 
-
-        ----------
-        data : pd.DataFrame
-            The input data to validate.
-        filename : str
-            Name of the file, used to identify the corresponding data column.
-
-        Returns
-        -------
-        pd.DataFrame
-            The validated and reformatted DataFrame.
         """
 
 
@@ -133,7 +147,7 @@ class Cleaner:
         return data
 
 
-    def _filter_techs(self,df: pd.DataFrame, filter: str)-> pd.DataFrame:
+    def _filter_techs(self, df: pd.DataFrame, filter: str)-> pd.DataFrame:
         """
         Filter the input data based on technologies defined in the basefile
         """
@@ -152,6 +166,7 @@ class Cleaner:
                 self._validate_databases()
 
             self.basefile = pd.read_excel(self.mother_file, sheet_name='Processors').dropna(subset=['Ecoinvent_key_code'])
+            self._verify_national()
             self.basefile['alias_carrier'] = self.basefile['Processor'] + '_' + self.basefile['@SimulationCarrier']
             #self.basefile['alias_region'] = self.basefile['alias_carrier']+'_'+self.basefile['Region']
             self.basefile['alias_filename'] = self.basefile['alias_carrier']+'__'+self.basefile['File_source']
@@ -285,7 +300,6 @@ class Cleaner:
         pass
         def _create_activity(row):
             # move the activities from the basefile into a DataBase dataclass
-
             try:
                 kwargs= {
                     'name': row['Processor'],
@@ -320,7 +334,6 @@ class Cleaner:
         self.base_activities = self._extract_data()
 
         df = pd.DataFrame([asdict(activity) for activity in self.base_activities])
-
         df = pd.merge(
             self.final_df,
             df,
@@ -328,6 +341,7 @@ class Cleaner:
             right_on="alias_filename_loc",
             how="right"
         )
+
 
         df=df.dropna()
         df=self._check_str_values(df, 'energy_value')
