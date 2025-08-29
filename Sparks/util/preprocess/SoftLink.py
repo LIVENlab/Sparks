@@ -1,6 +1,7 @@
 import copy
 import json
 import pandas as pd
+from pathlib import Path
 from Sparks.generic.generic_dataclass import *
 
 bd.projects.set_current(bw_project)            # Select your project
@@ -13,11 +14,12 @@ class SoftLinkCalEnb():
     Transform table-like input into a hierarchy (ENBIOS) like format
     """
 
-    def __init__(self,calliope,
-                 mother_data: list,
-                 sublocations: list,
-                 motherfile,
-                 smaller_vers=None):
+    def __init__(self,
+                 calliope: pd.DataFrame,
+                 mother_data: list[BaseFileActivity],
+                 sublocations: list[str],
+                 motherfile: Path,
+                 smaller_vers: bool =None):
 
         self.calliope=calliope
         self.motherfile=motherfile
@@ -27,8 +29,8 @@ class SoftLinkCalEnb():
 
 
     def _generate_scenarios(self):
-
-        cal_dat=self.calliope
+        pass
+        cal_dat=self.calliope #This is empty!
         cal_dat['scenarios']=cal_dat['scenarios'].astype(str)
         try:
             scenarios = cal_dat['scenarios'].unique().tolist()
@@ -70,8 +72,8 @@ class SoftLinkCalEnb():
 
     def _get_methods(self):
         processors = pd.read_excel(self.motherfile, sheet_name='Methods')
-        methods=[Method(meth).to_dict() for meth in processors['Formula'].apply(eval)]
-
+        methods=[Method(meth).to_dict(*meth) for meth in processors['Formula'].apply(eval)]
+        pass
         return  {key: value for key, value in [list(item.items())[0] for item in methods]}
 
 
@@ -81,6 +83,8 @@ class SoftLinkCalEnb():
         self.hierarchy=Hierarchy(base_path=self.motherfile,
                                  motherdata=self.mother_data,
                                  sublocations=self.sublocations ).generate_hierarchy()
+        
+        
         enbios2_methods= self._get_methods()
         self.enbios2_data = {
             "adapters": [
@@ -172,7 +176,7 @@ class Hierarchy:
         last_level=None
         last_level_branches=[]
         last_level_hierachy=[] # official list
-        pass
+        
         for level in reversed(self.parents['Level'].unique().tolist()):
             data=self.parents.loc[self.parents['Level']==level]
             if last_level is None:
@@ -185,7 +189,6 @@ class Hierarchy:
                     )
                     for _, row in data.iterrows()
                 ]
-                pass
                 last_level_hierachy=[x.leafs for x in last_level_branches]
                 last_level=level
                 continue
