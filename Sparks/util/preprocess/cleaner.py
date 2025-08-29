@@ -68,7 +68,7 @@ class Cleaner:
             subnational_regions = [r for r in regions if pattern.search(r)]
 
             if len(subnational_regions) < 1:
-                pass
+                
                 warnings.warn(f"""Region names look national (no '-' or '_'). \n
                               Since national was defined as False, but data looks like national, this could lead to critical errors in the results \n
                               If you expected subnational detail, review the 'Region' values in the basefile.""")
@@ -87,6 +87,7 @@ class Cleaner:
         
 
     def _input_checker(self, data: pd.DataFrame, filename: str) -> pd.DataFrame:
+        #TODO: transform this into a schema validation - version 1.2.0
         """
         Validate and standardize the input DataFrame structure.
 
@@ -222,6 +223,8 @@ class Cleaner:
                 'techs': 'first',
                 'carriers': 'first',
             })
+            # Hardfix: create a copy of alias filename called full_name
+            grouped_df['full_name'] = grouped_df['alias_filename']
 
         else:
 
@@ -258,7 +261,6 @@ class Cleaner:
         grouped = self.basefile.groupby('File_source')
 
         for data_source, group in grouped:
-            
             if pd.isna(data_source):
                 warnings.warn(f"DataSource is missing for some entries. Skipping these entries.", Warning)
                 continue
@@ -284,7 +286,7 @@ class Cleaner:
 
             Please, check the following items to avoid missing information."""
             warnings.warn(message, Warning)
-        pass
+        
         self.final_df = self._group_data(all_data) # calliope data
         self.final_df = self._manage_regions(self.final_df)
 
