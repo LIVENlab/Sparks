@@ -74,8 +74,6 @@ class BaseFileActivity:
             warnings.warn(message, Warning)
             result = None
 
-
-
         # save activity into the cache
         BaseFileActivity.activity_cache[key] = result
         return result
@@ -189,13 +187,30 @@ class Branch:
 
 @dataclass
 class Method:
+    """
+     For methods we need to pass a dictionary,
+     where the keys are arbitrary names that we give to the method and the tuple of strings, 
+     which are the names/identifiers of methods in brightway
+    """
     method: tuple
+    def __post_init__(self):
+        self._methods_exist(self.method)
 
-    def to_dict(self):
-        #return {self.method[2].split('(')[1].split(')')[0]: [
-        #    self.method[0], self.method[1], self.method[2]
-        #]}
-        return {self.method[2]: [
-            self.method[0], self.method[1], self.method[2]
-        ]}
 
+
+    def to_dict(self,*args):
+        """
+        @Enbios2: "For methods we need to pass a dictionary, 
+        where the keys are arbitrary names that we give to the method and the tuple of strings,
+          which are the names/identifiers of methods in brightway"
+        This function returns a dictionary with a key being the second arbitrary element
+        """
+        return {self.method[2]: list(args)}
+
+
+    def _methods_exist(self, method: tuple):
+        """Check that method exists in brightway db as passed"""
+        if method not in bd.methods:
+            raise ValueError(f"Method {method} not found in brightway. Please, introduce the full method")
+    
+    
