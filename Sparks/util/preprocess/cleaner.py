@@ -329,8 +329,6 @@ class Cleaner:
 
 
 
-
-
     def _adapt_units(self):
         """adapt the units (flow_out_sum * conversion factor)"""
         self.base_activities = self._extract_data()
@@ -344,13 +342,27 @@ class Cleaner:
             how="right"
         )
 
-
         df=df.dropna()
         df=self._check_str_values(df, 'energy_value')
         df['new_vals'] = df['factor'] * df['energy_value']
         df['new_units'] =df['unit']
 
         return self._final_dataframe(df)
+
+    @staticmethod
+    def _check_unique_full_names(df: pd.DataFrame)-> None:
+        """
+        Check if the full_name column is unique. If not, raise a warning
+        """
+        #TODO: Create as DEBUG function
+        if df['full_name'].duplicated().any():
+            duplicate_names = df.loc[df['full_name'].duplicated(keep=False), 'full_name'].tolist()
+            unique_duplicates = sorted(set(duplicate_names))
+            print(f"Duplicated full_name values ({len(unique_duplicates)}): {unique_duplicates}")
+            warnings.warn(
+                f"The full_name column is not unique. Duplicates found: {unique_duplicates} in self.cleaner"
+            )
+        
 
     @staticmethod
     def _check_str_values(df: pd.DataFrame, column: str, cast_to_int: bool = False):
@@ -398,7 +410,7 @@ class Cleaner:
         df['aliases'] = df['techs'] + '__' + df['carriers'] + '___' + df['locs'] # TODO: remove in clean versions
 
         self._techs_sublocations = df['full_name'].unique().tolist()  # save sublocation aliases for hierarchy
-
+        self._check_unique_full_names(df) # Validate full_names column
         return df
 
 
