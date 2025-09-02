@@ -197,18 +197,16 @@ class Method:
     def __post_init__(self):
         if self.method not in bd.methods:
             raise ValueError(f"Method {self.method} not found in brightway. Please, introduce the full method")
-    
-        
 
 
     def to_dict(self,*args):
         """
-        @Enbios2: "For methods we need to pass a dictionary, 
-        where the keys are arbitrary names that we give to the method and the tuple of strings,
-          which are the names/identifiers of methods in brightway"
         This function returns a dictionary with a key being the second arbitrary element
         """
-        base_key = self.method[2]
+        try:
+            base_key = self.method[2]
+        except:
+            base_key = self.method[1]
         
         if base_key in self._used_keys:
             counter = 1
