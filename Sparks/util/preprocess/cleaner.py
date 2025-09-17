@@ -189,7 +189,7 @@ class Cleaner:
 
         if self._edited is False:  # working with basefile data
 
-            if self.specify_database: # check that the database column is there and contains no empty values
+            if self.specify_database: # check that the database column is there and doesn't contain empty values
                 self._validate_databases()
 
             self.basefile = pd.read_excel(self.mother_file, sheet_name='Processors').dropna(subset=['Ecoinvent_key_code'])
@@ -216,19 +216,24 @@ class Cleaner:
         return df_names
 
 
-    def _validate_databases(self):
+    def _validate_databases(self)-> None:
         """
         if specify database is activated, check that the basefile has non NaN values
         """
+        logger.debug(f"specify_database has been set as {self.specify_database}")
+        logger.info(f"specify_database has been set as True. Checking the database column...")
+
         if 'database' not in self.basefile.columns:
+            logger.error("-database- column not found in the basefile")
             raise KeyError(f"Please, specify the database column in the basefile")
 
         if self.basefile['database'].isnull().any():
+            logger.error("The column database from the basefile containse missing values")
             raise ValueError(f"The column database from the basefile containse missing values")
+        
 
 
-
-    def _group_data(self,df: pd.DataFrame)-> pd.DataFrame:
+    def _group_data(self, df: pd.DataFrame)-> pd.DataFrame:
         """
         Group the input data based on technologies defined in the basefile
         If national= True, it aggregates by country
@@ -344,6 +349,9 @@ class Cleaner:
         return self.final_df
 
 
+######################
+# Unit adapter
+######################
 
     def _extract_data(self) -> List['BaseFileActivity']:
         """
@@ -370,23 +378,26 @@ class Cleaner:
                 return BaseFileActivity(**kwargs)
 
 
-            except KeyError:
+            except KeyError as e:
+                logger.warning(f"Warning during data extraction {e}")
                 return None
 
         base_activities = self.basefile.progress_apply(_create_activity, axis=1).dropna().tolist()
         logger.info(f"{len(base_activities)} activities extracted")
+        logger.debug(f"First 3 extracted activities: {base_activities[:3]}")
         return [activity for activity in base_activities if activity.unit is not None]
-
-
 
 
     def _adapt_units(self):
         """adapt the units (flow_out_sum * conversion factor)"""
-        logger.info("Adapting units")
+        logger.info("Adapting units...")
 
         self.base_activities = self._extract_data()
 
+        logger.debug(f"Converting {len(self.base_activities)} activities into a DF")
         df = pd.DataFrame([asdict(activity) for activity in self.base_activities])
+        logger.debug(f"Base activities DataFrame shape: {df.shape}")
+
         df = pd.merge(
             self.final_df,
             df,
@@ -394,34 +405,38 @@ class Cleaner:
             right_on="alias_filename_loc",
             how="right"
         )
-        
+        logger.debug(f"After merge with final_df: {df.shape}")
+
         if self.specify_database is False: # Fix #16
             df = df.drop('database', axis=1)
         
+        before_drop = len(df) # logger debug 
         df=df.dropna() # This removes all in the case of self.national= True. Looks for database. Related to passing addditional columns
         df=self._check_str_values(df, 'energy_value')
         df['new_vals'] = df['factor'] * df['energy_value']
         df['new_units'] =df['unit']
-
+        logger.debug(f"Dropped {before_drop - len(df)} rows containing NaN values")
+        
         return self._final_dataframe(df)
+
 
     @staticmethod
     def _check_unique_full_names(df: pd.DataFrame)-> None:
         """
         Check if the full_name column is unique. If not, raise a warning
         """
-        #TODO: Create as DEBUG function
-        if df['full_name'].duplicated().any():
-            duplicate_names = df.loc[df['full_name'].duplicated(keep=False), 'full_name'].tolist()
-            unique_duplicates = sorted(set(duplicate_names))
-            print(f"Duplicated full_name values ({len(unique_duplicates)}): {unique_duplicates}")
-            warnings.warn(
-                f"The full_name column is not unique. Duplicates found: {unique_duplicates} in self.cleaner"
+        duplicates = df.loc[df['full_name'].duplicated(keep=False), 'full_name']
+        if not duplicates.empty:
+            unique_dupes = sorted(set(duplicates.tolist()))
+            logger.warning(
+            f"The 'full_name' column is not unique. Found {len(unique_dupes)} duplicates: {unique_dupes}"
             )
         
 
     @staticmethod
-    def _check_str_values(df: pd.DataFrame, column: str, cast_to_int: bool = False):
+    def _check_str_values(df: pd.DataFrame,
+                           column: str,
+                             cast_to_int: bool = False):
         """
         if ';' passed, issues may rise. This function checks a particular column that could potentially be a string
         instead of float
