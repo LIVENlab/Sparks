@@ -51,7 +51,10 @@ class Cleaner:
                    "carriers",
                    "energy_value"]
         logger.debug(f"Creating empty dataframe template with {columns}")
-        return pd.DataFrame(columns=columns)
+        df = pd.DataFrame(columns=columns)
+
+        assert list(df.columns) == columns, "Template df didn't work as expected"
+        return df
 
 
     def _verify_csv(self, source:str)-> None:
@@ -67,7 +70,17 @@ class Cleaner:
             message = f"File {source} is not a csv file"
             logger.error(message)
             raise KeyError(message)
+
+    
+    def _get_basefile_info(self):
+        """ Get some basic debug information about the basefile"""
+        logger.debug(f"Files passed in basefile: {self.basefile['File_source'].unique()}")
         
+        for item in self.basefile['File_source'].unique().tolist():
+            if item not in self.file_handler.keys():
+                logger.error(f"File defined in basefile {item} not present in the base folder")
+                raise ValueError(f"File defined in basefile {item} not present in the base folder")
+            
 
     def _verify_national(self)-> None:
         """ 
@@ -94,7 +107,6 @@ class Cleaner:
     def _load_data(self, source:str) -> pd.DataFrame:
         """ Assuming comma separated input, load the data from a specific file"""
         self._verify_csv(source)
-
 
         try:
             logger.info(f"Loading data from {source}")
@@ -193,6 +205,7 @@ class Cleaner:
                 self._validate_databases()
 
             self.basefile = pd.read_excel(self.mother_file, sheet_name='Processors').dropna(subset=['Ecoinvent_key_code'])
+            self._get_basefile_info() # extract basic debug info
             self._verify_national()
             self.basefile['alias_carrier'] = self.basefile['Processor'] + '_' + self.basefile['@SimulationCarrier']
             #self.basefile['alias_region'] = self.basefile['alias_carrier']+'_'+self.basefile['Region']
@@ -335,8 +348,7 @@ class Cleaner:
 
             message = (
                 "\nThere are technologies present in the energy data but not in the Basefile.\n"
-                f"Please check the log file for details: {log_file_path} and see -Excluded techs-\n\n"
-                "Please review the items to avoid missing information."
+                f"Please check the log file for details: {log_file_path} and see -Excluded techs-\n"
             )
             warnings.warn(message, Warning)
             logger.warning(message)
@@ -415,6 +427,7 @@ class Cleaner:
         df=self._check_str_values(df, 'energy_value')
         df['new_vals'] = df['factor'] * df['energy_value']
         df['new_units'] =df['unit']
+
         logger.debug(f"Dropped {before_drop - len(df)} rows containing NaN values")
         
         return self._final_dataframe(df)
@@ -445,6 +458,8 @@ class Cleaner:
             raise ValueError(f"Column '{column}' not found in DataFrame.")
 
         if not is_numeric_dtype(df[column]):
+            logger.debug(f"column {column} is not numeric. Fixing it...")
+
             df[column] = (
                 df[column]
                 .astype(str)
@@ -456,11 +471,10 @@ class Cleaner:
 
         if cast_to_int:
             df[column] = df[column].astype("Int64")  # Nullable integer type for missing values
-
         return df
 
-    def _final_dataframe(self, df):
 
+    def _final_dataframe(self, df):
 
         cols = ['spores',
                 'locs',
@@ -470,9 +484,15 @@ class Cleaner:
                 'new_vals',
                 'new_units']
 
+        
+        before_drop = len(df)
         df.dropna(axis=0, inplace=True)
-
+        dropped = before_drop - len(df)
+        if dropped > 0:
+            logger.debug(f"Dropped {dropped} rows with NaN values during final cleanup")
+        
         if self.national:
+            logger.debug("National mode active → renaming 'alias_filename' to 'full_name'")
             df.rename(columns={'alias_filename' : 'full_name'}, inplace=True)
             
         df = df[cols]
@@ -482,6 +502,12 @@ class Cleaner:
 
         self._techs_sublocations = df['full_name'].unique().tolist()  # save sublocation aliases for hierarchy
         self._check_unique_full_names(df) # Validate full_names column
+
+        logger.info(
+        f"Final preprocess DataFrame ready with shape {df.shape} "
+        f"({len(df)} rows, {len(df.columns)} columns)")
+        logger.debug(f"Final DataFrame columns: {list(df.columns)}")
+
         return df
 
 
