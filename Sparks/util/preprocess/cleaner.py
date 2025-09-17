@@ -11,6 +11,9 @@ bd.projects.set_current(bw_project)
 from dataclasses import asdict
 from pandas.api.types import is_numeric_dtype
 import re
+import logging
+
+logger = logging.getLogger("sparks")
 
 
 class Cleaner:
@@ -23,7 +26,8 @@ class Cleaner:
                  specify_database: Optional[bool] =False,
                  additional_columns: Optional [List[str]] = None
                  ):
-
+        logger.debug("Initiating the Claner class")
+        
         self.national = national
         self.specify_database = specify_database
         self.mother_file = motherfile
@@ -32,6 +36,8 @@ class Cleaner:
         self.file_handler = file_handler
         self.additional_columns = additional_columns or []
         self._edited = False
+
+
 
 
     @staticmethod
@@ -44,6 +50,7 @@ class Cleaner:
                    "techs",
                    "carriers",
                    "energy_value"]
+        logger.debug(f"Creating empty dataframe template with {columns}")
         return pd.DataFrame(columns=columns)
 
 
@@ -54,6 +61,7 @@ class Cleaner:
         if not source.endswith('.csv'):
             raise ValueError(f"File {source} is not a csv file")
         
+
     def _verify_national(self)-> None:
         """ 
         Check locations in the motherfile and rise a warning if it looks like national
@@ -68,22 +76,27 @@ class Cleaner:
             subnational_regions = [r for r in regions if pattern.search(r)]
 
             if len(subnational_regions) < 1:
-                
-                warnings.warn(f"""Region names look national (no '-' or '_'). \n
+                message = f"""Region names look national (no '-' or '_') in the Basefile. \n
                               Since national was defined as False, but data looks like national, this could lead to critical errors in the results \n
-                              If you expected subnational detail, review the 'Region' values in the basefile.""")
-
-
+                              If you expected subnational detail, review the 'Region' values in the basefile."""
+                warnings.warn(message)
+                logger.warning(message)
+                logger.debug(f"Regions passed {regions}")
 
 
     def _load_data(self, source:str) -> pd.DataFrame:
         """ Assuming comma separated input, load the data from a specific file"""
         self._verify_csv(source)
+
         try:
-            return pd.read_csv(self.file_handler[source], sep = None, engine='python').dropna()
+            logger.info(f"Loading data from {source}")
+            data= pd.read_csv(self.file_handler[source], sep = None, engine='python').dropna()
+            return data
         
         except FileNotFoundError as e:
+            logger.error(f"Failed to load {source}: {e}")
             raise FileNotFoundError(f"File {source} does not exist") from e
+        
         
 
     def _input_checker(self, data: pd.DataFrame, filename: str) -> pd.DataFrame:
@@ -99,19 +112,20 @@ class Cleaner:
         Locs / nodes are now consiered synonyms
 
         """
-
-
         filename_base = filename.split('.')[0]
 
+        logger.debug(f"Checking missing columns for {filename}. Initial columns {data.columns}")
         # Standardize scenario/spores column
         if 'spores' not in data.columns:
             if 'scenario' in data.columns:
+                logger.debug(f"renaming --scenario-- for spores in {filename}")
                 data = data.rename(columns={'scenario': 'spores'})
             else:
                 data['spores'] = 0  # Default spores value
 
         if 'locs' not in data.columns:
             if 'nodes' in data.columns:
+                logger.debug(f"renaming --nodes-- for --locs-- in {filename}")
                 data = data.rename(columns={'nodes': 'locs'})
 
 
@@ -120,6 +134,7 @@ class Cleaner:
 
 
         if 'carriers' not in data.columns:
+            logger.debug(f"carriers column not found in {filename}. Adding a default_carrier column")
             data['carriers'] = 'default_carrier'
 
 
@@ -128,6 +143,7 @@ class Cleaner:
 
         missing_columns = expected_columns - set(data.columns)
         if missing_columns:
+            logger.error(f"Missing required columns in {filename}: {missing_columns}")
             raise KeyError(
                 f"Missing required column(s): {missing_columns}. "
                 f"Expected columns include: {expected_columns}. "
@@ -144,7 +160,7 @@ class Cleaner:
                 f"Error processing '{filename}'. No rows found after processing. "
                 f"Verify that the input file contains valid data."
             )
-
+        logger.debug(f"Columns after checker {data.columns}")
         return data
 
 
@@ -152,6 +168,8 @@ class Cleaner:
         """
         Filter the input data based on technologies defined in the basefile
         """
+        logger.info("Starting filter techs")
+
         df_names=df.copy()
         # Filter Processors from calliope data
         df_names['alias_carrier'] = df_names['techs'] + '_' + df_names['carriers']
@@ -183,7 +201,10 @@ class Cleaner:
         self.techs_region_not_included=excluded_techs
 
         df_names = df_names[~df_names['alias_carrier'].isin(excluded_techs)] # exclude the technologies
-
+        
+        logger.debug(f"Filtering technologies for {filter}")
+        logger.debug(f"Excluded techs: {excluded_techs}")
+        logger.debug(f"Data shape after filtering: {df_names.shape}")
         return df_names
 
 
@@ -204,6 +225,7 @@ class Cleaner:
         Group the input data based on technologies defined in the basefile
         If national= True, it aggregates by country
         """
+        logger.info(f"Grouping Energy System data according to the Basefile...")
 
         if self.additional_columns:
             # Safely combine spores + additional columns into a single string key
@@ -215,7 +237,7 @@ class Cleaner:
             df['spores'] = df['spores'].astype(str)
 
         if self.national:
-            pass
+            
             df['locs'] = df['locs'].str.split('_').str[0].str.split('-').str[0]
             grouped_df = df.groupby(['alias_filename', "locs"], as_index=False).agg({ #todo: remove units form here
                 'energy_value': 'sum',
@@ -239,7 +261,11 @@ class Cleaner:
             grouped_df = df.groupby(group_cols, as_index=False).agg({
                 'energy_value': 'sum'
             })
-        pass
+        logger.info("Data grouped completed")
+        logger.debug(f"Grouped df columns: {grouped_df.columns}")
+        logger.debug(f"Grouped df shape: {grouped_df.shape}")
+        logger.debug(f"Grouped df head \n"
+                     f": {grouped_df.head(2)}")
         return grouped_df
 
 
@@ -250,11 +276,13 @@ class Cleaner:
         """
         df['countries'] = [x.split('_')[0].split('-')[0]
                      for x in df['locs']]
+        logger.debug(f"Countries generated {df['countries'].unique()}")
         return df
 
 
     def preprocess_data(self)->pd.DataFrame:
         """Run data preprocessing steps"""
+        logger.info("Starting preprocessing data")
 
         self.basefile = pd.read_excel(self.mother_file, sheet_name='Processors')
         all_data = self.create_template_df()
@@ -267,39 +295,53 @@ class Cleaner:
             try:
 
                 raw_data = self._load_data(data_source) # Calliope data
+
                 checked_data = self._input_checker(data=raw_data, filename = data_source) # calliope data
 
                 filtered_data = self._filter_techs(checked_data, data_source) # calliope data
 
+                logger.debug("Adding filtered data to the template...")
                 all_data = pd.concat([all_data, filtered_data], ignore_index=True)
 
             except ValueError as e:
                 # Propagate validation errors (e.g., from verify_csv) as real errors
                 raise
+                
             except Exception as e:
                 warnings.warn(f"Error processing {data_source}: {e}", Warning)
 
+        
         if len(self.techs_region_not_included) > 1:
-            formatted_items = "\n".join(f"    - {item}" for item in self.techs_region_not_included)
-            message = f"""\nThe following technologies are present in the energy data but not in the Basefile: 
-            {formatted_items}
+            
+            
+            # Find the FileHandler path
+            log_file_path = next(
+                (h.baseFilename for h in logger.handlers if isinstance(h, logging.FileHandler)),
+                "log file not found"
+            )
 
-            Please, check the following items to avoid missing information."""
+            message = (
+                "\nThere are technologies present in the energy data but not in the Basefile.\n"
+                f"Please check the log file for details: {log_file_path} and see -Excluded techs-\n\n"
+                "Please review the items to avoid missing information."
+            )
             warnings.warn(message, Warning)
+            logger.warning(message)
+
         
         self.final_df = self._group_data(all_data) # calliope data
         self.final_df = self._manage_regions(self.final_df)
 
+        logger.info("Data preprocessing finished")
         return self.final_df
 
 
 
-    # noinspection PyArgumentList
     def _extract_data(self) -> List['BaseFileActivity']:
         """
         extract activities from the basefile and create a list BasFileActivity instances
         """
-        pass
+        logger.info("Extracting LCA activities...")
         def _create_activity(row):
             # move the activities from the basefile into a DataBase dataclass
             try:
@@ -324,6 +366,7 @@ class Cleaner:
                 return None
 
         base_activities = self.basefile.progress_apply(_create_activity, axis=1).dropna().tolist()
+        logger.info(f"{len(base_activities)} activities extracted")
         return [activity for activity in base_activities if activity.unit is not None]
 
 
@@ -331,6 +374,8 @@ class Cleaner:
 
     def _adapt_units(self):
         """adapt the units (flow_out_sum * conversion factor)"""
+        logger.info("Adapting units")
+
         self.base_activities = self._extract_data()
 
         df = pd.DataFrame([asdict(activity) for activity in self.base_activities])
