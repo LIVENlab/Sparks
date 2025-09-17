@@ -56,10 +56,17 @@ class Cleaner:
 
     def _verify_csv(self, source:str)-> None:
         """
-        Verify that the value passed has a csv extension.
+        Verify that the value passed has a csv extension and exists in self.file_handler.
         """
+        if source not in self.file_handler:
+            message= f"File key {source} not found in file handler dictionary. Check the basefile and the files in the directory"
+            logger.error(message)
+            raise KeyError(message)
+
         if not source.endswith('.csv'):
-            raise ValueError(f"File {source} is not a csv file")
+            message = f"File {source} is not a csv file"
+            logger.error(message)
+            raise KeyError(message)
         
 
     def _verify_national(self)-> None:
@@ -87,6 +94,7 @@ class Cleaner:
     def _load_data(self, source:str) -> pd.DataFrame:
         """ Assuming comma separated input, load the data from a specific file"""
         self._verify_csv(source)
+
 
         try:
             logger.info(f"Loading data from {source}")
