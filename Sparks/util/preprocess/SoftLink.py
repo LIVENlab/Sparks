@@ -3,9 +3,10 @@ import json
 import pandas as pd
 from pathlib import Path
 from Sparks.generic.generic_dataclass import *
+import logging
 
-bd.projects.set_current(bw_project)            # Select your project
-     # Select your db
+logger = logging.getLogger("sparks")
+bd.projects.set_current(bw_project)            
 
 
 
@@ -27,10 +28,11 @@ class SoftLinkCalEnb():
         self.smaller_vers=smaller_vers
         self.mother_data=mother_data
 
+        logger.info("Soflink class initiated")
+
 
     def _generate_scenarios(self):
-        pass
-        cal_dat=self.calliope #This is empty!
+        cal_dat=self.calliope 
         cal_dat['scenarios']=cal_dat['scenarios'].astype(str)
         try:
             scenarios = cal_dat['scenarios'].unique().tolist()
