@@ -3,16 +3,19 @@
         -LexPascal
 """
 import pandas as pd
-pd.options.mode.chained_assignment = None  # default='warn'
 from Sparks.generic.generic_dataclass import *
 from tqdm import tqdm
-tqdm.pandas()
-bd.projects.set_current(bw_project)
 from dataclasses import asdict
 from pandas.api.types import is_numeric_dtype
 import re
 import logging
-import os
+import pandera.pandas as pa
+
+from Sparks.generic.basefile_schema import schema
+
+pd.options.mode.chained_assignment = None  #
+tqdm.pandas()
+bd.projects.set_current(bw_project)
 logger = logging.getLogger("sparks")
 
 
@@ -72,15 +75,26 @@ class Cleaner:
             raise KeyError(message)
 
     
-    def _get_basefile_info(self):
+    def _validate_basefile(self):
         """ Get some basic debug information about the basefile"""
+        logger.info(f"Validating basefile schema...")
+        try:
+            schema.validate(self.basefile)
+        except pa.errors.SchemaError as exc:
+            logger.error(f"Schema validation failed for basefile {self.mother_file}")
+            failure_cases = getattr(exc, "failure_cases", None)
+            if failure_cases is not None:
+                logger.error("Validation failed at these locations:\n%s", failure_cases)
+            raise ValueError(f"Schema validation failed for basefile {self.mother_file})") from exc
+
         logger.debug(f"Files passed in basefile: {self.basefile['File_source'].unique()}")
         
         for item in self.basefile['File_source'].unique().tolist():
             if item not in self.file_handler.keys():
                 logger.error(f"File defined in basefile {item} not present in the base folder")
                 raise ValueError(f"File defined in basefile {item} not present in the base folder")
-            
+
+
 
     def _verify_national(self)-> None:
         """ 
@@ -209,7 +223,8 @@ class Cleaner:
                 self._validate_databases()
 
             self.basefile = pd.read_excel(self.mother_file, sheet_name='Processors').dropna(subset=['Ecoinvent_key_code'])
-            self._get_basefile_info() # extract basic debug info
+
+            self._validate_basefile() # extract basic debug info
             self._verify_national()
 
             self.basefile['alias_carrier'] = (self.basefile['Processor']
