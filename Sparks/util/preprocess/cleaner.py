@@ -469,9 +469,9 @@ class Cleaner:
                     (merged['_merge'] == 'left_only').sum(),
                     (merged['_merge'] == 'right_only').sum())
 
-        pass
+
         merged['energy_value'] = pd.to_numeric(merged.get('energy_value', 0), errors='coerce').fillna(0.0)
-        logger.debug("energy_value stats: min=%s max=%s", merged['energy_value'].min(), merged['energy_value'].max())
+
 
         # factor required
         if 'factor' not in merged.columns:
@@ -494,17 +494,19 @@ class Cleaner:
         merged = merged.drop(columns=['_merge'], errors='ignore')
         logger.debug("Computed new_vals for %d rows", len(merged))
 
+        if not self.national:
+            merged = self._fix_fullname(merged) # extend full_name with subregion if subnational
+            logger.debug("Extended full_name with subregion for subnational data")
         return self._final_dataframe(merged)
 
 
     @staticmethod
-    def _prefilter_final_df(df: pd.DataFrame) -> pd.DataFrame:
+    def _fix_fullname(df: pd.DataFrame) -> pd.DataFrame:
         """
-        Pre-filter the final DataFrame to remove rows with missing or zero energy values.
-        Specifically, drop rows in the merge dataframe that only come from the basefile,
-        meaning that something is wrong with the input data.
+        If national is True, extend the full_name with the subregion
         """
-        pass
+        locs = df['locs'].str.split("_").str[1]
+        df['full_name'] = df['full_name'] + '_' + locs
         return df
 
     @staticmethod
@@ -588,7 +590,6 @@ class Cleaner:
 
         return df
 
-        return df
 
 
     def adapt_units(self):
