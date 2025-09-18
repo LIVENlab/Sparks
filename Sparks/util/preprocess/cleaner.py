@@ -12,7 +12,7 @@ from dataclasses import asdict
 from pandas.api.types import is_numeric_dtype
 import re
 import logging
-
+import os
 logger = logging.getLogger("sparks")
 
 
@@ -154,7 +154,7 @@ class Cleaner:
 
 
         if 'carriers' not in data.columns:
-            logger.debug(f"carriers column not found in {filename}. Adding a default_carrier column")
+            logger.warning(f"carriers column not found in {filename}. Adding a default_carrier column. Add this carrier to the basefile")
             data['carriers'] = 'default_carrier'
 
 
@@ -187,33 +187,40 @@ class Cleaner:
     def _filter_techs(self, df: pd.DataFrame, filter: str)-> pd.DataFrame:
         """
         Filter the input data based on technologies defined in the basefile
+        * filter: File_source to filter the data
         """
         logger.info("Starting filter techs")
 
         df_names=df.copy()
         # Filter Processors from calliope data
         df_names['alias_carrier'] = df_names['techs'] + '_' + df_names['carriers']
-        df_names['alias_filename'] = df_names['alias_carrier']+ '__' + df_names['filename']
-        df_names['full_name'] = df_names['alias_filename'] + '___' + df_names['locs']
+        df_names['alias_filename_base'] = df_names['alias_carrier']+ '__' + df_names['filename']
+        # create the country column
         df_names = self._manage_regions(df_names)
-        df_names['alias_filename']=df_names['alias_filename']+'___' + df_names['countries']
+        df_names['alias_filename_loc']=df_names['alias_filename_base']+'___' + df_names['countries']
 
+        if self.national:
+            df_names['full_name'] = df_names['alias_filename_base']
+        else:  # subnational
+            df_names['full_name'] = df_names['alias_filename_loc']
 
         if self._edited is False:  # working with basefile data
-
             if self.specify_database: # check that the database column is there and doesn't contain empty values
                 self._validate_databases()
 
             self.basefile = pd.read_excel(self.mother_file, sheet_name='Processors').dropna(subset=['Ecoinvent_key_code'])
             self._get_basefile_info() # extract basic debug info
             self._verify_national()
-            self.basefile['alias_carrier'] = self.basefile['Processor'] + '_' + self.basefile['@SimulationCarrier']
-            #self.basefile['alias_region'] = self.basefile['alias_carrier']+'_'+self.basefile['Region']
-            self.basefile['alias_filename'] = self.basefile['alias_carrier']+'__'+self.basefile['File_source']
-            self.basefile['alias_filename'] = self.basefile['alias_filename'].str.split('.').str[0]
 
-            self.basefile['alias_filename_loc'] = self.basefile['alias_filename'] + '___' + self.basefile['Region']
-            self.basefile['full_alias'] = self.basefile['alias_filename_loc'] + '-' + self.basefile['geo_loc'] # TODO: make optional
+            self.basefile['alias_carrier'] = (self.basefile['Processor']
+                                              + '_' + self.basefile['@SimulationCarrier'])
+            self.basefile['alias_filename_base'] = (self.basefile['alias_carrier']
+                                                    + '__' +
+                                                    self.basefile['File_source'].astype(str).str.split('.').str[0])
+            self.basefile['alias_filename_loc'] = self.basefile['alias_filename_base'] + '___' + self.basefile[
+                'Region'].astype(str)
+            self.basefile['full_alias'] = self.basefile['alias_filename_loc'] + '-' + self.basefile['geo_loc'].astype(
+                str)
             self._edited = True
 
 
@@ -253,8 +260,8 @@ class Cleaner:
         """
         logger.info(f"Grouping Energy System data according to the Basefile...")
 
+        # combine spores + additional columns into a single string key
         if self.additional_columns:
-            # Safely combine spores + additional columns into a single string key
             df['spores'] = df['spores'].astype(str)
             for col in self.additional_columns:
                 if col in df.columns:
@@ -262,36 +269,44 @@ class Cleaner:
         else:
             df['spores'] = df['spores'].astype(str)
 
-        if self.national:
-            
-            df['locs'] = df['locs'].str.split('_').str[0].str.split('-').str[0]
-            grouped_df = df.groupby(['alias_filename', "locs"], as_index=False).agg({ #todo: remove units form here
-                'energy_value': 'sum',
-                'spores': 'first',
-                'techs': 'first',
-                'carriers': 'first',
-            })
-            # Hardfix: create a copy of alias filename called full_name
-            grouped_df['full_name'] = grouped_df['alias_filename']
+            # Ensure alias_filename_base and alias_filename_loc exist
+            if 'alias_filename_base' not in df.columns:
+                df['alias_carrier'] = df['techs'].astype(str) + '_' + df['carriers'].astype(str)
+                df['alias_filename_base'] = df['alias_carrier'] + '__' + df['filename'].astype(str).str.split('.').str[
+                    0]
+                df = self._manage_regions(df)
+                df['alias_filename_loc'] = df['alias_filename_base'] + '___' + df['countries']
 
-        else:
+            if self.national:
+                # clean locs -> country part
+                df['locs'] = df['locs'].astype(str).str.split('_').str[0].str.split('-').str[0]
+                grouped_df = df.groupby(['alias_filename_base', 'locs'], as_index=False).agg({
+                    'energy_value': 'sum',
+                    'spores': 'first',
+                    'techs': 'first',
+                    'carriers': 'first',
+                })
+                # canonical full_name is base alias (no region suffix) in national mode
+                grouped_df['full_name'] = grouped_df['alias_filename_base']
+            else:
+                # subnational: group by detailed alias including country
+                group_cols = [
+                    'spores',
+                    'techs',
+                    'carriers',
+                    'locs',
+                    'alias_carrier',
+                    'alias_filename_loc',
+                    'full_name' if 'full_name' in df.columns else 'alias_filename_loc'
+                ]
+                # Ensure the column used exists
+                group_cols = [c for c in group_cols if c in df.columns]
+                grouped_df = df.groupby(group_cols, as_index=False).agg({'energy_value': 'sum'})
 
-            group_cols = ['spores',
-                          'techs',
-                          'carriers',
-                          'locs',
-                          'alias_carrier',
-                          'alias_filename',
-                          'full_name']
-
-            grouped_df = df.groupby(group_cols, as_index=False).agg({
-                'energy_value': 'sum'
-            })
-        logger.info("Data grouped completed")
-        logger.debug(f"Grouped df columns: {grouped_df.columns}")
-        logger.debug(f"Grouped df shape: {grouped_df.shape}")
-        logger.debug(f"Grouped df head \n"
-                     f": {grouped_df.head(2)}")
+            logger.info("Data grouped completed")
+            logger.debug(f"Grouped df columns: {grouped_df.columns}")
+            logger.debug(f"Grouped df shape: {grouped_df.shape}")
+            logger.debug(f"Grouped df head:\n{grouped_df.head(3)}")
         return grouped_df
 
 
@@ -300,9 +315,9 @@ class Cleaner:
         """
         Edit the regions format strings in order to get general country names
         """
-        df['countries'] = [x.split('_')[0].split('-')[0]
-                     for x in df['locs']]
-        logger.debug(f"Countries generated {df['countries'].unique()}")
+        df['locs'] = df['locs'].astype(str)
+        df['countries'] = df['locs'].str.split('_').str[0].str.split('-').str[0].str.strip()
+        logger.debug(f"Countries generated {df['countries'].unique()[:10]}")
         return df
 
 
@@ -324,7 +339,8 @@ class Cleaner:
 
                 checked_data = self._input_checker(data=raw_data, filename = data_source) # calliope data
 
-                filtered_data = self._filter_techs(checked_data, data_source) # calliope data
+                filtered_data = self._filter_techs(checked_data,
+                                                   data_source) # calliope data
 
                 logger.debug("Adding filtered data to the template...")
                 all_data = pd.concat([all_data, filtered_data], ignore_index=True)
@@ -334,6 +350,7 @@ class Cleaner:
                 raise
                 
             except Exception as e:
+                logger.exception(f"Error processing {data_source}: {e}")
                 warnings.warn(f"Error processing {data_source}: {e}", Warning)
 
         
@@ -381,14 +398,14 @@ class Cleaner:
                     'code': row['Ecoinvent_key_code'],
                     'factor': row['@SimulationToEcoinventFactor'],
                     'full_alias': row['full_alias'],
-                    'alias_filename_loc': row['alias_filename_loc']
+                    'alias_filename_loc': row['alias_filename_loc'],
+                    'national': self.national
                 }
 
                 if self.specify_database:
                     kwargs['database']=row['database']
 
                 return BaseFileActivity(**kwargs)
-
 
             except KeyError as e:
                 logger.warning(f"Warning during data extraction {e}")
@@ -397,7 +414,7 @@ class Cleaner:
         base_activities = self.basefile.progress_apply(_create_activity, axis=1).dropna().tolist()
         logger.info(f"{len(base_activities)} activities extracted")
         logger.debug(f"First 3 extracted activities: {base_activities[:3]}")
-        return [activity for activity in base_activities if activity.unit is not None]
+        return [activity for activity in base_activities if getattr(activity, 'unit', None) is not None]
 
 
     def _adapt_units(self):
@@ -405,33 +422,75 @@ class Cleaner:
         logger.info("Adapting units...")
 
         self.base_activities = self._extract_data()
-
         logger.debug(f"Converting {len(self.base_activities)} activities into a DF")
-        df = pd.DataFrame([asdict(activity) for activity in self.base_activities])
+
+        rows = []   
+        for activity in self.base_activities:
+            d = asdict(activity)  # serialize dataclass fields
+            d["full_name"] = activity.full_name
+            rows.append(d)
+
+        df = pd.DataFrame(rows)
         logger.debug(f"Base activities DataFrame shape: {df.shape}")
 
-        df = pd.merge(
-            self.final_df,
-            df,
-            left_on="full_name",
-            right_on="alias_filename_loc",
-            how="right"
-        )
-        logger.debug(f"After merge with final_df: {df.shape}")
+        if df.empty:
+            logger.error("No base activity found.")
+            raise RuntimeError("No base activity found for unit adaptaiton.")
 
-        if self.specify_database is False: # Fix #16
-            df = df.drop('database', axis=1)
-        
-        before_drop = len(df) # logger debug 
-        df=df.dropna() # This removes all in the case of self.national= True. Looks for database. Related to passing addditional columns
-        df=self._check_str_values(df, 'energy_value')
-        df['new_vals'] = df['factor'] * df['energy_value']
-        df['new_units'] =df['unit']
+        self.final_df['full_name'] = self.final_df['full_name'].astype(str).str.strip()
+        df['full_name'] = df['full_name'].astype(str).str.strip()
 
-        logger.debug(f"Dropped {before_drop - len(df)} rows containing NaN values")
-        
-        return self._final_dataframe(df)
 
+        merged = pd.merge(self.final_df,
+                          df,
+                          on='full_name',
+                          how='right',
+                          indicator=True,
+                          suffixes=('_energy', '_act'))
+
+        logger.debug(f"After merge: {merged.shape}")
+        logger.info("Merge counts: matched=%d, energy-only=%d, basefile-only=%d",
+                    (merged['_merge'] == 'both').sum(),
+                    (merged['_merge'] == 'left_only').sum(),
+                    (merged['_merge'] == 'right_only').sum())
+
+        pass
+        merged['energy_value'] = pd.to_numeric(merged.get('energy_value', 0), errors='coerce').fillna(0.0)
+        logger.debug("energy_value stats: min=%s max=%s", merged['energy_value'].min(), merged['energy_value'].max())
+
+        # factor required
+        if 'factor' not in merged.columns:
+            logger.error("Missing 'factor' column after merge; cannot compute new_vals.")
+            raise KeyError("Missing 'factor' column in merged data")
+        merged['factor'] = pd.to_numeric(merged['factor'], errors='coerce')
+
+        # Drop rows missing required calculation fields (factor or unit)
+        before = len(merged)
+        merged = merged.dropna(subset=['factor', 'unit'])
+        dropped_required = before - len(merged)
+        if dropped_required:
+            logger.warning("Dropped %d rows missing required fields (factor/unit) after merge", dropped_required)
+
+        # Compute new values
+        merged['new_vals'] = merged['factor'] * merged['energy_value']
+        merged['new_units'] = merged['unit']
+
+        # Cleanup and forward
+        merged = merged.drop(columns=['_merge'], errors='ignore')
+        logger.debug("Computed new_vals for %d rows", len(merged))
+
+        return self._final_dataframe(merged)
+
+
+    @staticmethod
+    def _prefilter_final_df(df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Pre-filter the final DataFrame to remove rows with missing or zero energy values.
+        Specifically, drop rows in the merge dataframe that only come from the basefile,
+        meaning that something is wrong with the input data.
+        """
+        pass
+        return df
 
     @staticmethod
     def _check_unique_full_names(df: pd.DataFrame)-> None:
@@ -475,38 +534,44 @@ class Cleaner:
 
 
     def _final_dataframe(self, df):
+        """
+            Prepare and validate the final cleaned DataFrame.
+            Assumes `full_name` already exists and is the canonical join key.
+            """
+        cols = [
+            'spores',
+            'locs',
+            'techs',
+            'full_name',
+            'carriers',
+            'new_vals',
+            'new_units'
+        ]
 
-        cols = ['spores',
-                'locs',
-                'techs',
-                'full_alias',
-                'carriers',
-                'new_vals',
-                'new_units']
+        # Drop rows that are entirely empty, but avoid blanket dropna that removes useful rows
+        df = df.dropna(axis=0, how='all')
 
-        
-        before_drop = len(df)
-        df.dropna(axis=0, inplace=True)
-        dropped = before_drop - len(df)
-        if dropped > 0:
-            logger.debug(f"Dropped {dropped} rows with NaN values during final cleanup")
-        
-        if self.national:
-            logger.debug("National mode active → renaming 'alias_filename' to 'full_name'")
-            df.rename(columns={'alias_filename' : 'full_name'}, inplace=True)
-            
+        # Verify required columns exist
+        missing_cols = [c for c in cols if c not in df.columns]
+        if missing_cols:
+            logger.error("Missing columns in final dataframe: %s", missing_cols)
+            raise KeyError(f"Missing columns in final dataframe: {missing_cols}")
+
         df = df[cols]
 
-        df.rename(columns={'full_alias':'full_name', 'spores': 'scenarios', 'new_vals': 'energy_value'}, inplace=True)
-        df['aliases'] = df['techs'] + '__' + df['carriers'] + '___' + df['locs'] # TODO: remove in clean versions
+        # rename internal column names to final consumer names
+        df = df.rename(columns={'new_vals': 'energy_value', 'new_units': 'unit', 'spores': 'scenarios'})
 
-        self._techs_sublocations = df['full_name'].unique().tolist()  # save sublocation aliases for hierarchy
-        self._check_unique_full_names(df) # Validate full_names column
+        # build aliases column
+        df['aliases'] = df['techs'].astype(str) + '__' + df['carriers'].astype(str) + '___' + df['locs'].astype(str)
 
-        logger.info(
-        f"Final preprocess DataFrame ready with shape {df.shape} "
-        f"({len(df)} rows, {len(df.columns)} columns)")
-        logger.debug(f"Final DataFrame columns: {list(df.columns)}")
+        self._techs_sublocations = df['full_name'].unique().tolist()
+        self._check_unique_full_names(df)
+
+        logger.info("Final preprocess DataFrame ready with shape %s", df.shape)
+        logger.debug("Final DataFrame columns: %s", list(df.columns))
+
+        return df
 
         return df
 

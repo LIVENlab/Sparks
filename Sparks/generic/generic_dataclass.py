@@ -28,16 +28,19 @@ class BaseFileActivity:
     database: Optional[str] = None
     unit: Optional[str] = None
     init_post: InitVar[bool]=True # Allow to create an instance without calling alias modifications
+    national:  bool = False
 
     activity_cache = defaultdict(lambda: None)  # init cache to speedup db search!
 
 
     def __post_init__(self,init_post):
-
         if not init_post:
             return
 
+
         self.alias_carrier = f"{self.name}_{self.carrier}"
+
+
         self.alias_carrier_region=f"{self.name}__{self.carrier}___{self.region}"
         #self.alias_carrier_parent_loc =f"{self.alias_carrier}_{self.alias_carrier_parent_loc}"
         self.activity = self._load_activity(key=self.code)
@@ -77,6 +80,20 @@ class BaseFileActivity:
         # save activity into the cache
         BaseFileActivity.activity_cache[key] = result
         return result
+    
+    @property
+    def full_name(self) ->str:
+        """ join key for an activity, depends on national flag.
+
+                - If national == True -> return base alias (no region suffix).
+                - If national == False -> return alias including region (sublocation).
+            """
+        if not isinstance(self.alias_filename_loc, str):
+            return str(self.alias_filename_loc)  # defensive
+        if self.national:
+            return self.alias_filename_loc.split("___")[0]
+        return self.alias_filename_loc
+
 
 
 @dataclass
