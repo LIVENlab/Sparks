@@ -135,7 +135,6 @@ class Last_Branch:
 
         self._filter_unique_origin_by_full_alias()  # Filter unique values
 
-
         self.leafs = [
             {
                 'name': x.full_alias,
@@ -149,8 +148,17 @@ class Last_Branch:
             for x in self.origin]
 
         if not self.leafs:
-            warnings.warn(f"leafs not found for Last Tree Branch {self.name}, at {self.level}. This error can induce critical erros when using this data in enbios. Please, check the dendrogram structure")
-
+            logger.error(
+                f"[Hierarchy] Last_Branch '{self.name}' at level '{self.level}' "
+                f"has NO leafs. Parent='{self.parent}', origin={self.origin}"
+            )
+            raise ValueError(
+                f"Critical error: Last_Branch '{self.name}' at level '{self.level}' has no leafs."
+            )
+        else:
+            logger.debug(
+                f"[Hierarchy] Last_Branch '{self.name}' built with {len(self.leafs)} leaf(s)"
+            )
 
     def _filter_unique_origin_by_full_alias(self):
         """Filters out duplicate full_alias entries from self.origin and logs duplicates."""
@@ -167,12 +175,13 @@ class Last_Branch:
             else:
                 duplicates_reported = True
                 warning_msg = (
-                    f"⚠️  Found {len(group)} entries with duplicated full_alias: '{alias}' "
+                    f" Found {len(group)} entries with duplicated full_alias: '{alias}' "
                     f"in Last_Branch '{self.name}' at level '{self.level}'. Only the first occurrence will be kept.\n"
                 )
                 for i, item in enumerate(group, 1):
                     warning_msg += f"    [{i}] {item}\n"
-                warnings.warn(warning_msg.strip())
+                logger.warning(warning_msg.strip())
+
 
 
                 unique.append(group[0])
@@ -197,9 +206,18 @@ class Branch:
                 'name': x.name, 'aggregator': 'sum', 'children': x.leafs
             }
             for x in self.origin]
-        if not self.leafs:
-            warnings.warn(f"leafs not found for Last Tree Branch {self.name}, at {self.level}. This  can induce critical errors when using this data in enbios. Please, check the dendrogram structure")
 
+        if not self.leafs:
+            logger.error(
+                f"[Hierarchy] Branch '{self.name}' at level '{self.level}' has no children."
+            )
+            raise ValueError(
+                f"Critical error: Branch '{self.name}' at level '{self.level}' has no children."
+            )
+        else:
+            logger.debug(
+                f"[Hierarchy] Branch '{self.name}' at level '{self.level}' created with {len(self.leafs)} children"
+            )
 
 
 @dataclass

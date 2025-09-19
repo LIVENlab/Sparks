@@ -54,19 +54,6 @@ class SoftLinkCalEnb():
             raise ValueError("Duplicate full_name detected among mother_data activities. Consider deduplicating.")
 
 
-
-
-    def _generate_scenarios(self):
-        cal_dat=self.calliope 
-        cal_dat['scenarios']=cal_dat['scenarios'].astype(str)
-        try:
-            scenarios = cal_dat['scenarios'].unique().tolist()
-        except KeyError as e:
-            cols=cal_dat.columns
-            raise KeyError(f'Input data error. Columns are {cols}.', f' and expecting {e}.')
-
-        return self._get_scenarios()
-
     def _get_scenarios(self):
         cal_dat = self.calliope
         cal_dat['scenarios'] = cal_dat['scenarios'].astype(str)
@@ -82,19 +69,26 @@ class SoftLinkCalEnb():
 
         scenarios_check = [str(x) for x in
                            cal_dat['scenarios'].unique()]  # Convert to string, just in case the scenario is a number
+        logger.debug(f"Found scenarios in the dataset: {scenarios_check}")
 
-        scenarios = [
-            Scenario(name=str(scenario),
-                     activities=[
-                         Activity_scenario(
-                             alias=row['full_name'],
-                             amount=row['energy_value'],
-                             unit=row['new_units']
-                         )
-                         for _, row in group.iterrows()
-                     ]).to_dict()
-            for scenario, group in cal_dat.groupby('scenarios')
-        ]
+        scenarios = []
+        for scenario, group in cal_dat.groupby('scenarios'):
+            logger.debug(f"[Scenarios] Processing scenario: {scenario} with {len(group)} activities")
+            activities = [
+                Activity_scenario(
+                    alias=row['full_name'],
+                    amount=row['energy_value'],
+                    unit=row['unit']
+                )
+                for _, row in group.iterrows()
+            ]
+            if not activities:
+                logger.warning(f"[Scenarios] Scenario '{scenario}' has no activities!")
+
+            scenarios.append(
+                Scenario(name=str(scenario), activities=activities).to_dict()
+            )
+
         assert (len(scenarios) == len(scenarios_check))
         return scenarios
 
@@ -125,33 +119,46 @@ class SoftLinkCalEnb():
         return  {key: value for d in methods for key, value in d.items()}
 
 
-    def run(self, path= None):
+    def run(self, path: Optional[Union[str, Path]] = None) -> dict:
         """public function """
-        logger.info("Starting ENBIOS hierarchy generation")
-        self.hierarchy=Hierarchy(base_path=self.motherfile,
-                                 motherdata=self.mother_data,
-                                 sublocations=self.sublocations ).generate_hierarchy()
+        logger.info("Starting ENBIOS generation")
 
-        enbios2_methods= self._get_methods()
-        logger.info(f"{len(enbios2_methods)} Methods extracted from motherfile")
+        hierarchy = Hierarchy(base_path=self.motherfile, motherdata=self.mother_data,
+                              sublocations=self.sublocations).generate_hierarchy()
+        logger.info("Hierarchy generated (top-level name: %s)",
+                    hierarchy.get("name") if isinstance(hierarchy, dict) else "N/A")
 
-        self.enbios2_data = {
+        methods = self._get_methods()
+        logger.info("Methods extracted: %d", len(methods))
+
+        scenarios = self._get_scenarios()
+        logger.info("Scenarios prepared: %d", len(scenarios))
+
+        enbios2_data = {
             "adapters": [
                 {
                     "adapter_name": "brightway-adapter",
                     "config": {"bw_project": bw_project},
-                    "methods": enbios2_methods
+                    "methods": methods,
                 }
             ],
-            "hierarchy": self.hierarchy,
-            "scenarios": self._generate_scenarios()
+            "hierarchy": hierarchy,
+            "scenarios": scenarios,
         }
 
         if path is not None:
-            with open(path, 'w') as gen_diction:
-                json.dump(self.enbios2_data, gen_diction, indent=4)
-            gen_diction.close()
-        print('Input data for ENBIOS created')
+            out_path = Path(path)
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                with open(out_path, "w", encoding="utf8") as fh:
+                    json.dump(enbios2_data, fh, indent=4)
+                logger.info("Wrote ENBIOS JSON to %s", out_path.resolve())
+            except Exception:
+                logger.exception("Failed to write ENBIOS JSON to %s", out_path)
+
+        self.enbios2_data = enbios2_data
+        logger.info("ENBIOS data generation finished")
+        return enbios2_data
 
 
 class Hierarchy:
@@ -164,8 +171,6 @@ class Hierarchy:
         self.motherdata = self.manage_subregions()
         self.data=self._transform_motherdata()
 
-
-        
 
 
     def _create_copies(self,
