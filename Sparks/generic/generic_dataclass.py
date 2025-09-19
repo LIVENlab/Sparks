@@ -6,8 +6,14 @@ import bw2data as bd
 from bw2data.errors import UnknownObject
 from bw2data.backends import Activity, ActivityDataset
 from Sparks.const.const import bw_project
-bd.projects.set_current(bw_project)            # Select your project
+bd.projects.set_current(bw_project)            
+from dataclasses import dataclass, field
+from typing import List
 from collections import defaultdict
+import warnings
+import logging
+
+logger = logging.getLogger("sparks")
 
 
 @dataclass
@@ -19,20 +25,23 @@ class BaseFileActivity:
     carrier: str
     parent: str
     code:str
-    full_alias: str
+    alias_filename_loc: str
+    full_alias:str
     factor: Union[int, float]
+    database: Optional[str] = None
     unit: Optional[str] = None
     init_post: InitVar[bool]=True # Allow to create an instance without calling alias modifications
+    national:  bool = False
 
     activity_cache = defaultdict(lambda: None)  # init cache to speedup db search!
 
 
     def __post_init__(self,init_post):
-
         if not init_post:
             return
 
         self.alias_carrier = f"{self.name}_{self.carrier}"
+
         self.alias_carrier_region=f"{self.name}__{self.carrier}___{self.region}"
         #self.alias_carrier_parent_loc =f"{self.alias_carrier}_{self.alias_carrier_parent_loc}"
         self.activity = self._load_activity(key=self.code)
@@ -48,7 +57,6 @@ class BaseFileActivity:
         """
         key: code
         """
-
         if key in BaseFileActivity.activity_cache:
             return BaseFileActivity.activity_cache[key]
 
@@ -69,11 +77,23 @@ class BaseFileActivity:
             warnings.warn(message, Warning)
             result = None
 
-
-
         # save activity into the cache
         BaseFileActivity.activity_cache[key] = result
         return result
+    
+    @property
+    def full_name(self) ->str:
+        """ join key for an activity, depends on national flag.
+
+                - If national == True -> return base alias (no region suffix).
+                - If national == False -> return alias including region (sublocation).
+            """
+        if not isinstance(self.alias_filename_loc, str):
+            return str(self.alias_filename_loc)  # defensive
+        if self.national:
+            return self.alias_filename_loc.split("___")[0]
+        return self.alias_filename_loc
+
 
 
 @dataclass
@@ -112,9 +132,62 @@ class Last_Branch:
 
 
     def __post_init__(self):
-        self.leafs = [{'name': x.alias_carrier_region, 'adapter': 'bw', 'config': {'code': x.code}} for x in self.origin]
+
+        self._filter_unique_origin_by_full_alias()  # Filter unique values
+
+        self.leafs = [
+            {
+                'name': x.full_alias,
+                'adapter': 'bw',
+                'config': (
+                    {'code': x.code, 'database': x.database}
+                    if x.database is not None else
+                    {'code': x.code}
+                )
+            }
+            for x in self.origin]
+
         if not self.leafs:
-            warnings.warn(f"leafs not found for Last Tree Branch {self.name}, at {self.level}. This error can induce critical erros when using this data in enbios. Please, check the dendrogram structure")
+            logger.error(
+                f"[Hierarchy] Last_Branch '{self.name}' at level '{self.level}' "
+                f"has NO leafs. Parent='{self.parent}', origin={self.origin}"
+            )
+            raise ValueError(
+                f"Critical error: Last_Branch '{self.name}' at level '{self.level}' has no leafs."
+            )
+        else:
+            logger.debug(
+                f"[Hierarchy] Last_Branch '{self.name}' built with {len(self.leafs)} leaf(s)"
+            )
+
+    def _filter_unique_origin_by_full_alias(self):
+        """Filters out duplicate full_alias entries from self.origin and logs duplicates."""
+        alias_map = defaultdict(list)
+        for activity in self.origin:
+            alias_map[activity.full_alias].append(activity)
+
+        unique = []
+        duplicates_reported = False
+
+        for alias, group in alias_map.items():
+            if len(group) == 1:
+                unique.append(group[0])
+            else:
+                duplicates_reported = True
+                warning_msg = (
+                    f" Found {len(group)} entries with duplicated full_alias: '{alias}' "
+                    f"in Last_Branch '{self.name}' at level '{self.level}'. Only the first occurrence will be kept.\n"
+                )
+                for i, item in enumerate(group, 1):
+                    warning_msg += f"    [{i}] {item}\n"
+                logger.warning(warning_msg.strip())
+
+
+
+                unique.append(group[0])
+
+        self.origin = unique
+
 
 
 
@@ -133,18 +206,53 @@ class Branch:
                 'name': x.name, 'aggregator': 'sum', 'children': x.leafs
             }
             for x in self.origin]
-        if not self.leafs:
-            warnings.warn(f"leafs not found for Last Tree Branch {self.name}, at {self.level}. This  can induce critical errors when using this data in enbios. Please, check the dendrogram structure")
 
+        if not self.leafs:
+            logger.error(
+                f"[Hierarchy] Branch '{self.name}' at level '{self.level}' has no children."
+            )
+            raise ValueError(
+                f"Critical error: Branch '{self.name}' at level '{self.level}' has no children."
+            )
+        else:
+            logger.debug(
+                f"[Hierarchy] Branch '{self.name}' at level '{self.level}' created with {len(self.leafs)} children"
+            )
 
 
 @dataclass
 class Method:
+    """
+     For methods we need to pass a dictionary,
+     where the keys are arbitrary names that we give to the method and the tuple of strings, 
+     which are the names/identifiers of methods in brightway
+    """
     method: tuple
+    _used_keys = set() #Fixes issue #12
+    def __post_init__(self):
+        if self.method not in bd.methods:
+            logger.warning(f"Method {self.method} not found in brightway project. Please, check that information before running enbios")
+            #raise ValueError(f"Method {self.method} not found in brightway. Please, introduce the full method")
 
-    def to_dict(self):
-        return {self.method[2].split('(')[1].split(')')[0]: [
-            self.method[0], self.method[1], self.method[2]
-        ]}
+    def to_dict(self,*args)-> Dict[str, List[str]]:
+        """
+        This function returns a dictionary with a key being the second arbitrary element
+        (Enbios like format)
+        """
+        try:
+            base_key = self.method[2]
+        except:
+            base_key = self.method[1]
+        
+        if base_key in self._used_keys:
+            counter = 1
+            while f"{base_key}_{counter}" in self._used_keys:
+                counter += 1
+            key = f"{base_key}_{counter}"
+        else:
+            key = base_key 
+        
+        self._used_keys.add(key) #Issue #12
+        return {key: list(args)}
 
-
+    
