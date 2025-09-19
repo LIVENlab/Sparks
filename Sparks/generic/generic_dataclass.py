@@ -11,6 +11,9 @@ from dataclasses import dataclass, field
 from typing import List
 from collections import defaultdict
 import warnings
+import logging
+
+logger = logging.getLogger("sparks")
 
 
 @dataclass
@@ -37,9 +40,7 @@ class BaseFileActivity:
         if not init_post:
             return
 
-
         self.alias_carrier = f"{self.name}_{self.carrier}"
-
 
         self.alias_carrier_region=f"{self.name}__{self.carrier}___{self.region}"
         #self.alias_carrier_parent_loc =f"{self.alias_carrier}_{self.alias_carrier_parent_loc}"
@@ -56,7 +57,6 @@ class BaseFileActivity:
         """
         key: code
         """
-
         if key in BaseFileActivity.activity_cache:
             return BaseFileActivity.activity_cache[key]
 
@@ -213,12 +213,13 @@ class Method:
     _used_keys = set() #Fixes issue #12
     def __post_init__(self):
         if self.method not in bd.methods:
-            raise ValueError(f"Method {self.method} not found in brightway. Please, introduce the full method")
+            logger.warning(f"Method {self.method} not found in brightway project. Please, check that information before running enbios")
+            #raise ValueError(f"Method {self.method} not found in brightway. Please, introduce the full method")
 
-
-    def to_dict(self,*args):
+    def to_dict(self,*args)-> Dict[str, List[str]]:
         """
         This function returns a dictionary with a key being the second arbitrary element
+        (Enbios like format)
         """
         try:
             base_key = self.method[2]
