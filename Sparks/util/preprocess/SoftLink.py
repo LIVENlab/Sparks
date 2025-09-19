@@ -2,12 +2,15 @@ import copy
 import json
 import pandas as pd
 from pathlib import Path
-from Sparks.generic.generic_dataclass import *
+import pandera as pa
 import logging
+import ast
+from Sparks.generic.basefile_schema import calliope_cleaning_schema, methods_schema
+from Sparks.generic.generic_dataclass import *
+
 
 logger = logging.getLogger("sparks")
 bd.projects.set_current(bw_project)            
-
 
 
 class SoftLinkCalEnb():
@@ -22,13 +25,35 @@ class SoftLinkCalEnb():
                  motherfile: Path,
                  smaller_vers: bool =None):
 
-        self.calliope=calliope
-        self.motherfile=motherfile
-        self.sublocations=sublocations # Use for hierarchy
+        self.calliope=calliope.copy()
+        self.motherfile=Path(motherfile)
+        self.sublocations=sublocations
         self.smaller_vers=smaller_vers
         self.mother_data=mother_data
 
-        logger.info("Soflink class initiated")
+        logger.info("===Soflink class initiated===")
+        self._validate_inputs()
+
+    def _validate_inputs(self)-> None:
+        """
+        Validate input data using pandera schemas
+        :return:
+        """
+        logger.info("Validating input data")
+        #try:
+         #   calliope_cleaning_schema.validate(self.calliope, lazy=True)
+        #except pa.errors.SchemaErrors as e:
+         #   logger.error(f"Input data validation error: {e.failure_cases}")
+          #  raise
+        #logger.info("Input data validated successfully")
+        
+        # check unique entries
+        act_names = [getattr(a, "full_name", None) for a in self.mother_data]
+        if len(act_names) != len(set(act_names)):
+            logger.error("Duplicate full_name detected among mother_data activities. Consider deduplicating.")
+            raise ValueError("Duplicate full_name detected among mother_data activities. Consider deduplicating.")
+
+
 
 
     def _generate_scenarios(self):
@@ -51,6 +76,7 @@ class SoftLinkCalEnb():
                 scenario = cal_dat['scenarios'].unique().tolist()[0]
                 cal_dat['scenarios'] = cal_dat['scenarios'].astype(str)
                 cal_dat = cal_dat[cal_dat['scenarios'] == str(scenario)]
+                logger.info(f"Using only scenario {scenario}")
             except:
                 raise ValueError('Scenarios out of bonds')
 
@@ -72,29 +98,51 @@ class SoftLinkCalEnb():
         assert (len(scenarios) == len(scenarios_check))
         return scenarios
 
+
     def _get_methods(self):
-        processors = pd.read_excel(self.motherfile, sheet_name='Methods')
-        methods=[Method(meth).to_dict(*meth) for meth in processors['Formula'].apply(eval)]
-        pass
-        return  {key: value for key, value in [list(item.items())[0] for item in methods]}
+        """ Get methods from the motherfile"""
+        methods_data = pd.read_excel(self.motherfile, sheet_name='Methods')
+        logger.info("Validating methods sheet")
+
+        try:
+           methods_schema.validate(methods_data, lazy=True)
+        except pa.errors.SchemaErrors as e:
+            logger.error(f"Input data validation error: {e.failure_cases}")
+            raise
+
+        methods = []
+
+        for meth in methods_data['Formula']:
+            try:
+                parsed = ast.literal_eval(meth)
+                methods.append(
+                    Method(parsed).to_dict(*parsed)
+                )
+            except (ValueError, SyntaxError) as e:
+                logger.error(f"Failed to parse method entry '{meth}': {e}")
+                continue
+
+        return  {key: value for d in methods for key, value in d.items()}
 
 
     def run(self, path= None):
         """public function """
-
+        logger.info("Starting ENBIOS hierarchy generation")
         self.hierarchy=Hierarchy(base_path=self.motherfile,
                                  motherdata=self.mother_data,
                                  sublocations=self.sublocations ).generate_hierarchy()
-        
-        
+
         enbios2_methods= self._get_methods()
+        logger.info(f"{len(enbios2_methods)} Methods extracted from motherfile")
+
         self.enbios2_data = {
             "adapters": [
                 {
                     "adapter_name": "brightway-adapter",
                     "config": {"bw_project": bw_project},
                     "methods": enbios2_methods
-                }],
+                }
+            ],
             "hierarchy": self.hierarchy,
             "scenarios": self._generate_scenarios()
         }
@@ -111,8 +159,12 @@ class Hierarchy:
         self.parents = pd.read_excel(base_path, sheet_name='Dendrogram_top')
         self.motherdata=motherdata
         self.subloc = sublocations
+        logger.debug("Hierarchy class initiated")
+
         self.motherdata = self.manage_subregions()
         self.data=self._transform_motherdata()
+
+
         
 
 
@@ -144,6 +196,7 @@ class Hierarchy:
 
 
     def manage_subregions(self):
+        logger.debug("Managing subregions in hierarchy")
         seen = set()
         final_list = []
         for act in self.motherdata:
