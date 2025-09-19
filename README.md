@@ -123,6 +123,7 @@ The core configuration file (`basefile.xlsx`) must contain a **Processors** shee
 | `File_source`                  | Source CSV file name                                           | `"flow_out_sum.csv"`      |
 | `geo_loc`                      | Distinguish betwen onsite-offsite, operation or infrastructure | `"onsite"`                |
 
+See the [Pandera](https://pandera.readthedocs.io/en/stable/index.html) validations schemas [here](https://github.com/LIVENlab/Sparks/blob/main/Sparks/generic/basefile_schema.py)
 
 ### Energy Data File Requirements
 
