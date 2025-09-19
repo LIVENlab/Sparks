@@ -35,7 +35,7 @@ def setup_logging(
     logger.setLevel(logging.DEBUG)
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)
-    logger.propagate = False  # don't bubble up
+    logger.propagate = True  # don't bubble up
 
     if capture_warnings:
         logging.captureWarnings(True)
