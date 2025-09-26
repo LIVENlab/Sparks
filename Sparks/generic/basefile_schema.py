@@ -35,3 +35,15 @@ methods_schema = pa.DataFrameSchema(
         "Formula": pa.Column(str, required=True, nullable=False),
     },
     strict= False ) # Allow extra columns (i.e information about the method)
+
+hierarchy_schema = pa.DataFrameSchema(
+    {
+        "Processor": pa.Column(str, required=True, nullable=False),
+        "ParentProcessor": pa.Column(str, required=True, nullable=False),
+        "Level": pa.Column(str,
+                           required=True,
+                           nullable=False,
+                           checks=Check.str_matches(r"^n(-\d+)?$")
+                           ),
+    } # Level should be n or n-1, n-2 etc.
+)

@@ -5,7 +5,7 @@ from pathlib import Path
 import pandera as pa
 import logging
 import ast
-from Sparks.generic.basefile_schema import calliope_cleaning_schema, methods_schema
+from Sparks.generic.basefile_schema import calliope_cleaning_schema, methods_schema, hierarchy_schema
 from Sparks.generic.generic_dataclass import *
 
 
@@ -163,13 +163,30 @@ class SoftLinkCalEnb():
 
 class Hierarchy:
     def __init__(self, base_path: str, motherdata, sublocations:list):
-        self.parents = pd.read_excel(base_path, sheet_name='Dendrogram_top')
+        self.parents = pd.read_excel(base_path,
+                                     sheet_name='Dendrogram_top',
+                                     keep_default_na=False,
+                                     na_values=[])
+        self._validate_hierarchy_input()
+
+
         self.motherdata=motherdata
         self.subloc = sublocations
         logger.debug("Hierarchy class initiated")
 
         self.motherdata = self.manage_subregions()
         self.data=self._transform_motherdata()
+
+
+    def _validate_hierarchy_input(self):
+        """Validate the input Motherfile schema"""
+        logger.info("Validating hierarchy input")
+        try:
+            hierarchy_schema.validate(self.parents, lazy=True)
+        except pa.errors.SchemaErrors as e:
+            logger.error(f"Input hierarchy data validation error: {e.failure_cases}")
+            logger.debug(self.parents)
+            raise ValueError("Hierarchy input validation failed, see logs for details") from err
 
 
 
