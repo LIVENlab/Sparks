@@ -25,12 +25,12 @@ class Cleaner:
     def __init__(self,
                  motherfile: str,
                  file_handler: dict,
-                 national: Optional[bool]= False,
-                 specify_database: Optional[bool] =False,
-                 additional_columns: Optional [List[str]] = None
+                 national: Optional[bool] = False,
+                 specify_database: Optional[bool] = False,
+                 additional_columns: Optional[List[str]] = None
                  ):
         logger.debug("Initiating the Claner class")
-        
+
         self.national = national
         self.specify_database = specify_database
         self.mother_file = motherfile
@@ -40,15 +40,12 @@ class Cleaner:
         self.additional_columns = additional_columns or []
         self._edited = False
 
-
-
-
     @staticmethod
     def create_template_df() -> pd.DataFrame:
         """
         Basic template for clean data
         """
-        #todo: remove from, here
+        # todo: remove from, here
         columns = ['spores',
                    "techs",
                    "carriers",
@@ -59,13 +56,12 @@ class Cleaner:
         assert list(df.columns) == columns, "Template df didn't work as expected"
         return df
 
-
-    def _verify_csv(self, source:str)-> None:
+    def _verify_csv(self, source: str) -> None:
         """
         Verify that the value passed has a csv extension and exists in self.file_handler.
         """
         if source not in self.file_handler:
-            message= f"File key {source} not found in file handler dictionary. Check the basefile and the files in the directory"
+            message = f"File key {source} not found in file handler dictionary. Check the basefile and the files in the directory"
             logger.error(message)
             raise KeyError(message)
 
@@ -74,7 +70,6 @@ class Cleaner:
             logger.error(message)
             raise KeyError(message)
 
-    
     def _validate_basefile(self):
         """ Get some basic debug information about the basefile"""
         logger.info(f"Validating basefile schema...")
@@ -88,16 +83,15 @@ class Cleaner:
             raise ValueError(f"Schema validation failed for basefile {self.mother_file})") from exc
 
         logger.debug(f"Files passed in basefile: {self.basefile['File_source'].unique()}")
-        
+
         for item in self.basefile['File_source'].unique().tolist():
             if item not in self.file_handler.keys():
                 logger.error(f"File defined in basefile {item} not present in the base folder")
                 raise ValueError(f"File defined in basefile {item} not present in the base folder")
 
 
-
-    def _verify_national(self)-> None:
-        """ 
+    def _verify_national(self) -> None:
+        """
         Check locations in the motherfile and rise a warning if it looks like national
         """
         if not self.national:
@@ -118,23 +112,22 @@ class Cleaner:
                 logger.debug(f"Regions passed {regions}")
 
 
-    def _load_data(self, source:str) -> pd.DataFrame:
+    def _load_data(self, source: str) -> pd.DataFrame:
         """ Assuming comma separated input, load the data from a specific file"""
         self._verify_csv(source)
 
         try:
             logger.info(f"Loading data from {source}")
-            data= pd.read_csv(self.file_handler[source], sep = None, engine='python').dropna()
+            data = pd.read_csv(self.file_handler[source], sep=None, engine='python').dropna()
             return data
-        
+
         except FileNotFoundError as e:
             logger.error(f"Failed to load {source}: {e}")
             raise FileNotFoundError(f"File {source} does not exist") from e
-        
-        
+
 
     def _input_checker(self, data: pd.DataFrame, filename: str) -> pd.DataFrame:
-        #TODO: transform this into a schema validation - version 1.2.0
+        # TODO: transform this into a schema validation - version 1.2.0
         """
         Validate and standardize the input DataFrame structure.
 
@@ -162,18 +155,15 @@ class Cleaner:
                 logger.debug(f"renaming --nodes-- for --locs-- in {filename}")
                 data = data.rename(columns={'nodes': 'locs'})
 
-
         if 'Unnamed: 0' in data.columns:
             data = data.drop(columns='Unnamed: 0')
 
-
         if 'carriers' not in data.columns:
-            logger.warning(f"carriers column not found in {filename}. Adding a default_carrier column. Add this carrier to the basefile")
+            logger.warning(
+                f"carriers column not found in {filename}. Adding a default_carrier column. Add this carrier to the basefile")
             data['carriers'] = 'default_carrier'
 
-
         expected_columns = {'spores', 'techs', 'locs', 'carriers', filename_base}
-
 
         missing_columns = expected_columns - set(data.columns)
         if missing_columns:
@@ -184,10 +174,8 @@ class Cleaner:
                 f"Available columns: {list(data.columns)}"
             )
 
-
         data = data.rename(columns={filename_base: 'energy_value'})
         data['filename'] = filename_base
-
 
         if data.empty:
             raise ValueError(
@@ -197,61 +185,7 @@ class Cleaner:
         logger.debug(f"Columns after checker {data.columns}")
         return data
 
-
-    def _filter_techs(self, df: pd.DataFrame, filter: str)-> pd.DataFrame:
-        """
-        Filter the input data based on technologies defined in the basefile
-        * filter: File_source to filter the data
-        """
-        logger.info("Starting filter techs")
-
-        df_names=df.copy()
-        # Filter Processors from calliope data
-        df_names['alias_carrier'] = df_names['techs'] + '_' + df_names['carriers']
-        df_names['alias_filename_base'] = df_names['alias_carrier']+ '__' + df_names['filename']
-        # create the country column
-        df_names = self._manage_regions(df_names)
-        df_names['alias_filename_loc']=df_names['alias_filename_base']+'___' + df_names['countries']
-
-        if self.national:
-            df_names['full_name'] = df_names['alias_filename_base']
-        else:  # subnational
-            df_names['full_name'] = df_names['alias_filename_loc']
-
-        if self._edited is False:  # working with basefile data
-            if self.specify_database: # check that the database column is there and doesn't contain empty values
-                self._validate_databases()
-
-            self.basefile = pd.read_excel(self.mother_file, sheet_name='Processors').dropna(subset=['Ecoinvent_key_code'])
-
-            self._validate_basefile() # extract basic debug info
-            self._verify_national()
-
-            self.basefile['alias_carrier'] = (self.basefile['Processor']
-                                              + '_' + self.basefile['@SimulationCarrier'])
-            self.basefile['alias_filename_base'] = (self.basefile['alias_carrier']
-                                                    + '__' +
-                                                    self.basefile['File_source'].astype(str).str.split('.').str[0])
-            self.basefile['alias_filename_loc'] = self.basefile['alias_filename_base'] + '___' + self.basefile[
-                'Region'].astype(str)
-            self.basefile['full_alias'] = self.basefile['alias_filename_loc'] + '-' + self.basefile['geo_loc'].astype(
-                str)
-            self._edited = True
-
-
-        basefile = self.basefile.loc[self.basefile['File_source'] == filter]
-        excluded_techs = set(df_names['alias_carrier']) - set(basefile['alias_carrier'])
-        self.techs_region_not_included=excluded_techs
-
-        df_names = df_names[~df_names['alias_carrier'].isin(excluded_techs)] # exclude the technologies
-        
-        logger.debug(f"Filtering technologies for {filter}")
-        logger.debug(f"Excluded techs: {excluded_techs}")
-        logger.debug(f"Data shape after filtering: {df_names.shape}")
-        return df_names
-
-
-    def _validate_databases(self)-> None:
+    def _validate_databases(self) -> None:
         """
         if specify database is activated, check that the basefile has non NaN values
         """
@@ -265,10 +199,84 @@ class Cleaner:
         if self.basefile['database'].isnull().any():
             logger.error("The column database from the basefile containse missing values")
             raise ValueError(f"The column database from the basefile containse missing values")
-        
 
 
-    def _group_data(self, df: pd.DataFrame)-> pd.DataFrame:
+
+    def _preprocess_basefile(self):
+
+        self.basefile = pd.read_excel(self.mother_file, sheet_name='Processors').dropna(
+            subset=['Ecoinvent_key_code'])
+
+        self._validate_basefile()
+        self._verify_national()
+
+        self.basefile['alias_carrier'] = (self.basefile['Processor']
+                                          + '_' + self.basefile['@SimulationCarrier'])
+
+        self.basefile['alias_filename_base'] = (self.basefile['alias_carrier']
+                                                + '__' +
+                                                self.basefile['File_source'].astype(str).str.split('.').str[0])
+
+        self.basefile['alias_filename_loc'] = self.basefile['alias_filename_base'] + '___' + self.basefile[
+            'Region'].astype(str)
+
+        self.basefile['full_alias'] = self.basefile['alias_filename_loc'] + '-' + self.basefile['geo_loc'].astype(
+            str)
+
+
+    def _preprocess_calliope(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Previous to filtering the data, preprocess the calliope data:
+            -Add new columns for the filters
+        """
+        df_names = df.copy()
+        # Filter Processors from calliope data
+        df_names['alias_carrier'] = df_names['techs'] + '_' + df_names['carriers']
+        df_names['alias_filename_base'] = df_names['alias_carrier'] + '__' + df_names['filename']
+
+        # create the country column
+        df_names = self._manage_regions(df_names)
+        df_names['alias_filename_loc'] = df_names['alias_filename_base'] + '___' + df_names['countries']
+
+        if self.national:
+            df_names['full_name'] = df_names['alias_filename_base']
+        else:  # subnational
+            df_names['full_name'] = df_names['alias_filename_loc']
+
+        return df_names
+
+
+    def _filter_techs(self, df: pd.DataFrame,
+                      filter: str) -> pd.DataFrame:
+        """
+        Filter the input data based on technologies defined in the basefile
+        * filter: File_source to filter the data
+        """
+        logger.info("Starting filter techs")
+        df_names = self._preprocess_calliope(df) # create new columns aggregating others.
+
+        if self._edited is False:  # working with basefile data
+            if self.specify_database:  # check that the database column is there and doesn't contain empty values
+                self._validate_databases()
+
+            self._preprocess_basefile() # Create new columns and aliases
+            self._edited = True
+
+        basefile = self.basefile.loc[self.basefile['File_source'] == filter] # FILTERS BY FILE SOURCE FIRST.
+        excluded_techs = set(df_names['alias_carrier']) - set(basefile['alias_carrier'])
+
+        self.techs_region_not_included = excluded_techs
+        df_names = df_names[~df_names['alias_carrier'].isin(excluded_techs)]  # exclude the technologies
+
+        logger.debug(f"Filtering technologies for {filter}")
+        logger.debug(f"Excluded techs: {excluded_techs}")
+        logger.debug(f"Data shape after filtering: {df_names.shape}")
+
+        return df_names
+
+
+
+    def _group_data(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         Group the input data based on technologies defined in the basefile
         If national= True, it aggregates by country
@@ -324,9 +332,8 @@ class Cleaner:
             logger.debug(f"Grouped df head:\n{grouped_df.head(3)}")
         return grouped_df
 
-
     @staticmethod
-    def _manage_regions(df:pd.DataFrame)-> pd.DataFrame:
+    def _manage_regions(df: pd.DataFrame) -> pd.DataFrame:
         """
         Edit the regions format strings in order to get general country names
         """
@@ -335,8 +342,7 @@ class Cleaner:
         logger.debug(f"Countries generated {df['countries'].unique()[:10]}")
         return df
 
-
-    def preprocess_data(self)->pd.DataFrame:
+    def preprocess_data(self) -> pd.DataFrame:
         """Run data preprocessing steps"""
         logger.info("Starting preprocessing data")
 
@@ -350,12 +356,12 @@ class Cleaner:
                 continue
             try:
 
-                raw_data = self._load_data(data_source) # Calliope data
+                raw_data = self._load_data(data_source)  # Calliope data
 
-                checked_data = self._input_checker(data=raw_data, filename = data_source) # calliope data
+                checked_data = self._input_checker(data=raw_data, filename=data_source)  # calliope data
 
                 filtered_data = self._filter_techs(checked_data,
-                                                   data_source) # calliope data
+                                                   data_source)  # calliope data
 
                 logger.debug("Adding filtered data to the template...")
                 all_data = pd.concat([all_data, filtered_data], ignore_index=True)
@@ -363,15 +369,12 @@ class Cleaner:
             except ValueError as e:
                 # Propagate validation errors (e.g., from verify_csv) as real errors
                 raise
-                
+
             except Exception as e:
                 logger.exception(f"Error processing {data_source}: {e}")
                 warnings.warn(f"Error processing {data_source}: {e}", Warning)
 
-        
         if len(self.techs_region_not_included) > 1:
-            
-            
             # Find the FileHandler path
             log_file_path = next(
                 (h.baseFilename for h in logger.handlers if isinstance(h, logging.FileHandler)),
@@ -385,27 +388,26 @@ class Cleaner:
             warnings.warn(message, Warning)
             logger.warning(message)
 
-        
-        self.final_df = self._group_data(all_data) # calliope data
+        self.final_df = self._group_data(all_data)  # calliope data
         self.final_df = self._manage_regions(self.final_df)
 
         logger.info("Data preprocessing finished")
         return self.final_df
 
-
-######################
-# Unit adapter
-######################
+    ######################
+    # Unit adapter
+    ######################
 
     def _extract_data(self) -> List['BaseFileActivity']:
         """
         extract activities from the basefile and create a list BasFileActivity instances
         """
         logger.info("Extracting LCA activities...")
+
         def _create_activity(row):
             # move the activities from the basefile into a DataBase dataclass
             try:
-                kwargs= {
+                kwargs = {
                     'name': row['Processor'],
                     'carrier': row['@SimulationCarrier'],
                     'parent': row['ParentProcessor'],
@@ -418,7 +420,7 @@ class Cleaner:
                 }
 
                 if self.specify_database:
-                    kwargs['database']=row['database']
+                    kwargs['database'] = row['database']
 
                 return BaseFileActivity(**kwargs)
 
@@ -431,7 +433,6 @@ class Cleaner:
         logger.debug(f"First 3 extracted activities: {base_activities[:3]}")
         return [activity for activity in base_activities if getattr(activity, 'unit', None) is not None]
 
-
     def _adapt_units(self):
         """adapt the units (flow_out_sum * conversion factor)"""
         logger.info("Adapting units...")
@@ -439,7 +440,7 @@ class Cleaner:
         self.base_activities = self._extract_data()
         logger.debug(f"Converting {len(self.base_activities)} activities into a DF")
 
-        rows = []   
+        rows = []
         for activity in self.base_activities:
             d = asdict(activity)  # serialize dataclass fields
             d["full_name"] = activity.full_name
@@ -455,7 +456,6 @@ class Cleaner:
         self.final_df['full_name'] = self.final_df['full_name'].astype(str).str.strip()
         df['full_name'] = df['full_name'].astype(str).str.strip()
 
-
         merged = pd.merge(self.final_df,
                           df,
                           on='full_name',
@@ -469,9 +469,7 @@ class Cleaner:
                     (merged['_merge'] == 'left_only').sum(),
                     (merged['_merge'] == 'right_only').sum())
 
-
         merged['energy_value'] = pd.to_numeric(merged.get('energy_value', 0), errors='coerce').fillna(0.0)
-
 
         # factor required
         if 'factor' not in merged.columns:
@@ -495,10 +493,9 @@ class Cleaner:
         logger.debug("Computed new_vals for %d rows", len(merged))
 
         if not self.national:
-            merged = self._fix_fullname(merged) # extend full_name with subregion if subnational
+            merged = self._fix_fullname(merged)  # extend full_name with subregion if subnational
             logger.debug("Extended full_name with subregion for subnational data")
         return self._final_dataframe(merged)
-
 
     @staticmethod
     def _fix_fullname(df: pd.DataFrame) -> pd.DataFrame:
@@ -510,7 +507,7 @@ class Cleaner:
         return df
 
     @staticmethod
-    def _check_unique_full_names(df: pd.DataFrame)-> None:
+    def _check_unique_full_names(df: pd.DataFrame) -> None:
         """
         Check if the full_name column is unique. If not, raise a warning
         """
@@ -518,14 +515,13 @@ class Cleaner:
         if not duplicates.empty:
             unique_dupes = sorted(set(duplicates.tolist()))
             logger.warning(
-            f"The 'full_name' column is not unique. Found {len(unique_dupes)} duplicates: {unique_dupes}"
+                f"The 'full_name' column is not unique. Found {len(unique_dupes)} duplicates: {unique_dupes}"
             )
-        
 
     @staticmethod
     def _check_str_values(df: pd.DataFrame,
-                           column: str,
-                             cast_to_int: bool = False):
+                          column: str,
+                          cast_to_int: bool = False):
         """
         if ';' passed, issues may rise. This function checks a particular column that could potentially be a string
         instead of float
@@ -548,7 +544,6 @@ class Cleaner:
         if cast_to_int:
             df[column] = df[column].astype("Int64")  # Nullable integer type for missing values
         return df
-
 
     def _final_dataframe(self, df):
         """
@@ -590,12 +585,9 @@ class Cleaner:
 
         return df
 
-
-
     def adapt_units(self):
         """Public method to adapt the units"""
         return self._adapt_units()
-
 
 
 
