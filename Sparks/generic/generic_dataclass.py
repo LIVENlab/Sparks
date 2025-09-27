@@ -96,12 +96,13 @@ class BaseFileActivity:
         return self.alias_filename_loc
 
 @dataclass
-class HierarchyActivity:
+class HierarchyActivity: #TODO: add database
     """ Base class for motherfile data"""
     name: str
     full_name: str
     parent: str
     code:str
+    database: Optional[str] = None
 
 
 @dataclass
@@ -135,17 +136,17 @@ class Last_Branch:
     level: str
     parent: str
     adapter='bw'
-    origin: List['BaseFileActivity'] = field(default_factory=list)
+    origin: List['HierarchyActivity'] = field(default_factory=list)
     leafs: List = field(init=False)
 
 
     def __post_init__(self):
 
-        self._filter_unique_origin_by_full_alias()  # Filter unique values
+        self._filter_unique_origin_by_full_alias()  # Filter unique values TODO: reframe
 
         self.leafs = [
             {
-                'name': x.full_alias,
+                'name': x.full_name,
                 'adapter': 'bw',
                 'config': (
                     {'code': x.code, 'database': x.database}
@@ -172,7 +173,7 @@ class Last_Branch:
         """Filters out duplicate full_alias entries from self.origin and logs duplicates."""
         alias_map = defaultdict(list)
         for activity in self.origin:
-            alias_map[activity.full_alias].append(activity)
+            alias_map[activity.full_name].append(activity)
 
         unique = []
         duplicates_reported = False
