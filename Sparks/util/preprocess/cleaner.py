@@ -204,24 +204,26 @@ class Cleaner:
 
     def _preprocess_basefile(self):
 
+        self._validate_basefile()
+
         self.basefile = pd.read_excel(self.mother_file, sheet_name='Processors').dropna(
             subset=['Ecoinvent_key_code'])
 
-        self._validate_basefile()
         self._verify_national()
 
         self.basefile['alias_carrier'] = (self.basefile['Processor']
                                           + '_' + self.basefile['@SimulationCarrier'])
 
+        # tech_carrier_{file_name}
         self.basefile['alias_filename_base'] = (self.basefile['alias_carrier']
                                                 + '__' +
                                                 self.basefile['File_source'].astype(str).str.split('.').str[0])
 
         self.basefile['alias_filename_loc'] = self.basefile['alias_filename_base'] + '___' + self.basefile[
-            'Region'].astype(str)
+            'Region'].astype(str)  # alias_filename_base + COUNTRY (no subregions)
 
         self.basefile['full_alias'] = self.basefile['alias_filename_loc'] + '-' + self.basefile['geo_loc'].astype(
-            str)
+            str) # alias-filename-country+geoloc
 
 
     def _preprocess_calliope(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -231,17 +233,17 @@ class Cleaner:
         """
         df_names = df.copy()
         # Filter Processors from calliope data
-        df_names['alias_carrier'] = df_names['techs'] + '_' + df_names['carriers']
-        df_names['alias_filename_base'] = df_names['alias_carrier'] + '__' + df_names['filename']
+        df_names['alias_carrier'] = df_names['techs'] + '_' + df_names['carriers'] # tech + carrier
+        df_names['alias_filename_base'] = df_names['alias_carrier'] + '__' + df_names['filename'] # tech_carrier + file
 
         # create the country column
-        df_names = self._manage_regions(df_names)
+        df_names = self._manage_regions(df_names) # split countries (e.g [ESP]) from locs (ESP_1)
         df_names['alias_filename_loc'] = df_names['alias_filename_base'] + '___' + df_names['countries']
 
         if self.national:
-            df_names['full_name'] = df_names['alias_filename_base']
-        else:  # subnational
             df_names['full_name'] = df_names['alias_filename_loc']
+        else:  # subnational
+            df_names['full_name'] = df_names['alias_filename_base'] + '___' + df_names['locs']
 
         return df_names
 
@@ -263,22 +265,25 @@ class Cleaner:
             self._edited = True
 
         basefile = self.basefile.loc[self.basefile['File_source'] == filter] # FILTERS BY FILE SOURCE FIRST.
-        excluded_techs = set(df_names['alias_carrier']) - set(basefile['alias_carrier'])
+        calliope = df_names[df_names['filename'] == str(filter).split('.')[0]]
 
-        self.techs_region_not_included = excluded_techs
-        df_names = df_names[~df_names['alias_carrier'].isin(excluded_techs)]  # exclude the technologies
+        excluded_techs = set(calliope['alias_carrier']) - set(basefile['alias_carrier'])
+
+        self.techs_region_not_included.extend(excluded_techs)
+        calliope = calliope[~calliope['alias_carrier'].isin(excluded_techs)]  # exclude the technologies
 
         logger.debug(f"Filtering technologies for {filter}")
         logger.debug(f"Excluded techs: {excluded_techs}")
-        logger.debug(f"Data shape after filtering: {df_names.shape}")
+        logger.debug(f"Data shape before filtering: {df_names.shape}")
+        logger.debug(f"Data shape after filtering: {calliope.shape}")
 
-        return df_names
+        return calliope
 
 
 
     def _group_data(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Group the input data based on technologies defined in the basefile
+        Group the energy data based on technologies defined in the basefile
         If national= True, it aggregates by country
         """
         logger.info(f"Grouping Energy System data according to the Basefile...")
@@ -300,7 +305,7 @@ class Cleaner:
                 df = self._manage_regions(df)
                 df['alias_filename_loc'] = df['alias_filename_base'] + '___' + df['countries']
 
-            if self.national:
+            if self.national: # TODO: seems redundant, as it could be done with country
                 # clean locs -> country part
                 df['locs'] = df['locs'].astype(str).str.split('_').str[0].str.split('-').str[0]
                 grouped_df = df.groupby(['alias_filename_base', 'locs'], as_index=False).agg({
@@ -367,7 +372,6 @@ class Cleaner:
                 all_data = pd.concat([all_data, filtered_data], ignore_index=True)
 
             except ValueError as e:
-                # Propagate validation errors (e.g., from verify_csv) as real errors
                 raise
 
             except Exception as e:
@@ -389,7 +393,7 @@ class Cleaner:
             logger.warning(message)
 
         self.final_df = self._group_data(all_data)  # calliope data
-        self.final_df = self._manage_regions(self.final_df)
+        #self.final_df = self._manage_regions(self.final_df) # seems redundant
 
         logger.info("Data preprocessing finished")
         return self.final_df
@@ -409,13 +413,15 @@ class Cleaner:
             try:
                 kwargs = {
                     'name': row['Processor'],
+                    'alias_carrier': row['alias_carrier'],
                     'carrier': row['@SimulationCarrier'],
                     'parent': row['ParentProcessor'],
                     'region': row['Region'],
                     'code': row['Ecoinvent_key_code'],
                     'factor': row['@SimulationToEcoinventFactor'],
                     'full_alias': row['full_alias'],
-                    'alias_filename_loc': row['alias_filename_loc'],
+                    'alias_filename_loc': row['alias_filename_loc'], # without subregion!,
+                    'geo_loc': row['geo_loc'],
                     'national': self.national
                 }
 
@@ -438,7 +444,7 @@ class Cleaner:
         logger.info("Adapting units...")
 
         self.base_activities = self._extract_data()
-        logger.debug(f"Converting {len(self.base_activities)} activities into a DF")
+        logger.debug(f"Converting {len(self.base_activities)} activities into a DataFrame")
 
         rows = []
         for activity in self.base_activities:
@@ -446,7 +452,7 @@ class Cleaner:
             d["full_name"] = activity.full_name
             rows.append(d)
 
-        df = pd.DataFrame(rows)
+        df = pd.DataFrame(rows)  # basefile
         logger.debug(f"Base activities DataFrame shape: {df.shape}")
 
         if df.empty:
@@ -458,7 +464,7 @@ class Cleaner:
 
         merged = pd.merge(self.final_df,
                           df,
-                          on='full_name',
+                          on='alias_filename_loc',
                           how='right',
                           indicator=True,
                           suffixes=('_energy', '_act'))
@@ -493,8 +499,9 @@ class Cleaner:
         logger.debug("Computed new_vals for %d rows", len(merged))
 
         if not self.national:
-            merged = self._fix_fullname(merged)  # extend full_name with subregion if subnational
-            logger.debug("Extended full_name with subregion for subnational data")
+            #merged = self._fix_fullname(merged)  # extend full_name with subregion if subnational
+            #logger.debug("Extended full_name with subregion for subnational data")
+            pass # TODO: remove from clean versions
         return self._final_dataframe(merged)
 
     @staticmethod
@@ -511,6 +518,8 @@ class Cleaner:
         """
         Check if the full_name column is unique. If not, raise a warning
         """
+
+
         duplicates = df.loc[df['full_name'].duplicated(keep=False), 'full_name']
         if not duplicates.empty:
             unique_dupes = sorted(set(duplicates.tolist()))
@@ -545,6 +554,7 @@ class Cleaner:
             df[column] = df[column].astype("Int64")  # Nullable integer type for missing values
         return df
 
+
     def _final_dataframe(self, df):
         """
             Prepare and validate the final cleaned DataFrame.
@@ -554,7 +564,11 @@ class Cleaner:
             'spores',
             'locs',
             'techs',
-            'full_name',
+            'full_name_energy',
+            'code',
+            "full_alias",
+            "parent",
+            "geo_loc",
             'carriers',
             'new_vals',
             'new_units'
@@ -562,6 +576,9 @@ class Cleaner:
 
         # Drop rows that are entirely empty, but avoid blanket dropna that removes useful rows
         df = df.dropna(axis=0, how='all')
+
+        # hardfix #21 --> use the merged data to combine full_energy_name and full_alias
+
 
         # Verify required columns exist
         missing_cols = [c for c in cols if c not in df.columns]
@@ -574,10 +591,11 @@ class Cleaner:
         # rename internal column names to final consumer names
         df = df.rename(columns={'new_vals': 'energy_value', 'new_units': 'unit', 'spores': 'scenarios'})
 
-        # build aliases column
+        # build aliases column WHY??? #TODO: REMOVE
         df['aliases'] = df['techs'].astype(str) + '__' + df['carriers'].astype(str) + '___' + df['locs'].astype(str)
 
-        self._techs_sublocations = df['full_name'].unique().tolist()
+        df["full_name"] = df["full_name_energy"] + '-' + df['geo_loc']
+        self._techs_sublocations = df['full_name'].unique().tolist() # TODO: REMOVE
         self._check_unique_full_names(df)
 
         logger.info("Final preprocess DataFrame ready with shape %s", df.shape)

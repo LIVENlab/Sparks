@@ -55,6 +55,7 @@ class SoftLinkCalEnb():
 
 
     def _get_scenarios(self):
+
         cal_dat = self.calliope
         cal_dat['scenarios'] = cal_dat['scenarios'].astype(str)
 
@@ -76,11 +77,11 @@ class SoftLinkCalEnb():
             logger.debug(f"[Scenarios] Processing scenario: {scenario} with {len(group)} activities")
             activities = [
                 Activity_scenario(
-                    alias=row['full_name'],
+                    alias=row['full_name_energy'],
                     amount=row['energy_value'],
                     unit=row['unit']
                 )
-                for _, row in group.iterrows()
+                for _, row in group.iterrows() # the issue might come from the data
             ]
             if not activities:
                 logger.warning(f"[Scenarios] Scenario '{scenario}' has no activities!")
@@ -124,7 +125,7 @@ class SoftLinkCalEnb():
         logger.info("Starting ENBIOS generation")
 
         hierarchy = Hierarchy(base_path=self.motherfile, motherdata=self.mother_data,
-                              sublocations=self.sublocations).generate_hierarchy()
+                              sublocations=self.sublocations, data=self.calliope).generate_hierarchy()
         logger.info("Hierarchy generated (top-level name: %s)",
                     hierarchy.get("name") if isinstance(hierarchy, dict) else "N/A")
 
@@ -162,19 +163,24 @@ class SoftLinkCalEnb():
 
 
 class Hierarchy:
-    def __init__(self, base_path: str, motherdata, sublocations:list):
+    def __init__(self,
+                 base_path: str,
+                 motherdata,
+                 sublocations:list,
+                 data: pd.DataFrame):
+
         self.parents = pd.read_excel(base_path,
                                      sheet_name='Dendrogram_top',
                                      keep_default_na=False,
                                      na_values=[])
         self._validate_hierarchy_input()
-
+        self.hierarchy_data = self._extract_data(data)
 
         self.motherdata=motherdata
         self.subloc = sublocations
         logger.debug("Hierarchy class initiated")
 
-        self.motherdata = self.manage_subregions()
+        self.motherdata = self.hierarchy_data
         self.data=self._transform_motherdata()
 
 
@@ -217,35 +223,52 @@ class Hierarchy:
             return copies
 
 
-    def manage_subregions(self):
-        logger.debug("Managing subregions in hierarchy")
-        seen = set()
-        final_list = []
-        for act in self.motherdata:
-            new_names = [x for x in self.subloc if act.full_alias in str(x)]
-            if new_names:
-                copies = self._create_copies(act, new_names)
-                for copy in copies:
-                    if copy.alias_carrier_region not in seen:
-                        final_list.append(copy)
-                        seen.add(copy.alias_carrier_region)
-            else:
-                final_list.append(act)
 
-        return final_list
 
+
+    def _extract_data(self,df) -> List['HierarchyActivity']:
+        """
+        extract activities from the basefile and create a list HierarchyActivity instances
+        """
+        logger.info("Extracting LCA activities...")
+
+        def _create_activity(row):
+            # move the activities from the basefile into a DataBase dataclass
+            try:
+                kwargs = {
+                    'name': row['techs'],
+                    "full_name": row['full_name_energy'],
+                    "parent": row['parent'],
+                    "code": row['code']
+                }
+                return HierarchyActivity(**kwargs)
+
+            except KeyError as e:
+                logger.warning(f"Warning during data extraction {e}")
+                return None
+
+        logger.info("Extracting final hiearchy information")
+        logger.debug("Columns present: %s", df.columns.tolist())
+        logger.debug("dtypes:\n%s", df.dtypes.to_dict())
+        logger.debug("Sample head:\n%s", df.head(3).to_dict(orient='records'))
+
+        base_activities = df.progress_apply(_create_activity, axis=1).dropna().tolist()
+
+        return base_activities
 
     def _transform_motherdata(self):
         """ Transform mother data into a config dictionary
         This should be equal to the last level of the hierarchy"""
 
-        unique_dict = {}
-        for x in self.motherdata:
-            if x.alias_carrier_region not in unique_dict:
-                unique_dict[x.alias_carrier_region] = {'name': x.alias_carrier_region, 'adapter': 'bw',
-                                                       'config': {'code': x.code}}
-        unique_items = list(unique_dict.values())
-        return unique_items
+        unique_dict_2 ={}
+        for x in self.hierarchy_data:
+            if x.full_name not in unique_dict_2:
+                unique_dict_2[x.full_name] = {'name': x.full_name, 'adapter': 'bw',
+                                              'config': {'code': x.code}}
+
+        unique_items2 = list(unique_dict_2.values())
+
+        return unique_items2
 
 
     def generate_hierarchy(self):
