@@ -26,7 +26,9 @@ class BaseFileActivity:
     parent: str
     code:str
     alias_filename_loc: str
+    alias_carrier: str
     full_alias:str
+    geo_loc: str # Infrastrucutre vs operation, local vs external node etc
     factor: Union[int, float]
     database: Optional[str] = None
     unit: Optional[str] = None
@@ -40,10 +42,10 @@ class BaseFileActivity:
         if not init_post:
             return
 
-        self.alias_carrier = f"{self.name}_{self.carrier}"
-
+        #self.alias_carrier = f"{self.name}_{self.carrier}"
         self.alias_carrier_region=f"{self.name}__{self.carrier}___{self.region}"
         #self.alias_carrier_parent_loc =f"{self.alias_carrier}_{self.alias_carrier_parent_loc}"
+
         self.activity = self._load_activity(key=self.code)
 
         try:
@@ -84,16 +86,23 @@ class BaseFileActivity:
     @property
     def full_name(self) ->str:
         """ join key for an activity, depends on national flag.
-
                 - If national == True -> return base alias (no region suffix).
                 - If national == False -> return alias including region (sublocation).
             """
         if not isinstance(self.alias_filename_loc, str):
-            return str(self.alias_filename_loc)  # defensive
+            return str(self.alias_filename_loc)
         if self.national:
             return self.alias_filename_loc.split("___")[0]
         return self.alias_filename_loc
 
+@dataclass
+class HierarchyActivity: #TODO: add database
+    """ Base class for motherfile data"""
+    name: str
+    full_name: str
+    parent: str
+    code:str
+    database: Optional[str] = None
 
 
 @dataclass
@@ -127,17 +136,17 @@ class Last_Branch:
     level: str
     parent: str
     adapter='bw'
-    origin: List['BaseFileActivity'] = field(default_factory=list)
+    origin: List['HierarchyActivity'] = field(default_factory=list)
     leafs: List = field(init=False)
 
 
     def __post_init__(self):
 
-        self._filter_unique_origin_by_full_alias()  # Filter unique values
+        self._filter_unique_origin_by_full_alias()  # Filter unique values TODO: reframe
 
         self.leafs = [
             {
-                'name': x.full_alias,
+                'name': x.full_name,
                 'adapter': 'bw',
                 'config': (
                     {'code': x.code, 'database': x.database}
@@ -164,7 +173,7 @@ class Last_Branch:
         """Filters out duplicate full_alias entries from self.origin and logs duplicates."""
         alias_map = defaultdict(list)
         for activity in self.origin:
-            alias_map[activity.full_alias].append(activity)
+            alias_map[activity.full_name].append(activity)
 
         unique = []
         duplicates_reported = False
